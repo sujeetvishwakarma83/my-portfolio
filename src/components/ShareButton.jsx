@@ -4,7 +4,7 @@ function ShareButton({ darkMode }) {
   var [open, setOpen] = useState(false);
   var [copied, setCopied] = useState(false);
 
-  // Apna portfolio URL yahan likho — deploy hone ke baad update karna
+  // Enter your portfolio URL here — update it after deployment.
   var portfolioUrl = window.location.href;
   var portfolioTitle = 'Sujeet Vishwakarma — Full Stack Developer Portfolio';
   var portfolioDesc = 'Check out my portfolio! MCA student, Full Stack Developer. Available for freelance & internship.';
@@ -85,7 +85,7 @@ function ShareButton({ darkMode }) {
         setTimeout(function() { setCopied(false); }, 2000);
       });
       if (item.action === 'instagram') {
-        alert('Link copy ho gaya! Ab Instagram pe paste karo.');
+        alert('Instagram direct sharing is not supported — Share using the copy link option.');
       }
     } else if (item.url) {
       window.open(item.url, '_blank', 'width=600,height=400');
