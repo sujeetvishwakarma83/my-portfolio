@@ -85,7 +85,7 @@ function ShareButton({ darkMode }) {
         setTimeout(function() { setCopied(false); }, 2000);
       });
       if (item.action === 'instagram') {
-        alert('Instagram direct sharing is not supported — Share using the copy link option.');
+        alert('Instagram direct sharing is not Supported — Share using the copy link option.');
       }
     } else if (item.url) {
       window.open(item.url, '_blank', 'width=600,height=400');
