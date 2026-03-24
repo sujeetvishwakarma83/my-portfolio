@@ -103,12 +103,26 @@ function Contact({ darkMode }) {
     });
   };
 
-  var handleSubmit = function(e) {
-    e.preventDefault();
+  var handleSubmit = async function(e) {
+  e.preventDefault();
+
+  try {
+    await fetch("https://script.google.com/macros/s/AKfycbwg_rnIeQpyDmUjieNEnOqvz7UYBvN5hOxTWSPVwsdm_HpML5CO6swtQi-JkiXVHS7BKQ/exec", {
+      method: "POST",
+      body: JSON.stringify(formData),
+    });
+
     setSubmitted(true);
+
     setTimeout(function() { setSubmitted(false); }, 3000);
+
     setFormData({ name: '', email: '', message: '' });
-  };
+
+  } catch (error) {
+    console.error(error);
+    alert("Error sending message ❌");
+  }
+};
 
   var sectionBg = darkMode ? '#0a0a0f' : '#f0faf5';
   var titleColor = darkMode ? '#e8e8f0' : '#1a3a2e';
