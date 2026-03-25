@@ -224,7 +224,7 @@ function Skills({ darkMode }) {
           fontFamily: 'Space Mono, monospace',
           fontSize: '0.7rem',
           letterSpacing: '0.2em',
-          color: '#00f5a0',
+          color: '#00f59ff8',
           textTransform: 'uppercase',
           marginBottom: '0.5rem',
         }}>
