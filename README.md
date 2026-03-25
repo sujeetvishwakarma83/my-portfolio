@@ -146,7 +146,7 @@ npm start
 
 ## ⭐ Show Your Support
 
-If you like this project, give it a ⭐ on GitHub and share it!
+If You like this project, give it a ⭐ on GitHub and share it!
 
 ---
 
