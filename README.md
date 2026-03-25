@@ -152,5 +152,5 @@ If You like this project, give it a ⭐ on GitHub and share it!
 
 ## 💬 Final Note
 
-This portfolio represents my journey as a developer —
+This Portfolio represents my journey as a developer —
 and I am continuously learning, building, and improving 🚀
