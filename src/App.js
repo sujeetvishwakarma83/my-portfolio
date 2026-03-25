@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
 import Skills from './components/Skills';
+import Education from './components/Education'; // ✅ added
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -15,46 +16,48 @@ function App() {
   var [showTop, setShowTop] = useState(false);
   var [hovered, setHovered] = useState(false);
 
-  useEffect(function() {
-    var handleScroll = function() {
+  useEffect(function () {
+    var handleScroll = function () {
       setShowTop(window.scrollY > 400);
     };
     window.addEventListener('scroll', handleScroll);
-    return function() { window.removeEventListener('scroll', handleScroll); };
+    return function () {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
-  var scrollToTop = function() {
+  var scrollToTop = function () {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <div className="App" style={{
-      background: darkMode ? '#0a0a0f' : '#f5f5f0',
-      color: darkMode ? '#e8e8f0' : '#1a1a2e',
-      minHeight: '100vh',
-      transition: 'background 0.3s, color 0.3s'
-    }}>
-
-      {/* Custom cursor with bubbles */}
+    <div
+      className="App"
+      style={{
+        background: darkMode ? '#0a0a0f' : '#f5f5f0',
+        color: darkMode ? '#e8e8f0' : '#1a1a2e',
+        minHeight: '100vh',
+        transition: 'background 0.3s, color 0.3s',
+      }}
+    >
       <CustomCursor />
-
-      {/* Share button — right side middle */}
       <ShareButton darkMode={darkMode} />
 
-      {/* All sections */}
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
       <Hero darkMode={darkMode} />
       <About darkMode={darkMode} />
       <Skills darkMode={darkMode} />
+      {/* ✅ Education Added */}
+      <Education darkMode={darkMode} />
       <Projects darkMode={darkMode} />
       <Contact darkMode={darkMode} />
       <Footer darkMode={darkMode} />
 
-      {/* Scroll to Top Button */}
+      {/* Scroll To Top */}
       <button
         onClick={scrollToTop}
-        onMouseEnter={function() { setHovered(true); }}
-        onMouseLeave={function() { setHovered(false); }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
         style={{
           position: 'fixed',
           bottom: '2rem',
@@ -71,14 +74,17 @@ function App() {
           cursor: 'pointer',
           zIndex: 999,
           opacity: showTop ? 1 : 0,
-          transform: showTop ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.8)',
+          transform: showTop
+            ? 'translateY(0) scale(1)'
+            : 'translateY(20px) scale(0.8)',
           transition: 'all 0.3s ease',
           boxShadow: hovered ? '0 0 20px rgba(0,245,160,0.4)' : 'none',
           pointerEvents: showTop ? 'auto' : 'none',
         }}
       >
         <svg
-          width="20" height="20"
+          width="20"
+          height="20"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -89,7 +95,6 @@ function App() {
           <polyline points="18 15 12 9 6 15" />
         </svg>
       </button>
-
     </div>
   );
 }

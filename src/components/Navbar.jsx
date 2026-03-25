@@ -27,7 +27,7 @@ function Navbar({ darkMode, setDarkMode }) {
   var lastScrollY = useRef(0);
   var ulRef = useRef(null);
 
-  var links = ['about', 'skills', 'projects', 'contact'];
+  var links = ['about', 'skills', 'education', 'projects', 'contact'];
 
   useEffect(function() {
     var handleScroll = function() {
@@ -44,7 +44,7 @@ function Navbar({ darkMode, setDarkMode }) {
       setScrolled(currentY > 50);
 
       // Active section detect karo
-      var sections = ['about', 'skills', 'projects', 'contact'];
+      var sections = ['about', 'skills', 'education', 'projects', 'contact'];
       var current = '';
       sections.forEach(function(id) {
         var el = document.getElementById(id);

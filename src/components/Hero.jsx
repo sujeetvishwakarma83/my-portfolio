@@ -36,7 +36,7 @@ function useTyping(texts, speed, pause) {
       }
     }, deleting ? speed / 2 : speed);
     return function() { clearTimeout(timeout); };
-  }, [charIndex, deleting, textIndex, isPaused]);
+  }, [charIndex, deleting, textIndex, isPaused, texts, speed, pause]);
 
   return display;
 }
@@ -53,10 +53,10 @@ function Hero({ darkMode }) {
   }, []);
 
   useEffect(function() {
-    var handleResize = function() { setIsMobile(window.innerWidth <= 768); };
-    window.addEventListener('resize', handleResize);
-    return function() { window.removeEventListener('resize', handleResize); };
-  }, []);
+  var handleResize = function() { setIsMobile(window.innerWidth <= 768); };
+  window.addEventListener('resize', handleResize);
+  return function() { window.removeEventListener('resize', handleResize); };
+}, []);
 
   useEffect(function() {
     if (darkMode) {
