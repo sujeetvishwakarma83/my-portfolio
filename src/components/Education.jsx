@@ -60,7 +60,7 @@ const Education = ({ darkMode }) => {
             marginBottom: "0.5rem",
           }}
         >
-          02 — Education
+          03 — Education
         </div>
 
         {/* Title */}

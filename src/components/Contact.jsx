@@ -205,7 +205,7 @@ function Contact({ darkMode }) {
           textTransform: 'uppercase',
           marginBottom: '0.5rem',
         }}>
-          04 — Contact
+          05 — Contact
         </div>
 
         {/* Title */}

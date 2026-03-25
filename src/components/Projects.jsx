@@ -297,7 +297,7 @@ function Projects({ darkMode }) {
           textTransform: 'uppercase',
           marginBottom: '0.5rem',
         }}>
-          03 — Projects
+          04 — Projects
         </div>
 
         {/* Title */}
