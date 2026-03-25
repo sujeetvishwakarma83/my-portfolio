@@ -389,7 +389,7 @@ function Hero({ darkMode }) {
             Hire Me
           </a>
 
-          {/* Resume download */}
+          {/* Resume downloaD*/}
           <a
             href={resumeFile}
             download="Sujeet_Vishwakarma_Resume.pdf"
