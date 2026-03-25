@@ -28,9 +28,6 @@ const Education = ({ darkMode }) => {
         overflow: "hidden",
       }}
     >
-
-      {/* 🔥 HERO STYLE BACKGROUND */}
-
       {/* Grid */}
       {darkMode && (
         <div
@@ -77,9 +74,7 @@ const Education = ({ darkMode }) => {
         />
       )}
 
-      {/* CONTENT */}
       <div style={{ position: "relative", zIndex: 1 }}>
-
         {/* Heading */}
         <h2
           style={{
@@ -128,8 +123,14 @@ const Education = ({ darkMode }) => {
                   position: "relative",
                 }}
               >
-                {/* Card */}
-                <div
+                {/* 🔥 HOVER CARD */}
+                <motion.div
+                  whileHover={{
+                    scale: 1.05,
+                    rotate: 1,
+                    boxShadow: "0 0 30px rgba(0,245,160,0.4)",
+                  }}
+                  transition={{ type: "spring", stiffness: 200 }}
                   style={{
                     width: "100%",
                     maxWidth: "420px",
@@ -137,7 +138,7 @@ const Education = ({ darkMode }) => {
                     padding: "20px",
                     borderRadius: "12px",
                     boxShadow: "0 0 20px rgba(0,245,160,0.1)",
-                    transition: "0.3s",
+                    cursor: "pointer",
                   }}
                 >
                   <h3 style={{ color: "#00f5a0", marginBottom: "5px" }}>
@@ -155,7 +156,7 @@ const Education = ({ darkMode }) => {
                   <p style={{ fontSize: "0.9rem", opacity: 0.6 }}>
                     {item.extra}
                   </p>
-                </div>
+                </motion.div>
 
                 {/* Dot */}
                 <div
