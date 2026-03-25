@@ -17,18 +17,20 @@ const Education = ({ darkMode }) => {
     },
   ];
 
+  const isMobile = window.innerWidth <= 768;
+
   return (
     <section
       id="education"
       style={{
-        padding: "80px 20px",
+        padding: isMobile ? "4rem 1.5rem" : "6rem 4rem", // ✅ SAME AS ABOUT
         background: darkMode ? "transparent" : "#f0faf5",
         color: darkMode ? "#e8e8f0" : "#1a1a2e",
         position: "relative",
         overflow: "hidden",
       }}
     >
-      {/* Grid */}
+      {/* BACKGROUND GRID */}
       {darkMode && (
         <div
           style={{
@@ -42,56 +44,54 @@ const Education = ({ darkMode }) => {
         />
       )}
 
-      {/* Purple Glow */}
-      {darkMode && (
-        <div
-          style={{
-            position: "absolute",
-            top: "10%",
-            right: "-10%",
-            width: "400px",
-            height: "400px",
-            background:
-              "radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)",
-            pointerEvents: "none",
-          }}
-        />
-      )}
-
-      {/* Green Glow */}
-      {darkMode && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: "-10%",
-            left: "-5%",
-            width: "300px",
-            height: "300px",
-            background:
-              "radial-gradient(circle, rgba(0,245,160,0.08) 0%, transparent 70%)",
-            pointerEvents: "none",
-          }}
-        />
-      )}
-
+      {/* CONTENT */}
       <div style={{ position: "relative", zIndex: 1 }}>
-        {/* Heading */}
-        <h2
+
+        {/* 🔥 SAME AS ABOUT HEADING */}
+
+        {/* Label */}
+        <div
           style={{
-            textAlign: "center",
-            fontSize: "clamp(1.8rem, 5vw, 2.5rem)",
-            marginBottom: "60px",
-            fontWeight: "bold",
+            fontFamily: "Space Mono, monospace",
+            fontSize: "0.7rem",
+            letterSpacing: "0.2em",
+            color: "#00f5a0",
+            textTransform: "uppercase",
+            marginBottom: "0.5rem",
           }}
         >
-          🎓 Education
+          02 — Education
+        </div>
+
+        {/* Title */}
+        <h2
+          style={{
+            fontSize: "clamp(2rem, 4vw, 3rem)",
+            fontWeight: 800,
+            letterSpacing: "-0.03em",
+            marginBottom: "1rem",
+            color: darkMode ? "#e8e8f0" : "#1a3a2e",
+          }}
+        >
+          My Academic Journey
         </h2>
 
+        {/* Divider */}
+        <div
+          style={{
+            width: "48px",
+            height: "2px",
+            background: "#00f5a0",
+            marginBottom: "2.5rem",
+          }}
+        />
+
+        {/* TIMELINE CONTAINER (FIXED ALIGNMENT) */}
         <div
           style={{
             position: "relative",
-            maxWidth: "1000px",
-            margin: "0 auto",
+            maxWidth: "1100px", // ✅ SAME AS ABOUT
+            margin: "0", // ❌ NO center align
           }}
         >
           {/* Center Line */}
@@ -123,7 +123,7 @@ const Education = ({ darkMode }) => {
                   position: "relative",
                 }}
               >
-                {/* 🔥 HOVER CARD */}
+                {/* CARD */}
                 <motion.div
                   whileHover={{
                     scale: 1.05,
@@ -158,7 +158,7 @@ const Education = ({ darkMode }) => {
                   </p>
                 </motion.div>
 
-                {/* Dot */}
+                {/* DOT */}
                 <div
                   style={{
                     position: "absolute",
