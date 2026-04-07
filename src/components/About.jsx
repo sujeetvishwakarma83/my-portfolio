@@ -97,7 +97,8 @@ function About({ darkMode }) {
     { num: '\u221e', label: 'Curiosity' },
   ];
 
-  var badges = ['HTML', 'CSS', 'JavaScript', 'PHP', 'MySQL', 'React', 'Git'];
+  // NAYA: Badges ko MERN stack ke hisab se update kiya gaya hai
+  var badges = ['MongoDB', 'Express.js', 'React.js', 'Node.js', 'JavaScript', 'MySQL', 'Git'];
 
   var sectionBg = darkMode ? '#111118' : '#f0faf5';
   var titleColor = darkMode ? '#e8e8f0' : '#1a3a2e';
@@ -312,27 +313,23 @@ function About({ darkMode }) {
               <span style={{ color: highlightColor, fontWeight: 600 }}>
                 Sujeet Vishwakarma
               </span>{' '}
-              — a passionate MCA student from India. I have a deep interest
-              in web development and I am always ready to learn new things.
+              — a passionate software developer and MCA student from Jaunpur, Uttar Pradesh. I have a deep interest
+              in full-stack web development and I am always driven to learn new technologies and build innovative solutions.
             </p>
 
-            {/* Paragraph 2 — justified */}
+            {/* Paragraph 2 — justified (Updated for MERN) */}
             <p style={paraStyle}>
-              After completing my BCA, I am currently pursuing MCA. During
-              this journey, I have learned HTML, CSS, JavaScript, React.js,
-              PHP, and MySQL. Currently, I am exploring{' '}
-              <span style={{ color: '#00a870' }}>machine learning</span> and{' '}
-              <span style={{ color: '#00a870' }}>chatbot development</span>.
+              After completing my BCA, I transitioned into mastering modern web development. Currently, my primary focus is building robust and scalable web applications using the{' '}
+              <span style={{ color: '#00a870', fontWeight: 'bold' }}>MERN stack</span> (MongoDB, Express.js, React.js, and Node.js). While I have a strong foundation in PHP and MySQL, I truly enjoy crafting seamless user experiences with React and building powerful APIs with Node.js. I am also exploring concepts in AI and machine learning.
             </p>
 
             {/* Paragraph 3 — justified */}
             <p style={Object.assign({}, paraStyle, { marginBottom: '2rem' })}>
-              My goal is to build{' '}
+              My ultimate goal is to build{' '}
               <span style={{ color: highlightColor }}>
-                clean, fast, and beautiful
+                clean, fast, and secure
               </span>{' '}
-              websites that solve real-world problems. I am available for
-              freelancing and remote work.
+              applications that solve real-world problems. I am actively looking for opportunities to apply my skills and am available for freelancing and remote work.
             </p>
 
             {/* Tech badges */}

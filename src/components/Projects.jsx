@@ -4,8 +4,10 @@ var projectsData = [
   {
     num: '001',
     title: 'E-Commerce Website',
-    desc: 'Full-stack shopping website with product listing, cart, and payment integration using PHP and MySQL.',
-    tags: ['HTML', 'CSS', 'PHP', 'MySQL'],
+    // NAYA: Description ko MERN stack ke hisab se update kiya hai
+    desc: 'Full-stack shopping website with product listing, cart, and payment integration using MongoDB, Express, React, and Node.js.',
+    // NAYA: Tags ko bhi MERN stack me badal diya hai
+    tags: ['React', 'Node.js', 'Express', 'MongoDB'],
     link: 'https://my-shop-two-theta.vercel.app/',
     image: '/projects/ecommerce.png' 
   },
@@ -16,7 +18,6 @@ var projectsData = [
     tags: ['JavaScript', 'PHP', 'MySQL'],
     link: 'https://student-management.infinityfreeapp.com/index.php', 
     image: '/projects/sms.png',
-    // NAYA: Demo login details yahan add kiye hain
     demoId: 'admin',
     demoPass: 'admin123'
   },
@@ -116,7 +117,7 @@ function ProjectCard({ project, visible, index, darkMode }) {
             position: 'absolute',
             inset: 0,
             background: darkMode ? 'rgba(24, 24, 31, 0.7)' : 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(3px)', // Thoda blur effect peeche ki image par
+            backdropFilter: 'blur(3px)', 
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
