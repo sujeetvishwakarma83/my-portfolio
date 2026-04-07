@@ -6,21 +6,27 @@ var projectsData = [
     title: 'E-Commerce Website',
     desc: 'Full-stack shopping website with product listing, cart, and payment integration using PHP and MySQL.',
     tags: ['HTML', 'CSS', 'PHP', 'MySQL'],
-    link: '#'
+    link: 'https://my-shop-two-theta.vercel.app/',
+    image: '/projects/ecommerce.png' 
   },
   {
     num: '002',
     title: 'Student Management System',
     desc: 'CRUD application for managing student records with login authentication and responsive UI.',
     tags: ['JavaScript', 'PHP', 'MySQL'],
-    link: '#'
+    link: 'https://student-management.infinityfreeapp.com/index.php', 
+    image: '/projects/sms.png',
+    // NAYA: Demo login details yahan add kiye hain
+    demoId: 'admin',
+    demoPass: 'admin123'
   },
   {
     num: '003',
     title: 'Weather App',
     desc: 'Real-time weather application using OpenWeatherMap API with clean UI and city search.',
     tags: ['React', 'API', 'CSS'],
-    link: '#'
+    link: '#',
+    image: '' 
   },
 ];
 
@@ -50,24 +56,25 @@ function ProjectCard({ project, visible, index, darkMode }) {
         position: 'relative',
         overflow: 'hidden',
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(30px)',
+        transform: !visible ? 'translateY(30px)' : (hovered ? 'translateY(-8px)' : 'translateY(0)'),
         transitionProperty: 'border-color, opacity, transform, box-shadow',
-        transitionDuration: '0.2s, 0.6s, 0.6s, 0.2s',
-        transitionDelay: '0s, ' + delay1 + ', ' + delay1 + ', 0s',
+        transitionDuration: '0.3s, 0.6s, 0.4s, 0.3s', 
+        transitionDelay: '0s, ' + delay1 + ', 0s, 0s', 
         boxShadow: hovered
-          ? (darkMode ? 'none' : '0 8px 24px rgba(0,180,120,0.1)')
+          ? (darkMode ? '0 10px 30px rgba(0,0,0,0.5)' : '0 12px 30px rgba(0,180,120,0.15)')
           : 'none',
+        borderRadius: '12px', 
       }}
     >
       {/* Top gradient line on hover */}
       <div style={{
         position: 'absolute',
         top: 0, left: 0, right: 0,
-        height: '2px',
+        height: '3px',
         background: 'linear-gradient(90deg, #00f5a0, #7c3aed)',
         transform: hovered ? 'scaleX(1)' : 'scaleX(0)',
         transformOrigin: 'left',
-        transition: 'transform 0.3s ease',
+        transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
       }} />
 
       {/* Number */}
@@ -81,12 +88,90 @@ function ProjectCard({ project, visible, index, darkMode }) {
         {project.num}
       </div>
 
+      {/* Project Image/Screenshot with Interactive Overlay */}
+      {project.image && (
+        <div style={{
+          position: 'relative', 
+          marginBottom: '1.25rem',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          border: darkMode ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)',
+        }}>
+          <img 
+            src={project.image} 
+            alt={project.title} 
+            style={{
+              width: '100%',
+              height: '160px',
+              objectFit: 'cover',
+              objectPosition: 'top',
+              display: 'block',
+              transform: hovered ? 'scale(1.08)' : 'scale(1)',
+              transition: 'transform 0.5s ease-out',
+            }}
+          />
+          
+          {/* Interactive Hover Overlay */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: darkMode ? 'rgba(24, 24, 31, 0.7)' : 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(3px)', // Thoda blur effect peeche ki image par
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: hovered ? 1 : 0,
+            transition: 'opacity 0.3s ease',
+            pointerEvents: 'none', 
+          }}>
+            {/* Condition: Agar demo ID aur Pass hai toh details dikhao, warna sirf Preview */}
+            {project.demoId && project.demoPass ? (
+              <div style={{
+                background: darkMode ? '#111118' : '#ffffff',
+                border: darkMode ? '1px solid rgba(0, 245, 160, 0.3)' : '1px solid rgba(0, 180, 120, 0.3)',
+                padding: '10px 16px',
+                borderRadius: '8px',
+                fontFamily: 'Space Mono, monospace',
+                fontSize: '0.7rem',
+                color: darkMode ? '#e8e8f0' : '#1a3a2e',
+                transform: hovered ? 'translateY(0)' : 'translateY(15px)',
+                transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px'
+              }}>
+                <span style={{ color: '#00f5a0', fontWeight: 'bold', marginBottom: '2px', textAlign: 'center' }}>Demo Login</span>
+                <span><strong style={{ color: darkMode ? '#6b6b7a' : '#4a7a65'}}>ID:</strong> {project.demoId}</span>
+                <span><strong style={{ color: darkMode ? '#6b6b7a' : '#4a7a65'}}>Pass:</strong> {project.demoPass}</span>
+              </div>
+            ) : (
+              <span style={{
+                background: darkMode ? '#00f5a0' : '#ffffff',
+                color: darkMode ? '#111118' : '#00a870',
+                padding: '6px 14px',
+                borderRadius: '20px',
+                fontFamily: 'Space Mono, monospace',
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                transform: hovered ? 'translateY(0)' : 'translateY(15px)',
+                transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', 
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+              }}>
+                Preview
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Title */}
       <div style={{
-        fontSize: '1.05rem',
+        fontSize: '1.1rem',
         fontWeight: 700,
         marginBottom: '0.65rem',
         color: titleColor,
+        transition: 'color 0.2s',
       }}>
         {project.title}
       </div>
@@ -114,11 +199,13 @@ function ProjectCard({ project, visible, index, darkMode }) {
             <span key={tag} style={{
               fontFamily: 'Space Mono, monospace',
               fontSize: '0.62rem',
-              padding: '0.25rem 0.6rem',
-              background: tagBg,
+              padding: '0.3rem 0.6rem',
+              background: hovered ? (darkMode ? 'rgba(0,245,160,0.15)' : 'rgba(0,180,120,0.15)') : tagBg,
               color: tagColor,
               border: tagBorder,
               letterSpacing: '0.05em',
+              borderRadius: '4px',
+              transition: 'background 0.3s',
             }}>
               {tag}
             </span>
@@ -127,17 +214,24 @@ function ProjectCard({ project, visible, index, darkMode }) {
       </div>
 
       {/* Link */}
-      <a href={project.link} style={{
+      <a href={project.link} target="_blank" rel="noopener noreferrer" style={{
         fontFamily: 'Space Mono, monospace',
-        fontSize: '0.72rem',
+        fontSize: '0.75rem',
         color: '#00f5a0',
         display: 'inline-flex',
         alignItems: 'center',
         gap: hovered ? '0.8rem' : '0.4rem',
-        transition: 'gap 0.2s',
+        transition: 'gap 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         textDecoration: 'none',
+        fontWeight: 'bold',
       }}>
-        View Project →
+        View Project 
+        <span style={{ 
+          transform: hovered ? 'translateX(5px)' : 'translateX(0)', 
+          transition: 'transform 0.3s' 
+        }}>
+          →
+        </span>
       </a>
 
     </div>
@@ -324,7 +418,7 @@ function Projects({ darkMode }) {
           gridTemplateColumns: isMobile
             ? '1fr'
             : 'repeat(auto-fill, minmax(320px, 1fr))',
-          gap: '1.25rem',
+          gap: '2rem', 
           maxWidth: '1100px',
           width: '100%',
         }}>
