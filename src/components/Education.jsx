@@ -47,7 +47,7 @@ const Education = ({ darkMode }) => {
       {/* CONTENT */}
       <div style={{ position: "relative", zIndex: 1 }}>
 
-        {/* 🔥 SAME AS ABOUT HEADING */}
+        {/* 😘 SAME AS ABOUT HEADING */}
 
         {/* Label */}
         <div
