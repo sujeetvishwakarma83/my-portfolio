@@ -1,5 +1,46 @@
 import { useState, useEffect, useRef } from 'react';
-import profilePhoto from '../assets/profile.jpg';
+import profilePhoto from '../assets/profile.jpg'; // Apni photo ka path verify kar lein
+
+// AI Streaming Text Helper Component
+function AIStreamText({ content, visible, delayOffset }) {
+  let globalWordIndex = 0;
+  
+  return (
+    <>
+      {content.map((segment, segmentIndex) => {
+        // Text ko words mein todna
+        const words = segment.text.split(" ").filter(w => w !== "");
+        
+        return words.map((word, wordIndex) => {
+          // Har word ka delay calculate karna (0.02s per word = Fast AI typing)
+          const delay = delayOffset + (globalWordIndex * 0.02);
+          globalWordIndex++;
+          
+          return (
+            <span key={`${segmentIndex}-${wordIndex}`}>
+              <span 
+                style={{
+                  opacity: visible ? 1 : 0,
+                  filter: visible ? 'blur(0px)' : 'blur(4px)', // AI jaisa reveal effect
+                  transform: visible ? 'translateY(0)' : 'translateY(2px)',
+                  transition: `all 0.15s ease-out ${delay}s`,
+                  color: segment.color || 'inherit',
+                  fontWeight: segment.fontWeight || 'inherit',
+                  display: 'inline-block',
+                  willChange: 'opacity, filter'
+                }}
+              >
+                {word}
+              </span>
+              {/* Space zaroori hai taaki 'justify' alignment perfectly kaam kare */}
+              {" "}
+            </span>
+          );
+        });
+      })}
+    </>
+  );
+}
 
 function About({ darkMode }) {
   var [visible, setVisible] = useState(false);
@@ -15,17 +56,21 @@ function About({ darkMode }) {
     return function() { window.removeEventListener('resize', handleResize); };
   }, []);
 
+  // Scroll karne par animation trigger karne ke liye
   useEffect(function() {
     var observer = new IntersectionObserver(
       function(entries) {
-        if (entries[0].isIntersecting) setVisible(true);
+        if (entries[0].isIntersecting) {
+          setVisible(true);
+        }
       },
-      { threshold: 0.15 }
+      { threshold: 0.2 } 
     );
     if (ref.current) observer.observe(ref.current);
     return function() { observer.disconnect(); };
   }, []);
 
+  // Background Canvas for Light Mode
   useEffect(function() {
     if (darkMode) {
       if (animRef.current) cancelAnimationFrame(animRef.current);
@@ -43,15 +88,15 @@ function About({ darkMode }) {
     window.addEventListener('resize', resize);
 
     var particles = [];
-    for (var i = 0; i < 50; i++) {
+    for (var i = 0; i < 40; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        r: Math.random() * 3 + 1,
-        dx: (Math.random() - 0.5) * 0.5,
-        dy: (Math.random() - 0.5) * 0.5,
-        opacity: Math.random() * 0.5 + 0.1,
-        color: Math.random() > 0.5 ? '0,180,120' : '124,58,237',
+        r: Math.random() * 2 + 1,
+        dx: (Math.random() - 0.5) * 0.4,
+        dy: (Math.random() - 0.5) * 0.4,
+        opacity: Math.random() * 0.4 + 0.1,
+        color: Math.random() > 0.5 ? '0,245,160' : '124,58,237',
       });
     }
 
@@ -60,9 +105,9 @@ function About({ darkMode }) {
       for (var a = 0; a < particles.length; a++) {
         for (var b = a + 1; b < particles.length; b++) {
           var dist = Math.hypot(particles[a].x - particles[b].x, particles[a].y - particles[b].y);
-          if (dist < 120) {
+          if (dist < 100) {
             ctx.beginPath();
-            ctx.strokeStyle = 'rgba(0,180,120,' + (0.12 * (1 - dist / 120)) + ')';
+            ctx.strokeStyle = 'rgba(0,245,160,' + (0.1 * (1 - dist / 100)) + ')';
             ctx.lineWidth = 0.5;
             ctx.moveTo(particles[a].x, particles[a].y);
             ctx.lineTo(particles[b].x, particles[b].y);
@@ -92,127 +137,123 @@ function About({ darkMode }) {
   }, [darkMode]);
 
   var stats = [
-    { num: '5+', label: 'Projects' },
-    { num: '3+', label: 'Years Learning' },
-    { num: '\u221e', label: 'Curiosity' },
+    { num: '15+', label: 'Projects Completed' },
+    { num: '100%', label: 'Client Satisfaction' },
+    { num: '3+', label: 'Years Experience' },
   ];
 
-  // NAYA: Badges ko MERN stack ke hisab se update kiya gaya hai
-  var badges = ['MongoDB', 'Express.js', 'React.js', 'Node.js', 'JavaScript', 'MySQL', 'Git'];
+  var badges = ['React.js', 'Node.js', 'MongoDB', 'Express.js', 'PHP', 'MySQL', 'Tailwind'];
 
-  var sectionBg = darkMode ? '#111118' : '#f0faf5';
-  var titleColor = darkMode ? '#e8e8f0' : '#1a3a2e';
-  var textColor = darkMode ? '#6b6b7a' : '#4a7a65';
-  var highlightColor = darkMode ? '#e8e8f0' : '#1a3a2e';
-  var borderColor = darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,150,100,0.12)';
-  var badgeBg = darkMode ? 'rgba(0,245,160,0.06)' : 'rgba(0,180,120,0.08)';
-  var badgeBorder = darkMode ? '1px solid rgba(0,245,160,0.15)' : '1px solid rgba(0,180,120,0.25)';
-  var availableBg = darkMode ? '#0a0a0f' : '#ffffff';
-  var availableBorder = darkMode ? '1px solid rgba(0,245,160,0.3)' : '1px solid rgba(0,180,120,0.3)';
-  var imgBorder = imgHovered ? '#00f5a0' : (darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,150,100,0.2)');
+  // Theme Variables
+  var sectionBg = darkMode ? '#0A0A0A' : '#f8fafc';
+  var titleColor = darkMode ? '#ffffff' : '#0f172a';
+  var textColor = darkMode ? '#9ca3af' : '#475569';
+  var highlightColor = darkMode ? '#00F5A0' : '#00a86b';
+  var glassBg = darkMode ? 'rgba(20, 20, 20, 0.6)' : 'rgba(255, 255, 255, 0.7)';
+  var glassBorder = darkMode ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(0, 0, 0, 0.05)';
+  var badgeBg = darkMode ? 'rgba(0,245,160,0.1)' : 'rgba(0,245,160,0.15)';
+  var badgeBorder = darkMode ? '1px solid rgba(0,245,160,0.2)' : '1px solid rgba(0,245,160,0.3)';
 
-  // Common paragraph style with justify
+  // YAHAN CHANGE KIYA HAI: textAlign 'justify' add kiya gaya hai
   var paraStyle = {
-    fontFamily: 'Space Mono, monospace',
-    fontSize: isMobile ? '0.78rem' : '0.82rem',
+    fontFamily: '"Inter", "Segoe UI", sans-serif',
+    fontSize: isMobile ? '0.95rem' : '1.05rem',
     color: textColor,
     lineHeight: 1.8,
     marginBottom: '1.25rem',
-    textAlign: 'justify',
+    textAlign: 'justify', // <--- Text dono taraf se justify ho jayega
   };
 
   return (
     <section id="about" ref={ref} style={{
-      padding: isMobile ? '4rem 1.5rem' : '6rem 4rem',
+      padding: isMobile ? '5rem 1.5rem' : '8rem 4rem',
       background: sectionBg,
       overflow: 'hidden',
       position: 'relative',
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
     }}>
-
-      {/* Light mode canvas */}
-      {!darkMode && (
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: 'absolute', inset: 0,
-            width: '100%', height: '100%',
-            pointerEvents: 'none',
-          }}
-        />
-      )}
-
-      {/* Light mode blobs */}
-      {!darkMode && (
-        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-          <div style={{
-            position: 'absolute', top: '5%', right: '10%',
-            width: isMobile ? '180px' : '350px',
-            height: isMobile ? '180px' : '350px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(0,200,130,0.1) 0%, transparent 70%)',
-          }} />
-          <div style={{
-            position: 'absolute', bottom: '10%', left: '5%',
-            width: isMobile ? '150px' : '300px',
-            height: isMobile ? '150px' : '300px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 70%)',
-          }} />
-        </div>
-      )}
-
-      {/* Content */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
-
-        {/* Label */}
-        <div style={{
-          fontFamily: 'Space Mono, monospace',
-          fontSize: '0.7rem',
-          letterSpacing: '0.2em',
-          color: '#00f5a0',
-          textTransform: 'uppercase',
-          marginBottom: '0.5rem',
-        }}>
-          01 — About
-        </div>
-
-        {/* Title */}
-        <h2 style={{
-          fontSize: 'clamp(2rem, 4vw, 3rem)',
-          fontWeight: 800,
-          letterSpacing: '-0.03em',
-          marginBottom: '1rem',
-          color: titleColor,
-        }}>
-          Who I Am
-        </h2>
-
-        {/* Divider */}
-        <div style={{
-          width: '48px', height: '2px',
-          background: '#00f5a0',
-          marginBottom: '2.5rem',
+      
+      {/* Background Glowing Blobs */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{ 
+          position: 'absolute', top: '20%', left: '-10%', 
+          width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', 
+          background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%)', 
+          filter: 'blur(60px)' 
         }} />
+        <div style={{ 
+          position: 'absolute', bottom: '10%', right: '-5%', 
+          width: isMobile ? '200px' : '400px', height: isMobile ? '200px' : '400px', 
+          background: 'radial-gradient(circle, rgba(0,245,160,0.12) 0%, transparent 70%)', 
+          filter: 'blur(60px)' 
+        }} />
+      </div>
 
-        {/* Main Grid */}
+      {!darkMode && <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} />}
+
+      {/* Main Glassmorphism Container */}
+      <div style={{
+        position: 'relative',
+        zIndex: 10,
+        maxWidth: '1200px',
+        width: '100%',
+        background: glassBg,
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: glassBorder,
+        borderRadius: '24px',
+        padding: isMobile ? '2rem 1.5rem' : '4rem',
+        boxShadow: '0 20px 40px -20px rgba(0,0,0,0.2)',
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(40px)',
+        transition: 'opacity 0.8s ease, transform 0.8s ease'
+      }}>
+
+        {/* Section Header */}
+        <div style={{ marginBottom: '3rem', textAlign: isMobile ? 'center' : 'left' }}>
+          <div style={{
+            fontFamily: '"Space Mono", monospace',
+            fontSize: '0.8rem',
+            letterSpacing: '0.15em',
+            color: highlightColor,
+            textTransform: 'uppercase',
+            marginBottom: '0.5rem',
+            fontWeight: 600
+          }}>
+            01 // About Me
+          </div>
+          <h2 style={{
+            fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+            fontWeight: 800,
+            letterSpacing: '-0.03em',
+            color: titleColor,
+            margin: 0
+          }}>
+            Engineering Digital <span style={{ color: highlightColor }}>Success</span>.
+          </h2>
+        </div>
+
+        {/* Grid Layout */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1.4fr',
-          gap: isMobile ? '2.5rem' : '4rem',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1.5fr',
+          gap: isMobile ? '3rem' : '4rem',
           alignItems: 'center',
-          maxWidth: '1100px',
         }}>
 
-          {/* Photo */}
-          <div style={{
-            opacity: visible ? 1 : 0,
-            transform: visible ? 'translateX(0)' : 'translateX(-40px)',
-            transition: 'all 0.8s ease',
-            position: 'relative',
-            order: isMobile ? 1 : 0,
-            maxWidth: isMobile ? '280px' : '100%',
-            margin: isMobile ? '0 auto' : '0',
-          }}>
+          {/* Left: Interactive Photo */}
+          <div style={{ position: 'relative', margin: isMobile ? '0 auto' : '0', maxWidth: '350px', width: '100%' }}>
+            <div style={{
+              position: 'absolute', inset: '-5px',
+              background: 'linear-gradient(135deg, #00F5A0, #7C3AED)',
+              borderRadius: '20px',
+              filter: 'blur(15px)',
+              opacity: imgHovered ? 0.6 : 0.2,
+              transition: 'opacity 0.4s ease'
+            }} />
 
             <div
               onMouseEnter={function() { setImgHovered(true); }}
@@ -220,136 +261,117 @@ function About({ darkMode }) {
               style={{
                 position: 'relative',
                 width: '100%',
-                aspectRatio: '1',
+                aspectRatio: '4/5',
+                borderRadius: '16px',
                 overflow: 'hidden',
-                border: '1px solid ' + imgBorder,
-                transition: 'border-color 0.3s',
+                border: glassBorder,
+                zIndex: 2,
+                background: darkMode ? '#111' : '#fff'
               }}
             >
               <img
                 src={profilePhoto}
                 alt="Sujeet Vishwakarma"
                 style={{
-                  width: '100%',
-                  height: '100%',
+                  width: '100%', height: '100%',
                   objectFit: 'cover',
-                  objectPosition: 'top',
-                  display: 'block',
                   transform: imgHovered ? 'scale(1.05)' : 'scale(1)',
-                  transition: 'transform 0.5s ease',
-                  filter: imgHovered ? 'none' : 'grayscale(20%)',
+                  transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                  filter: imgHovered ? 'none' : (darkMode ? 'brightness(0.9) contrast(1.1)' : 'none'),
                 }}
               />
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'rgba(0,245,160,0.06)',
-                opacity: imgHovered ? 1 : 0,
-                transition: 'opacity 0.3s',
-              }} />
             </div>
-
-            {/* Corner bottom right */}
+            
+            {/* Status Badge */}
             <div style={{
               position: 'absolute',
-              bottom: '-12px', right: '-12px',
-              width: imgHovered ? '100px' : '80px',
-              height: imgHovered ? '100px' : '80px',
-              borderRight: '2px solid #00f5a0',
-              borderBottom: '2px solid #00f5a0',
-              transition: 'width 0.3s, height 0.3s',
-            }} />
-
-            {/* Corner top left */}
-            <div style={{
-              position: 'absolute',
-              top: '-12px', left: '-12px',
-              width: '50px', height: '50px',
-              borderLeft: '2px solid rgba(124,58,237,0.6)',
-              borderTop: '2px solid rgba(124,58,237,0.6)',
-            }} />
-
-            {/* Available badge */}
-            <div style={{
-              position: 'absolute',
-              bottom: '16px',
-              left: isMobile ? '8px' : '-16px',
-              background: availableBg,
-              border: availableBorder,
-              padding: '0.5rem 1rem',
+              bottom: '-15px', right: '-15px',
+              background: darkMode ? '#1A1A1A' : '#ffffff',
+              border: '1px solid ' + highlightColor,
+              padding: '0.75rem 1.25rem',
+              borderRadius: '50px',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
+              gap: '8px',
+              zIndex: 3,
+              boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2)'
             }}>
               <span style={{
-                width: '8px', height: '8px',
+                width: '10px', height: '10px',
                 borderRadius: '50%',
-                background: '#00f5a0',
+                background: highlightColor,
                 display: 'inline-block',
-                animation: 'blink 1.5s ease-in-out infinite',
+                boxShadow: '0 0 10px ' + highlightColor,
+                animation: 'pulse-ring 2s infinite',
               }} />
               <span style={{
-                fontFamily: 'Space Mono, monospace',
-                fontSize: '0.68rem',
-                color: '#00f5a0',
-                letterSpacing: '0.05em',
-              }}>
-                Available for Work
-              </span>
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                color: titleColor,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>Available</span>
             </div>
-
           </div>
 
-          {/* Text */}
-          <div style={{
-            opacity: visible ? 1 : 0,
-            transform: visible ? 'translateX(0)' : 'translateX(40px)',
-            transition: 'all 0.8s ease 0.2s',
-            order: isMobile ? 2 : 0,
-          }}>
-
-            {/* Paragraph 1 — justified */}
+          {/* Right: AI Streaming Text (Now Justified!) */}
+          <div>
             <p style={paraStyle}>
-              Hello! I'm{' '}
-              <span style={{ color: highlightColor, fontWeight: 600 }}>
-                Sujeet Vishwakarma
-              </span>{' '}
-              — a passionate software developer and MCA student from Jaunpur, Uttar Pradesh. I have a deep interest
-              in full-stack web development and I am always driven to learn new technologies and build innovative solutions.
+              <AIStreamText 
+                visible={visible} 
+                delayOffset={0.6} 
+                content={[
+                  { text: "Hello! I'm" },
+                  { text: " Sujeet Vishwakarma,", color: highlightColor, fontWeight: 700 },
+                  { text: " a Full Stack Developer based in Jaunpur, Uttar Pradesh. I bridge the gap between complex technical architecture and seamless user experiences." }
+                ]}
+              />
             </p>
-
-            {/* Paragraph 2 — justified (Updated for MERN) */}
+            
             <p style={paraStyle}>
-              After completing my BCA, I transitioned into mastering modern web development. Currently, my primary focus is building robust and scalable web applications using the{' '}
-              <span style={{ color: '#00a870', fontWeight: 'bold' }}>MERN stack</span> (MongoDB, Express.js, React.js, and Node.js). While I have a strong foundation in PHP and MySQL, I truly enjoy crafting seamless user experiences with React and building powerful APIs with Node.js. I am also exploring concepts in AI and machine learning.
+              <AIStreamText 
+                visible={visible} 
+                delayOffset={1.2} 
+                content={[
+                  { text: "With a solid foundation in BCA and MCA, I don't just write code—I engineer solutions that help businesses grow. Whether it's building a fast, scalable web application using the" },
+                  { text: " MERN stack", color: titleColor, fontWeight: 700 },
+                  { text: " or developing reliable backend systems with" },
+                  { text: " PHP,", color: titleColor, fontWeight: 700 },
+                  { text: " my focus is always on delivering secure and high-performance digital assets." }
+                ]}
+              />
+            </p>
+            
+            <p style={paraStyle}>
+              <AIStreamText 
+                visible={visible} 
+                delayOffset={2.2} 
+                content={[
+                  { text: "My approach is simple: I listen to your business requirements, design the optimal technical architecture, and deliver clean, scalable solutions on time. I am actively available for freelance projects and remote collaborations." }
+                ]}
+              />
             </p>
 
-            {/* Paragraph 3 — justified */}
-            <p style={Object.assign({}, paraStyle, { marginBottom: '2rem' })}>
-              My ultimate goal is to build{' '}
-              <span style={{ color: highlightColor }}>
-                clean, fast, and secure
-              </span>{' '}
-              applications that solve real-world problems. I am actively looking for opportunities to apply my skills and am available for freelancing and remote work.
-            </p>
-
-            {/* Tech badges */}
+            {/* Tech Stack Pills */}
             <div style={{
-              display: 'flex', flexWrap: 'wrap', gap: '0.5rem',
-              marginBottom: '2rem',
+              display: 'flex', flexWrap: 'wrap', gap: '0.75rem',
+              marginTop: '2rem', marginBottom: '2.5rem'
             }}>
               {badges.map(function(badge, i) {
                 return (
                   <span key={badge} style={{
-                    fontFamily: 'Space Mono, monospace',
-                    fontSize: '0.65rem',
-                    padding: '0.3rem 0.75rem',
+                    fontFamily: '"Space Mono", monospace',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    padding: '0.4rem 1rem',
                     background: badgeBg,
-                    color: '#00a870',
+                    color: highlightColor,
                     border: badgeBorder,
+                    borderRadius: '50px',
                     letterSpacing: '0.05em',
                     opacity: visible ? 1 : 0,
                     transform: visible ? 'translateY(0)' : 'translateY(10px)',
-                    transition: 'all 0.4s ease ' + (0.4 + i * 0.07) + 's',
+                    transition: `all 0.4s ease ${3.2 + (i * 0.1)}s` 
                   }}>
                     {badge}
                   </span>
@@ -357,35 +379,36 @@ function About({ darkMode }) {
               })}
             </div>
 
-            {/* Stats */}
+            {/* Stats Row */}
             <div style={{
               display: 'flex',
-              gap: isMobile ? '1.5rem' : '2.5rem',
-              paddingTop: '1.5rem',
-              borderTop: '1px solid ' + borderColor,
+              gap: isMobile ? '1.5rem' : '3rem',
+              paddingTop: '2rem',
+              borderTop: glassBorder,
               flexWrap: 'wrap',
             }}>
               {stats.map(function(stat, i) {
                 return (
                   <div key={stat.label} style={{
                     opacity: visible ? 1 : 0,
-                    transform: visible ? 'translateY(0)' : 'translateY(20px)',
-                    transition: 'all 0.5s ease ' + (0.6 + i * 0.1) + 's',
+                    transform: visible ? 'translateY(0)' : 'translateY(15px)',
+                    transition: `all 0.5s ease ${3.5 + (i * 0.15)}s` 
                   }}>
                     <div style={{
-                      fontSize: isMobile ? '1.6rem' : '2rem',
+                      fontSize: isMobile ? '1.8rem' : '2.2rem',
                       fontWeight: 800,
-                      color: '#00f5a0',
+                      color: titleColor,
                       lineHeight: 1,
+                      marginBottom: '0.5rem'
                     }}>
                       {stat.num}
                     </div>
                     <div style={{
-                      fontFamily: 'Space Mono, monospace',
-                      fontSize: '0.68rem',
+                      fontSize: '0.8rem',
                       color: textColor,
-                      letterSpacing: '0.1em',
-                      marginTop: '0.3rem',
+                      fontWeight: 500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
                     }}>
                       {stat.label}
                     </div>

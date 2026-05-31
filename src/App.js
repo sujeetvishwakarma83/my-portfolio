@@ -5,9 +5,11 @@ import ShareButton from './components/ShareButton';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
+import Services from './components/Services'; // ✅ Naya Services Component Import kiya
 import Skills from './components/Skills';
-import Education from './components/Education'; // ✅ added
+import Education from './components/Education';
 import Projects from './components/Projects';
+import WhyHireMe from './components/WhyHireMe';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 
@@ -46,10 +48,14 @@ function App() {
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
       <Hero darkMode={darkMode} />
       <About darkMode={darkMode} />
+      
+      {/* ✅ Services Section yahan add kiya hai */}
+      <Services darkMode={darkMode} /> 
+      
       <Skills darkMode={darkMode} />
-      {/* ✅ Education Added */}
       <Education darkMode={darkMode} />
       <Projects darkMode={darkMode} />
+      <WhyHireMe darkMode={darkMode} />
       <Contact darkMode={darkMode} />
       <Footer darkMode={darkMode} />
 

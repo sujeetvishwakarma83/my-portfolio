@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
+import { Layout, Server, Database, Lightbulb } from 'lucide-react';
 
-// ✅ Custom SVG Icons (same file me)
+// ✅ Aapke Custom SVG Icons
 const HtmlIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><title xmlns="">globe-sharp</title><path fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="44" d="M256 48C141.13 48 48 141.13 48 256s93.13 208 208 208s208-93.13 208-208S370.87 48 256 48Z"/><path fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="44" d="M256 48c-58.07 0-112.67 93.13-112.67 208S197.93 464 256 464s112.67-93.13 112.67-208S314.07 48 256 48Z"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="44" d="M117.33 121.33c38.24 27.15 86.38 43.34 138.67 43.34s100.43-16.19 138.67-43.34m0 269.34c-38.24-27.15-86.38-43.34-138.67-43.34s-100.43 16.19-138.67 43.34"/><path fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="44" d="M256 48v416m208-208H48"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><title xmlns="">globe-sharp</title><path fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="44" d="M256 48C141.13 48 48 141.13 48 256s93.13 208 208 208s208-93.13 208-208S370.87 48 256 48Z"/><path fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="44" d="M256 48c-58.07 0-112.67 93.13-112.67 208S197.93 464 256 464s112.67-93.13 112.67-208S314.07 48 256 48Z"/><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="44" d="M117.33 121.33c38.24 27.15 86.38 43.34 138.67 43.34s100.43-16.19 138.67-43.34m0 269.34c-38.24-27.15-86.38-43.34-138.67-43.34s-100.43 16.19-138.67 43.34"/><path fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="44" d="M256 48v416m208-208H48"/></svg>
 );
 
 const JsIcon = () => (
@@ -18,275 +19,233 @@ const PhpIcon = () => (
 );
 
 const GitIcon = () => (
- <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><title xmlns="">github</title><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="32" d="M12 4c1.67 0 2.61 0.4 3 0.5c0.53 -0.43 1.94 -1.5 3.5 -1.5c0.34 1 0.29 2.22 0 3c0.75 1 1 2 1 3.5c0 2.19 -0.48 3.58 -1.5 4.5c-1.02 0.92 -2.11 1.37 -3.5 1.5c0.65 0.54 0.5 1.87 0.5 2.5c0 0.73 0 3 0 3M12 4c-1.67 0 -2.61 0.4 -3 0.5c-0.53 -0.43 -1.94 -1.5 -3.5 -1.5c-0.34 1 -0.29 2.22 0 3c-0.75 1 -1 2 -1 3.5c0 2.19 0.48 3.58 1.5 4.5c1.02 0.92 2.11 1.37 3.5 1.5c-0.65 0.54 -0.5 1.87 -0.5 2.5c0 0.73 0 3 0 3"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="32;0"/></path><path stroke-dasharray="10" stroke-dashoffset="10" d="M9 19c-1.41 0 -2.84 -0.56 -3.69 -1.19c-0.84 -0.63 -1.09 -1.66 -2.31 -2.31"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.2s" to="0"/></path></g></svg>
+ <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><title xmlns="">github</title><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path strokeDasharray="32" d="M12 4c1.67 0 2.61 0.4 3 0.5c0.53 -0.43 1.94 -1.5 3.5 -1.5c0.34 1 0.29 2.22 0 3c0.75 1 1 2 1 3.5c0 2.19 -0.48 3.58 -1.5 4.5c-1.02 0.92 -2.11 1.37 -3.5 1.5c0.65 0.54 0.5 1.87 0.5 2.5c0 0.73 0 3 0 3M12 4c-1.67 0 -2.61 0.4 -3 0.5c-0.53 -0.43 -1.94 -1.5 -3.5 -1.5c-0.34 1 -0.29 2.22 0 3c-0.75 1 -1 2 -1 3.5c0 2.19 0.48 3.58 1.5 4.5c1.02 0.92 2.11 1.37 3.5 1.5c-0.65 0.54 -0.5 1.87 -0.5 2.5c0 0.73 0 3 0 3"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="32;0"/></path><path strokeDasharray="10" strokeDashoffset="10" d="M9 19c-1.41 0 -2.84 -0.56 -3.69 -1.19c-0.84 -0.63 -1.09 -1.66 -2.31 -2.31"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.2s" to="0"/></path></g></svg>
 );
 
 const MlIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32" fill="#000000" stroke="#000000"><title xmlns="" fill="#000000" stroke="#000000">machine-learning</title><path fill="#000000" d="M16 25a6.99 6.99 0 0 1-5.833-3.129l1.666-1.107a5 5 0 0 0 8.334 0l1.666 1.107A6.99 6.99 0 0 1 16 25m4-11a2 2 0 1 0 2 2a1.98 1.98 0 0 0-2-2m-8 0a2 2 0 1 0 2 2a1.98 1.98 0 0 0-2-2" stroke="#000000"/><path fill="#000000" d="M30 16v-2h-2v-4a4.005 4.005 0 0 0-4-4h-2V2h-2v4h-8V2h-2v4H8a4.005 4.005 0 0 0-4 4v4H2v2h2v5H2v2h2v3a4.005 4.005 0 0 0 4 4h16a4.005 4.005 0 0 0 4-4v-3h2v-2h-2v-5Zm-4 10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2Z" stroke="#000000"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32" fill="currentColor" stroke="currentColor"><title xmlns="">machine-learning</title><path fill="currentColor" d="M16 25a6.99 6.99 0 0 1-5.833-3.129l1.666-1.107a5 5 0 0 0 8.334 0l1.666 1.107A6.99 6.99 0 0 1 16 25m4-11a2 2 0 1 0 2 2a1.98 1.98 0 0 0-2-2m-8 0a2 2 0 1 0 2 2a1.98 1.98 0 0 0-2-2"/><path fill="currentColor" d="M30 16v-2h-2v-4a4.005 4.005 0 0 0-4-4h-2V2h-2v4h-8V2h-2v4H8a4.005 4.005 0 0 0-4 4v4H2v2h2v5H2v2h2v3a4.005 4.005 0 0 0 4 4h16a4.005 4.005 0 0 0 4-4v-3h2v-2h-2v-5Zm-4 10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2Z"/></svg>
 );
 
-// ✅ ONLY CHANGE: icons replaced
-var skillsData = [
-  { icon: <HtmlIcon />, name: 'HTML / CSS', level: 90, desc: 'Responsive & Semantic' },
-  { icon: <JsIcon />, name: 'JavaScript', level: 75, desc: 'ES6+, DOM, APIs' },
-  { icon: <ReactIcon />, name: 'React.js', level: 55, desc: 'Components, Hooks' },
-  { icon: <PhpIcon />, name: 'PHP / MySQL', level: 70, desc: 'Backend, CRUD' },
-  { icon: <GitIcon />, name: 'Git / GitHub', level: 65, desc: 'Version Control' },
-  { icon: <MlIcon />, name: 'Machine Learning', level: 35, desc: 'Learning Phase' },
+// ✅ Categorized Tech Stack Data
+const skillCategories = [
+  {
+    title: "Frontend Development",
+    icon: <Layout size={24} color="#00F5A0" />,
+    color: "#00F5A0",
+    skills: [
+      { icon: <ReactIcon />, name: 'React.js', tag: 'Core' },
+      { icon: <JsIcon />, name: 'JavaScript', tag: 'ES6+' },
+      { icon: <HtmlIcon />, name: 'HTML & CSS', tag: 'Responsive' }
+    ]
+  },
+  {
+    title: "Backend Development",
+    icon: <Server size={24} color="#7C3AED" />,
+    color: "#7C3AED",
+    skills: [
+      { icon: <PhpIcon />, name: 'PHP', tag: 'Core Backend' },
+      { icon: <Server size={20} />, name: 'Node.js', tag: 'MERN Stack' },
+      { icon: <Layout size={20} />, name: 'Express.js', tag: 'API Design' }
+    ]
+  },
+  {
+    title: "Database & Cloud",
+    icon: <Database size={24} color="#38bdf8" />,
+    color: "#38bdf8",
+    skills: [
+      { icon: <Database size={20} />, name: 'MongoDB', tag: 'NoSQL' },
+      { icon: <Database size={20} />, name: 'MySQL', tag: 'Relational' },
+      { icon: <GitIcon />, name: 'Git & GitHub', tag: 'Version Control' }
+    ]
+  },
+  {
+    title: "Emerging Tech",
+    icon: <Lightbulb size={24} color="#f59e0b" />,
+    color: "#f59e0b",
+    skills: [
+      { icon: <MlIcon />, name: 'Machine Learning', tag: 'Exploring' },
+      { icon: <Server size={20} />, name: 'Cloud Deployment', tag: 'AWS / Vercel' }
+    ]
+  }
 ];
 
-function SkillCard({ skill, visible, darkMode }) {
-  var [hovered, setHovered] = useState(false);
-
-  var cardBg = darkMode ? '#111118' : '#ffffff';
-  var cardBorder = hovered
-    ? '#00f5a0'
-    : (darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,150,100,0.15)');
-  var nameColor = darkMode ? '#e8e8f0' : '#1a3a2e';
-  var barBg = darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,150,100,0.1)';
-  var descColor = darkMode ? '#6b6b7a' : '#4a7a65';
+function SkillChip({ skill, darkMode, glowColor }) {
+  const [hovered, setHovered] = useState(false);
+  const bg = darkMode ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)';
+  const border = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  const nameColor = darkMode ? '#e8e8f0' : '#1a1a2e';
 
   return (
     <div
-      onMouseEnter={function() { setHovered(true); }}
-      onMouseLeave={function() { setHovered(false); }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        background: cardBg,
-        border: '1px solid ' + cardBorder,
-        padding: '1.5rem',
-        transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
-        opacity: visible ? 1 : 0,
-        transitionProperty: 'border-color, transform, opacity, background',
-        transitionDuration: '0.2s, 0.2s, 0.6s, 0.3s',
-        boxShadow: hovered
-          ? (darkMode ? 'none' : '0 8px 24px rgba(0,180,120,0.1)')
-          : 'none',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '0.8rem 1rem',
+        background: hovered ? (darkMode ? 'rgba(255,255,255,0.08)' : '#ffffff') : bg,
+        border: `1px solid ${hovered ? glowColor : border}`,
+        borderRadius: '12px',
+        cursor: 'default',
+        transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
+        transition: 'all 0.3s ease',
+        boxShadow: hovered ? `0 8px 20px -5px ${glowColor}40` : 'none',
       }}
     >
-      <div style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
+      <div style={{ fontSize: '1.4rem', display: 'flex', alignItems: 'center' }}>
         {skill.icon}
       </div>
-
-      <div style={{
-        fontSize: '0.95rem',
-        fontWeight: 700,
-        marginBottom: '0.75rem',
-        color: nameColor,
-      }}>
-        {skill.name}
-      </div>
-
-      <div style={{
-        height: '2px',
-        background: barBg,
-        overflow: 'hidden',
-      }}>
-        <div style={{
-          height: '100%',
-          width: visible ? (skill.level + '%') : '0%',
-          background: '#00f5a0',
-          transition: 'width 1.2s ease',
-        }} />
-      </div>
-
-      <div style={{
-        fontFamily: 'Space Mono, monospace',
-        fontSize: '0.7rem',
-        color: descColor,
-        marginTop: '0.5rem',
-      }}>
-        {skill.level}% — {skill.desc}
+      <div>
+        <div style={{ fontSize: '0.9rem', fontWeight: 700, color: nameColor }}>
+          {skill.name}
+        </div>
+        <div style={{ fontSize: '0.7rem', color: glowColor, fontFamily: '"Space Mono", monospace', marginTop: '2px' }}>
+          {skill.tag}
+        </div>
       </div>
     </div>
   );
 }
 
 function Skills({ darkMode }) {
-  var [visible, setVisible] = useState(false);
-  var [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  var ref = useRef(null);
-  var canvasRef = useRef(null);
-  var animRef = useRef(null);
+  const [visible, setVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const ref = useRef(null);
 
-  useEffect(function() {
-    var handleResize = function() { setIsMobile(window.innerWidth <= 768); };
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
-    return function() { window.removeEventListener('resize', handleResize); };
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(function() {
-    var observer = new IntersectionObserver(
-      function(entries) {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
         if (entries[0].isIntersecting) setVisible(true);
       },
-      { threshold: 0.1 }
+      { threshold: 0.15 }
     );
     if (ref.current) observer.observe(ref.current);
-    return function() { observer.disconnect(); };
+    return () => observer.disconnect();
   }, []);
 
-  useEffect(function() {
-    if (darkMode) {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
-      return;
-    }
-
-    var canvas = canvasRef.current;
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-
-    var resize = function() {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    var particles = [];
-    for (var i = 0; i < 50; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 3 + 1,
-        dx: (Math.random() - 0.5) * 0.5,
-        dy: (Math.random() - 0.5) * 0.5,
-        opacity: Math.random() * 0.5 + 0.1,
-        color: Math.random() > 0.5 ? '0,180,120' : '124,58,237',
-      });
-    }
-
-    var draw = function() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      for (var a = 0; a < particles.length; a++) {
-        for (var b = a + 1; b < particles.length; b++) {
-          var dist = Math.hypot(
-            particles[a].x - particles[b].x,
-            particles[a].y - particles[b].y
-          );
-          if (dist < 120) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'rgba(0,180,120,' + (0.12 * (1 - dist / 120)) + ')';
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(particles[a].x, particles[a].y);
-            ctx.lineTo(particles[b].x, particles[b].y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      for (var j = 0; j < particles.length; j++) {
-        var p = particles[j];
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(' + p.color + ',' + p.opacity + ')';
-        ctx.fill();
-        p.x += p.dx;
-        p.y += p.dy;
-        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
-      }
-
-      animRef.current = requestAnimationFrame(draw);
-    };
-
-    draw();
-
-    return function() {
-      cancelAnimationFrame(animRef.current);
-      window.removeEventListener('resize', resize);
-    };
-  }, [darkMode]);
-
-  var sectionBg = darkMode ? '#0a0a0f' : '#f0faf5';
-  var titleColor = darkMode ? '#e8e8f0' : '#1a3a2e';
+  // Theme Variables
+  const sectionBg = darkMode ? '#0A0A0A' : '#f8fafc';
+  const titleColor = darkMode ? '#ffffff' : '#0f172a';
+  const highlightColor = '#00F5A0';
+  const glassBg = darkMode ? 'rgba(20, 20, 20, 0.6)' : 'rgba(255, 255, 255, 0.7)';
+  const glassBorder = darkMode ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(0, 0, 0, 0.05)';
 
   return (
     <section id="skills" ref={ref} style={{
-      padding: isMobile ? '4rem 1.5rem' : '6rem 4rem',
+      padding: isMobile ? '5rem 1.5rem' : '8rem 4rem',
       background: sectionBg,
       position: 'relative',
       overflow: 'hidden',
     }}>
-
-      {!darkMode && (
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: 'absolute', inset: 0,
-            width: '100%', height: '100%',
-            pointerEvents: 'none',
-          }}
-        />
-      )}
-
-      {!darkMode && (
-        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-          <div style={{
-            position: 'absolute', top: '0%', left: '60%',
-            width: isMobile ? '150px' : '300px',
-            height: isMobile ? '150px' : '300px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(0,200,130,0.1) 0%, transparent 70%)',
-          }} />
-          <div style={{
-            position: 'absolute', bottom: '5%', right: '5%',
-            width: isMobile ? '120px' : '250px',
-            height: isMobile ? '120px' : '250px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 70%)',
-          }} />
-        </div>
-      )}
-
-      <div style={{ position: 'relative', zIndex: 1 }}>
-
-        <div style={{
-          fontFamily: 'Space Mono, monospace',
-          fontSize: '0.7rem',
-          letterSpacing: '0.2em',
-          color: '#00f59ff8',
-          textTransform: 'uppercase',
-          marginBottom: '0.5rem',
-        }}>
-          02 — Skills
-        </div>
-
-        <h2 style={{
-          fontSize: 'clamp(2rem, 4vw, 3rem)',
-          fontWeight: 800,
-          letterSpacing: '-0.03em',
-          marginBottom: '1rem',
-          color: titleColor,
-        }}>
-          Tech Stack
-        </h2>
-
-        <div style={{
-          width: '48px', height: '2px',
-          background: '#00f5a0',
-          marginBottom: '3rem',
+      
+      {/* Background Glowing Blobs */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div style={{ 
+          position: 'absolute', top: '10%', left: '-5%', 
+          width: isMobile ? '250px' : '400px', height: isMobile ? '250px' : '400px', 
+          background: `radial-gradient(circle, ${highlightColor}10 0%, transparent 70%)`, 
+          filter: 'blur(60px)' 
         }} />
+        <div style={{ 
+          position: 'absolute', bottom: '10%', right: '-5%', 
+          width: isMobile ? '200px' : '350px', height: isMobile ? '200px' : '350px', 
+          background: 'radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%)', 
+          filter: 'blur(60px)' 
+        }} />
+      </div>
 
+      <div style={{ position: 'relative', zIndex: 10, maxWidth: '1200px', margin: '0 auto' }}>
+
+        {/* Header */}
+        <div style={{
+          textAlign: isMobile ? 'center' : 'left',
+          marginBottom: '4rem',
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'translateY(0)' : 'translateY(30px)',
+          transition: 'all 0.8s ease'
+        }}>
+          <div style={{
+            fontFamily: '"Space Mono", monospace',
+            fontSize: '0.8rem',
+            letterSpacing: '0.15em',
+            color: highlightColor,
+            textTransform: 'uppercase',
+            marginBottom: '0.5rem',
+            fontWeight: 700
+          }}>
+            03 // Tech Stack
+          </div>
+          <h2 style={{
+            fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+            fontWeight: 800,
+            letterSpacing: '-0.03em',
+            color: titleColor,
+          }}>
+            Tools & <span style={{ color: highlightColor }}>Technologies</span>.
+          </h2>
+        </div>
+
+        {/* Categorized Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile
-            ? '1fr'
-            : 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '1.25rem',
-          maxWidth: '1100px',
-          width: '100%',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+          gap: '2rem',
         }}>
-          {skillsData.map(function(skill) {
-            return (
-              <SkillCard
-                key={skill.name}
-                skill={skill}
-                visible={visible}
-                darkMode={darkMode}
-              />
-            );
-          })}
+          {skillCategories.map((category, idx) => (
+            <div 
+              key={category.title}
+              style={{
+                background: glassBg,
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: glassBorder,
+                borderRadius: '24px',
+                padding: isMobile ? '2rem 1.5rem' : '2.5rem',
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateY(0)' : 'translateY(40px)',
+                transition: `all 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 0.15}s`,
+              }}
+            >
+              {/* Category Header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem' }}>
+                <div style={{
+                  width: '40px', height: '40px',
+                  borderRadius: '10px',
+                  background: `${category.color}15`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  border: `1px solid ${category.color}30`
+                }}>
+                  {category.icon}
+                </div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: titleColor, margin: 0 }}>
+                  {category.title}
+                </h3>
+              </div>
+
+              {/* Skills Chips */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                gap: '1rem'
+              }}>
+                {category.skills.map(skill => (
+                  <SkillChip 
+                    key={skill.name} 
+                    skill={skill} 
+                    darkMode={darkMode} 
+                    glowColor={category.color} 
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
 
       </div>

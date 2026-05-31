@@ -1,439 +1,326 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+// YAHAN FIX: Github ko lucide-react se nikal diya gaya hai
+import { ExternalLink, Lock, User } from 'lucide-react';
 
-var projectsData = [
+// ✅ Custom GitHub Icon (Bina kisi library ke)
+const CustomGithubIcon = ({ size = 18, color = "currentColor" }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke={color} 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+  >
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4" />
+    <path d="M12 18v4" />
+  </svg>
+);
+
+// ✅ DATA UPGRADED
+const projectsData = [
   {
-    num: '001',
-    title: 'E-Commerce Website',
-    // NAYA: Description ko MERN stack ke hisab se update kiya hai
-    desc: 'Full-stack shopping website with product listing, cart, and payment integration using MongoDB, Express, React, and Node.js.',
-    // NAYA: Tags ko bhi MERN stack me badal diya hai
-    tags: ['React', 'Node.js', 'Express', 'MongoDB'],
+    num: '01',
+    title: 'Vishwakarma Furniture (E-Commerce)',
+    problem: 'Manual inventory tracking and limited local reach.',
+    solution: 'Engineered a scalable MERN stack storefront with real-time cart functionality, secure checkout, and dynamic product management.',
+    tags: ['React.js', 'Node.js', 'Express.js', 'MongoDB'],
     link: 'https://my-shop-two-theta.vercel.app/',
+    github: '#', 
     image: '/projects/ecommerce.png' 
   },
   {
-    num: '002',
+    num: '02',
     title: 'Student Management System',
-    desc: 'CRUD application for managing student records with login authentication and responsive UI.',
-    tags: ['JavaScript', 'PHP', 'MySQL'],
+    problem: 'Paper-based records were slow to retrieve and hard to manage.',
+    solution: 'Developed a secure CRUD application with role-based authentication, enabling fast data retrieval and responsive dashboard management.',
+    tags: ['PHP', 'MySQL', 'JavaScript'],
     link: 'https://student-management.infinityfreeapp.com/index.php', 
+    github: '#',
     image: '/projects/sms.png',
     demoId: 'admin',
     demoPass: 'admin123'
   },
   {
-    num: '003',
-    title: 'Weather App',
-    desc: 'Real-time weather application using OpenWeatherMap API with clean UI and city search.',
-    tags: ['React', 'API', 'CSS'],
-    link: '#',
-    image: '' 
+    num: '03',
+    title: 'Banking Management System',
+    problem: 'Need for a secure, digitized way to handle transactions and ledgers.',
+    solution: 'Architected a robust backend system to manage user accounts, process internal transactions seamlessly, and maintain ledger accuracy.',
+    tags: ['PHP', 'MySQL', 'JavaScript', 'HTML/CSS'],
+    link: '#', 
+    github: '#',
+    image: '/projects/banking.png' 
   },
 ];
 
-function ProjectCard({ project, visible, index, darkMode }) {
-  var [hovered, setHovered] = useState(false);
+function ProjectCard({ project, index, darkMode }) {
+  const [hovered, setHovered] = useState(false);
 
-  var cardBg = darkMode ? '#18181f' : '#ffffff';
-  var cardBorder = hovered
-    ? '#00f5a0'
-    : (darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,150,100,0.15)');
-  var numColor = darkMode ? '#6b6b7a' : '#4a7a65';
-  var titleColor = darkMode ? '#e8e8f0' : '#1a3a2e';
-  var descColor = darkMode ? '#6b6b7a' : '#4a7a65';
-  var tagBg = darkMode ? 'rgba(0,245,160,0.08)' : 'rgba(0,180,120,0.08)';
-  var tagBorder = darkMode ? '1px solid rgba(0,245,160,0.2)' : '1px solid rgba(0,180,120,0.25)';
-  var tagColor = darkMode ? '#00f5a0' : '#00a870';
-  var delay1 = (index * 0.15) + 's';
-
+  const cardBg = darkMode ? 'rgba(24, 24, 31, 0.6)' : 'rgba(255, 255, 255, 0.7)';
+  const cardBorder = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  const glowColor = '#00f5a0';
+  const titleColor = darkMode ? '#ffffff' : '#0f172a';
+  const descColor = darkMode ? '#9ca3af' : '#475569';
+  
   return (
-    <div
-      onMouseEnter={function() { setHovered(true); }}
-      onMouseLeave={function() { setHovered(false); }}
-      style={{
-        background: cardBg,
-        border: '1px solid ' + cardBorder,
-        padding: '1.5rem',
-        position: 'relative',
-        overflow: 'hidden',
-        opacity: visible ? 1 : 0,
-        transform: !visible ? 'translateY(30px)' : (hovered ? 'translateY(-8px)' : 'translateY(0)'),
-        transitionProperty: 'border-color, opacity, transform, box-shadow',
-        transitionDuration: '0.3s, 0.6s, 0.4s, 0.3s', 
-        transitionDelay: '0s, ' + delay1 + ', 0s, 0s', 
-        boxShadow: hovered
-          ? (darkMode ? '0 10px 30px rgba(0,0,0,0.5)' : '0 12px 30px rgba(0,180,120,0.15)')
-          : 'none',
-        borderRadius: '12px', 
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6, delay: index * 0.15 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ perspective: '1000px' }}
     >
-      {/* Top gradient line on hover */}
-      <div style={{
-        position: 'absolute',
-        top: 0, left: 0, right: 0,
-        height: '3px',
-        background: 'linear-gradient(90deg, #00f5a0, #7c3aed)',
-        transform: hovered ? 'scaleX(1)' : 'scaleX(0)',
-        transformOrigin: 'left',
-        transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-      }} />
-
-      {/* Number */}
-      <div style={{
-        fontFamily: 'Space Mono, monospace',
-        fontSize: '0.7rem',
-        color: numColor,
-        marginBottom: '0.75rem',
-        letterSpacing: '0.1em',
-      }}>
-        {project.num}
-      </div>
-
-      {/* Project Image/Screenshot with Interactive Overlay */}
-      {project.image && (
-        <div style={{
-          position: 'relative', 
-          marginBottom: '1.25rem',
-          borderRadius: '8px',
+      <motion.div
+        animate={{ 
+          rotateX: hovered ? 2 : 0, 
+          rotateY: hovered ? -2 : 0,
+          y: hovered ? -8 : 0
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        style={{
+          background: cardBg,
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: `1px solid ${hovered ? glowColor : cardBorder}`,
+          padding: '1.5rem',
+          position: 'relative',
           overflow: 'hidden',
-          border: darkMode ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)',
-        }}>
-          <img 
-            src={project.image} 
-            alt={project.title} 
-            style={{
-              width: '100%',
-              height: '160px',
-              objectFit: 'cover',
-              objectPosition: 'top',
-              display: 'block',
-              transform: hovered ? 'scale(1.08)' : 'scale(1)',
-              transition: 'transform 0.5s ease-out',
-            }}
-          />
-          
-          {/* Interactive Hover Overlay */}
+          borderRadius: '20px',
+          boxShadow: hovered 
+            ? `0 20px 40px -10px ${glowColor}30` 
+            : '0 10px 30px -10px rgba(0,0,0,0.1)',
+        }}
+      >
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
+          background: `linear-gradient(90deg, ${glowColor}, #7c3aed)`,
+          transform: hovered ? 'scaleX(1)' : 'scaleX(0)',
+          transformOrigin: 'left',
+          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+        }} />
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <div style={{
-            position: 'absolute',
-            inset: 0,
-            background: darkMode ? 'rgba(24, 24, 31, 0.7)' : 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(3px)', 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: hovered ? 1 : 0,
-            transition: 'opacity 0.3s ease',
-            pointerEvents: 'none', 
+            fontFamily: '"Space Mono", monospace',
+            fontSize: '0.8rem',
+            color: glowColor,
+            fontWeight: 700,
+            letterSpacing: '0.1em',
           }}>
-            {/* Condition: Agar demo ID aur Pass hai toh details dikhao, warna sirf Preview */}
-            {project.demoId && project.demoPass ? (
-              <div style={{
-                background: darkMode ? '#111118' : '#ffffff',
-                border: darkMode ? '1px solid rgba(0, 245, 160, 0.3)' : '1px solid rgba(0, 180, 120, 0.3)',
-                padding: '10px 16px',
-                borderRadius: '8px',
-                fontFamily: 'Space Mono, monospace',
-                fontSize: '0.7rem',
-                color: darkMode ? '#e8e8f0' : '#1a3a2e',
-                transform: hovered ? 'translateY(0)' : 'translateY(15px)',
-                transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '4px'
-              }}>
-                <span style={{ color: '#00f5a0', fontWeight: 'bold', marginBottom: '2px', textAlign: 'center' }}>Demo Login</span>
-                <span><strong style={{ color: darkMode ? '#6b6b7a' : '#4a7a65'}}>ID:</strong> {project.demoId}</span>
-                <span><strong style={{ color: darkMode ? '#6b6b7a' : '#4a7a65'}}>Pass:</strong> {project.demoPass}</span>
-              </div>
-            ) : (
-              <span style={{
-                background: darkMode ? '#00f5a0' : '#ffffff',
-                color: darkMode ? '#111118' : '#00a870',
-                padding: '6px 14px',
-                borderRadius: '20px',
-                fontFamily: 'Space Mono, monospace',
-                fontSize: '0.75rem',
-                fontWeight: 'bold',
-                transform: hovered ? 'translateY(0)' : 'translateY(15px)',
-                transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', 
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-              }}>
-                Preview
-              </span>
-            )}
+            Project // {project.num}
+          </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+             {project.github && (
+               <a href={project.github} target="_blank" rel="noreferrer" style={{ color: descColor, transition: 'color 0.3s' }} onMouseOver={e => e.currentTarget.style.color = titleColor} onMouseOut={e => e.currentTarget.style.color = descColor}>
+                 {/* YAHAN FIX KIYA HAI: Custom Icon lagaya hai */}
+                 <CustomGithubIcon size={18} />
+               </a>
+             )}
           </div>
         </div>
-      )}
 
-      {/* Title */}
-      <div style={{
-        fontSize: '1.1rem',
-        fontWeight: 700,
-        marginBottom: '0.65rem',
-        color: titleColor,
-        transition: 'color 0.2s',
-      }}>
-        {project.title}
-      </div>
+        {project.image && (
+          <div style={{
+            position: 'relative', 
+            marginBottom: '1.5rem',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            aspectRatio: '16/9',
+            background: darkMode ? '#111' : '#eee',
+            border: cardBorder
+          }}>
+            <img 
+              src={project.image} 
+              alt={project.title} 
+              style={{
+                width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top',
+                transform: hovered ? 'scale(1.05)' : 'scale(1)',
+                transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:${descColor};font-family:'Space Mono', monospace;font-size:0.8rem;">[ Image Placeholder ]</div>`;
+              }}
+            />
+            
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: darkMode ? 'rgba(10, 10, 15, 0.85)' : 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(4px)', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              opacity: hovered ? 1 : 0,
+              transition: 'opacity 0.3s ease',
+            }}>
+              {project.demoId && project.demoPass ? (
+                <div style={{
+                  background: darkMode ? '#1a1a24' : '#f8fafc',
+                  border: `1px solid ${glowColor}50`,
+                  padding: '12px 20px',
+                  borderRadius: '12px',
+                  fontFamily: '"Space Mono", monospace',
+                  fontSize: '0.75rem',
+                  color: titleColor,
+                  transform: hovered ? 'translateY(0)' : 'translateY(10px)',
+                  transition: 'transform 0.4s ease',
+                  boxShadow: `0 10px 25px -5px ${glowColor}20`
+                }}>
+                  <div style={{ color: glowColor, fontWeight: 700, marginBottom: '8px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                    <Lock size={14} /> Demo Credentials
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <User size={12} color={descColor} /> <span>{project.demoId}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Lock size={12} color={descColor} /> <span>{project.demoPass}</span>
+                  </div>
+                </div>
+              ) : (
+                <a href={project.link} target="_blank" rel="noreferrer" style={{
+                  background: glowColor,
+                  color: '#000',
+                  padding: '8px 20px',
+                  borderRadius: '50px',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  textDecoration: 'none',
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  transform: hovered ? 'translateY(0)' : 'translateY(10px)',
+                  transition: 'transform 0.4s ease',
+                  boxShadow: `0 10px 20px -5px ${glowColor}50`
+                }}>
+                  Live Preview <ExternalLink size={14} />
+                </a>
+              )}
+            </div>
+          </div>
+        )}
 
-      {/* Description */}
-      <p style={{
-        fontFamily: 'Space Mono, monospace',
-        fontSize: '0.76rem',
-        color: descColor,
-        lineHeight: 1.7,
-        marginBottom: '1.25rem',
-      }}>
-        {project.desc}
-      </p>
+        <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: titleColor, marginBottom: '1rem' }}>
+          {project.title}
+        </h3>
 
-      {/* Tags */}
-      <div style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '0.4rem',
-        marginBottom: '1.25rem',
-      }}>
-        {project.tags.map(function(tag) {
-          return (
+        <div style={{ fontSize: '0.85rem', lineHeight: 1.7, color: descColor, marginBottom: '1.5rem' }}>
+          <p style={{ margin: '0 0 0.5rem 0' }}><strong style={{ color: titleColor }}>Problem:</strong> {project.problem}</p>
+          <p style={{ margin: 0 }}><strong style={{ color: titleColor }}>Solution:</strong> {project.solution}</p>
+        </div>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem' }}>
+          {project.tags.map((tag) => (
             <span key={tag} style={{
-              fontFamily: 'Space Mono, monospace',
-              fontSize: '0.62rem',
-              padding: '0.3rem 0.6rem',
-              background: hovered ? (darkMode ? 'rgba(0,245,160,0.15)' : 'rgba(0,180,120,0.15)') : tagBg,
-              color: tagColor,
-              border: tagBorder,
-              letterSpacing: '0.05em',
-              borderRadius: '4px',
-              transition: 'background 0.3s',
+              fontFamily: '"Space Mono", monospace',
+              fontSize: '0.65rem',
+              fontWeight: 600,
+              padding: '0.3rem 0.8rem',
+              background: darkMode ? `${glowColor}15` : `${glowColor}20`,
+              color: darkMode ? glowColor : '#00a870',
+              borderRadius: '50px',
+              border: `1px solid ${glowColor}30`,
             }}>
               {tag}
             </span>
-          );
-        })}
-      </div>
+          ))}
+        </div>
 
-      {/* Link */}
-      <a href={project.link} target="_blank" rel="noopener noreferrer" style={{
-        fontFamily: 'Space Mono, monospace',
-        fontSize: '0.75rem',
-        color: '#00f5a0',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: hovered ? '0.8rem' : '0.4rem',
-        transition: 'gap 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        textDecoration: 'none',
-        fontWeight: 'bold',
-      }}>
-        View Project 
-        <span style={{ 
-          transform: hovered ? 'translateX(5px)' : 'translateX(0)', 
-          transition: 'transform 0.3s' 
+        <a href={project.link} target="_blank" rel="noopener noreferrer" style={{
+          fontSize: '0.85rem',
+          color: glowColor,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: hovered ? '8px' : '4px',
+          fontWeight: 700,
+          textDecoration: 'none',
+          transition: 'all 0.3s ease',
         }}>
-          →
-        </span>
-      </a>
+          Explore Project <ExternalLink size={14} />
+        </a>
 
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
 function Projects({ darkMode }) {
-  var [visible, setVisible] = useState(false);
-  var [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  var ref = useRef(null);
-  var canvasRef = useRef(null);
-  var animRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const ref = useRef(null);
 
-  useEffect(function() {
-    var handleResize = function() { setIsMobile(window.innerWidth <= 768); };
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
-    return function() { window.removeEventListener('resize', handleResize); };
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(function() {
-    var observer = new IntersectionObserver(
-      function(entries) {
-        if (entries[0].isIntersecting) setVisible(true);
-      },
-      { threshold: 0.05 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return function() { observer.disconnect(); };
-  }, []);
-
-  // Light mode canvas particles
-  useEffect(function() {
-    if (darkMode) {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
-      return;
-    }
-
-    var canvas = canvasRef.current;
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-
-    var resize = function() {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    var particles = [];
-    for (var i = 0; i < 50; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 3 + 1,
-        dx: (Math.random() - 0.5) * 0.5,
-        dy: (Math.random() - 0.5) * 0.5,
-        opacity: Math.random() * 0.5 + 0.1,
-        color: Math.random() > 0.5 ? '0,180,120' : '124,58,237',
-      });
-    }
-
-    var draw = function() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      for (var a = 0; a < particles.length; a++) {
-        for (var b = a + 1; b < particles.length; b++) {
-          var dist = Math.hypot(
-            particles[a].x - particles[b].x,
-            particles[a].y - particles[b].y
-          );
-          if (dist < 120) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'rgba(0,180,120,' + (0.12 * (1 - dist / 120)) + ')';
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(particles[a].x, particles[a].y);
-            ctx.lineTo(particles[b].x, particles[b].y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      for (var j = 0; j < particles.length; j++) {
-        var p = particles[j];
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(' + p.color + ',' + p.opacity + ')';
-        ctx.fill();
-        p.x += p.dx;
-        p.y += p.dy;
-        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
-      }
-
-      animRef.current = requestAnimationFrame(draw);
-    };
-
-    draw();
-
-    return function() {
-      cancelAnimationFrame(animRef.current);
-      window.removeEventListener('resize', resize);
-    };
-  }, [darkMode]);
-
-  var sectionBg = darkMode ? '#111118' : '#f0faf5';
-  var titleColor = darkMode ? '#e8e8f0' : '#1a3a2e';
+  const sectionBg = darkMode ? '#0A0A0A' : '#f8fafc';
+  const titleColor = darkMode ? '#ffffff' : '#0f172a';
+  const glowColor = '#00F5A0';
 
   return (
     <section id="projects" ref={ref} style={{
-      padding: isMobile ? '4rem 1.5rem' : '6rem 4rem',
+      padding: isMobile ? '5rem 1.5rem' : '8rem 4rem',
       background: sectionBg,
       position: 'relative',
       overflow: 'hidden',
+      minHeight: '100vh',
     }}>
-
-      {/* Light mode canvas */}
-      {!darkMode && (
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: 'absolute', inset: 0,
-            width: '100%', height: '100%',
-            pointerEvents: 'none',
-          }}
-        />
-      )}
-
-      {/* Light mode blobs */}
-      {!darkMode && (
-        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+      
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        {darkMode && (
           <div style={{
-            position: 'absolute', top: '10%', right: '0%',
-            width: isMobile ? '150px' : '300px',
-            height: isMobile ? '150px' : '300px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(0,200,130,0.1) 0%, transparent 70%)',
+            position: "absolute", inset: 0,
+            backgroundImage: "radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)",
+            backgroundSize: "30px 30px",
           }} />
-          <div style={{
-            position: 'absolute', bottom: '5%', left: '5%',
-            width: isMobile ? '120px' : '250px',
-            height: isMobile ? '120px' : '250px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 70%)',
-          }} />
-        </div>
-      )}
-
-      {/* Content */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
-
-        {/* Label */}
-        <div style={{
-          fontFamily: 'Space Mono, monospace',
-          fontSize: '0.7rem',
-          letterSpacing: '0.2em',
-          color: '#00f5a0',
-          textTransform: 'uppercase',
-          marginBottom: '0.5rem',
-        }}>
-          04 — Projects
-        </div>
-
-        {/* Title */}
-        <h2 style={{
-          fontSize: 'clamp(2rem, 4vw, 3rem)',
-          fontWeight: 800,
-          letterSpacing: '-0.03em',
-          marginBottom: '1rem',
-          color: titleColor,
-        }}>
-          My Work
-        </h2>
-
-        {/* Divider */}
-        <div style={{
-          width: '48px', height: '2px',
-          background: '#00f5a0',
-          marginBottom: '3rem',
+        )}
+        <div style={{ 
+          position: 'absolute', top: '10%', right: '-5%', 
+          width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', 
+          background: `radial-gradient(circle, ${glowColor}10 0%, transparent 70%)`, 
+          filter: 'blur(60px)' 
         }} />
+      </div>
 
-        {/* Grid */}
+      <div style={{ position: 'relative', zIndex: 10, maxWidth: '1200px', margin: '0 auto' }}>
+
+        <div style={{ textAlign: isMobile ? 'center' : 'left', marginBottom: '4rem' }}>
+          <div style={{
+            fontFamily: '"Space Mono", monospace',
+            fontSize: '0.8rem',
+            letterSpacing: '0.15em',
+            color: glowColor,
+            textTransform: 'uppercase',
+            marginBottom: '0.5rem',
+            fontWeight: 700
+          }}>
+            05 // Selected Work
+          </div>
+          <h2 style={{
+            fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+            fontWeight: 800,
+            letterSpacing: '-0.03em',
+            color: titleColor,
+          }}>
+            Featured <span style={{ color: glowColor }}>Projects</span>.
+          </h2>
+        </div>
+
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile
-            ? '1fr'
-            : 'repeat(auto-fill, minmax(320px, 1fr))',
-          gap: '2rem', 
-          maxWidth: '1100px',
-          width: '100%',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(350px, 1fr))',
+          gap: '2.5rem', 
         }}>
-          {projectsData.map(function(project, index) {
-            return (
-              <ProjectCard
-                key={project.num}
-                project={project}
-                visible={visible}
-                index={index}
-                darkMode={darkMode}
-              />
-            );
-          })}
+          {projectsData.map((project, index) => (
+            <ProjectCard
+              key={project.num}
+              project={project}
+              index={index}
+              darkMode={darkMode}
+            />
+          ))}
         </div>
 
       </div>
