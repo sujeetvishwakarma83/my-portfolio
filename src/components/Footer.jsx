@@ -36,7 +36,7 @@ function Footer({ darkMode }) {
       const g1x = w * (0.2 + 0.15 * Math.sin(t));
       const g1y = h * (0.5 + 0.3 * Math.cos(t * 0.7));
       const grad1 = ctx.createRadialGradient(g1x, g1y, 0, g1x, g1y, w * 0.4);
-      grad1.addColorStop(0, darkMode ? 'rgba(0,245,160,0.18)' : 'rgba(0,200,130,0.15)');
+      grad1.addColorStop(0, darkMode? 'rgba(0,245,160,0.18)' : 'rgba(0,200,130,0.15)');
       grad1.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = grad1;
       ctx.fillRect(0, 0, w, h);
@@ -45,7 +45,7 @@ function Footer({ darkMode }) {
       const g2x = w * (0.75 + 0.15 * Math.cos(t * 0.8));
       const g2y = h * (0.5 + 0.3 * Math.sin(t * 0.6));
       const grad2 = ctx.createRadialGradient(g2x, g2y, 0, g2x, g2y, w * 0.35);
-      grad2.addColorStop(0, darkMode ? 'rgba(124,58,237,0.2)' : 'rgba(124,58,237,0.12)');
+      grad2.addColorStop(0, darkMode? 'rgba(124,58,237,0.2)' : 'rgba(124,58,237,0.12)');
       grad2.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = grad2;
       ctx.fillRect(0, 0, w, h);
@@ -54,7 +54,7 @@ function Footer({ darkMode }) {
       const g3x = w * (0.5 + 0.2 * Math.sin(t * 1.1 + 1));
       const g3y = h * (0.5 + 0.2 * Math.cos(t * 0.9 + 2));
       const grad3 = ctx.createRadialGradient(g3x, g3y, 0, g3x, g3y, w * 0.25);
-      grad3.addColorStop(0, darkMode ? 'rgba(0,180,255,0.1)' : 'rgba(0,150,220,0.08)');
+      grad3.addColorStop(0, darkMode? 'rgba(0,180,255,0.1)' : 'rgba(0,150,220,0.08)');
       grad3.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = grad3;
       ctx.fillRect(0, 0, w, h);
@@ -70,7 +70,7 @@ function Footer({ darkMode }) {
     };
   }, [darkMode]);
 
-  const links = [
+  const socialLinks = [
     {
       label: 'GitHub',
       href: 'https://github.com/sujeetvishwakarma83',
@@ -100,11 +100,34 @@ function Footer({ darkMode }) {
     },
   ];
 
-  const footerBg = darkMode ? '#0d0d14' : '#e8f5f0';
-  const borderColor = darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,150,100,0.15)';
-  const textColor = darkMode ? '#6b6b7a' : '#4a7a65';
-  const linkColor = darkMode ? '#6b6b7a' : '#4a7a65';
+  const quickLinks = [
+    { label: 'Home', href: '#hero' },
+    { label: 'About', href: '#about' },
+    { label: 'Projects', href: '#projects' },
+    { label: 'Services', href: '#services' },
+    { label: 'Contact', href: '#contact' },
+  ];
+
+  const techStack = ['React.js', 'Next.js', 'Node.js', 'MongoDB', 'Express', 'AWS', 'TypeScript'];
+
+  const footerBg = darkMode? '#0d0d14' : '#e8f5f0';
+  const borderColor = darkMode? 'rgba(255,255,255,0.07)' : 'rgba(0,150,100,0.15)';
+  const textColor = darkMode? '#6b6b7a' : '#4a7a65';
+  const linkColor = darkMode? '#9ca3af' : '#4a7a65';
   const glowColor = '#00f5a0';
+  const cardBg = darkMode? 'rgba(255,255,255,0.03)' : 'rgba(0,150,100,0.05)';
+
+  // Hire Me button handler - scroll to contact section
+  const handleHireMe = () => {
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Agar contact section nahi hai to hero pe le jao
+      const heroSection = document.getElementById('hero');
+      if (heroSection) heroSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <footer style={{
@@ -124,84 +147,293 @@ function Footer({ darkMode }) {
         }}
       />
 
-      {/* Content */}
+      {/* Main Content */}
       <div style={{
         position: 'relative', zIndex: 1,
-        padding: isMobile ? '3rem 1.5rem' : '4rem 4rem',
-        display: 'flex',
-        flexDirection: isMobile ? 'column' : 'row',
-        justifyContent: 'space-between',
-        alignItems: isMobile ? 'center' : 'flex-start',
-        gap: '2rem',
+        padding: isMobile? '3rem 1.5rem 2rem' : '4rem 4rem 2.5rem',
       }}>
 
-        {/* Left — branding & Location */}
-        <div style={{ textAlign: isMobile ? 'center' : 'left', maxWidth: '350px' }}>
-          <div style={{
-            fontFamily: '"Space Mono", monospace',
-            fontSize: '1.2rem',
-            color: glowColor,
-            letterSpacing: '0.05em',
-            marginBottom: '0.8rem',
-            fontWeight: 800,
-          }}>
-            Sujeet Vishwakarma.
-          </div>
-          <p style={{
-            fontSize: '0.85rem',
-            color: textColor,
-            lineHeight: 1.6,
-            marginBottom: '1rem'
-          }}>
-            Building seamless digital solutions and scalable web applications. Based in Jaunpur, Uttar Pradesh.
-          </p>
-        </div>
-
-        {/* Right — Social Links with icons */}
+        {/* Top Section - 3 Columns */}
         <div style={{
-          display: 'flex',
-          gap: '1rem',
-          flexWrap: 'wrap',
-          justifyContent: isMobile ? 'center' : 'flex-end',
+          display: 'grid',
+          gridTemplateColumns: isMobile? '1fr' : '2fr 1fr 1fr',
+          gap: isMobile? '2.5rem' : '3rem',
+          marginBottom: '3rem',
         }}>
-          {links.map((link) => (
+
+          {/* Column 1 — Branding + About + CTA */}
+          <div style={{ textAlign: isMobile? 'center' : 'left' }}>
+            <div style={{
+              fontFamily: '"Space Mono", monospace',
+              fontSize: '1.5rem',
+              color: glowColor,
+              letterSpacing: '0.05em',
+              marginBottom: '0.8rem',
+              fontWeight: 800,
+            }}>
+              Sujeet Vishwakarma
+            </div>
+            <p style={{
+              fontSize: '0.9rem',
+              color: textColor,
+              lineHeight: 1.7,
+              marginBottom: '1.2rem',
+              maxWidth: '400px',
+              margin: isMobile? '0 auto 1.2rem' : '0 0 1.2rem 0'
+            }}>
+              Fullstack Developer building scalable web apps & APIs. Specialized in MERN stack with cloud deployment.
+            </p>
+
+            {/* Availability Badge */}
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontSize: '0.75rem',
+              color: glowColor,
+              background: darkMode? 'rgba(0,245,160,0.1)' : 'rgba(0,200,130,0.15)',
+              padding: '0.4rem 0.9rem',
+              borderRadius: '50px',
+              border: `1px solid ${glowColor}40`,
+              marginBottom: '1.5rem',
+              fontFamily: '"Space Mono", monospace',
+              fontWeight: 600,
+            }}>
+              <span style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: glowColor,
+                boxShadow: `0 0 10px ${glowColor}`,
+                animation: 'pulse 2s infinite'
+              }}></span>
+              Available for Projects
+            </div>
+
+            {/* CTA Button - Fixed */}
+            <div>
+              <button
+                onClick={handleHireMe}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  fontFamily: '"Space Mono", monospace',
+                  fontSize: '0.85rem',
+                  color: '#000',
+                  background: glowColor,
+                  padding: '0.8rem 1.8rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  letterSpacing: '0.03em',
+                  transition: 'all 0.3s',
+                  boxShadow: `0 4px 15px -3px ${glowColor}80`,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = `0 8px 25px -5px ${glowColor}`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = `0 4px 15px -3px ${glowColor}80`;
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M4 4h16c1.1 0 2 0 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                Hire Me
+              </button>
+            </div>
+          </div>
+
+          {/* Column 2 — Quick Links */}
+          <div style={{ textAlign: isMobile? 'center' : 'left' }}>
+            <h4 style={{
+              fontFamily: '"Space Mono", monospace',
+              fontSize: '0.9rem',
+              color: darkMode? '#fff' : '#000',
+              marginBottom: '1.2rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontWeight: 700,
+            }}>
+              Quick Links
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+              {quickLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  style={{
+                    fontSize: '0.85rem',
+                    color: linkColor,
+                    textDecoration: 'none',
+                    transition: 'all 0.2s',
+                    fontFamily: '"Space Mono", monospace',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = glowColor;
+                    e.currentTarget.style.paddingLeft = '5px';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = linkColor;
+                    e.currentTarget.style.paddingLeft = '0';
+                  }}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Column 3 — Contact + Social */}
+          <div style={{ textAlign: isMobile? 'center' : 'left' }}>
+            <h4 style={{
+              fontFamily: '"Space Mono", monospace',
+              fontSize: '0.9rem',
+              color: darkMode? '#fff' : '#000',
+              marginBottom: '1.2rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontWeight: 700,
+            }}>
+              Connect
+            </h4>
+
+            {/* Email - Updated */}
             <a
-              key={link.label}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={link.label}
+              href="mailto:sujeet8528420907@gmail.com"
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem',
-                fontFamily: '"Space Mono", monospace',
-                fontSize: '0.75rem',
+                gap: '0.6rem',
+                fontSize: '0.85rem',
                 color: linkColor,
                 textDecoration: 'none',
-                padding: '0.6rem 1rem',
-                border: `1px solid ${borderColor}`,
-                borderRadius: '8px',
-                background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,150,100,0.05)',
-                transition: 'all 0.3s',
+                marginBottom: '1rem',
+                justifyContent: isMobile? 'center' : 'flex-start',
+                transition: 'color 0.2s',
+                fontFamily: '"Space Mono", monospace',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = glowColor;
-                e.currentTarget.style.borderColor = glowColor;
-                e.currentTarget.style.background = darkMode ? 'rgba(0,245,160,0.08)' : 'rgba(0,150,100,0.1)';
-                e.currentTarget.style.transform = 'translateY(-3px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = linkColor;
-                e.currentTarget.style.borderColor = borderColor;
-                e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,150,100,0.05)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = glowColor}
+              onMouseLeave={(e) => e.currentTarget.style.color = linkColor}
             >
-              {link.icon}
-              {link.label}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 4h16c1.1 0 2 0 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              sujeet8528420907@gmail.com
             </a>
-          ))}
+
+            {/* Location */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.6rem',
+              fontSize: '0.85rem',
+              color: textColor,
+              marginBottom: '1.2rem',
+              justifyContent: isMobile? 'center' : 'flex-start',
+              fontFamily: '"Space Mono", monospace',
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 10c0 7-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Jaunpur, UP, India | Remote Worldwide
+            </div>
+
+            {/* Social Icons - Fixed */}
+            <div style={{
+              display: 'flex',
+              gap: '0.8rem',
+              flexWrap: 'wrap',
+              justifyContent: isMobile? 'center' : 'flex-start',
+            }}>
+              {socialLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={link.label}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '38px',
+                    height: '38px',
+                    color: linkColor,
+                    border: `1px solid ${borderColor}`,
+                    borderRadius: '8px',
+                    background: cardBg,
+                    transition: 'all 0.3s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = glowColor;
+                    e.currentTarget.style.borderColor = glowColor;
+                    e.currentTarget.style.background = darkMode? 'rgba(0,245,160,0.1)' : 'rgba(0,150,100,0.15)';
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = linkColor;
+                    e.currentTarget.style.borderColor = borderColor;
+                    e.currentTarget.style.background = cardBg;
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  {link.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Tech Stack Tags */}
+        <div style={{
+          borderTop: `1px solid ${borderColor}`,
+          paddingTop: '2rem',
+          marginBottom: '2rem',
+        }}>
+          <p style={{
+            fontFamily: '"Space Mono", monospace',
+            fontSize: '0.75rem',
+            color: textColor,
+            marginBottom: '1rem',
+            textAlign: 'center',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+          }}>
+            Tech Stack
+          </p>
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.6rem',
+            justifyContent: 'center',
+          }}>
+            {techStack.map((tech) => (
+              <span
+                key={tech}
+                style={{
+                  fontSize: '0.7rem',
+                  color: linkColor,
+                  background: cardBg,
+                  border: `1px solid ${borderColor}`,
+                  padding: '0.4rem 0.8rem',
+                  borderRadius: '6px',
+                  fontFamily: '"Space Mono", monospace',
+                  fontWeight: 600,
+                }}
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
         </div>
 
       </div>
@@ -210,24 +442,44 @@ function Footer({ darkMode }) {
       <div style={{
         position: 'relative', zIndex: 1,
         borderTop: `1px solid ${borderColor}`,
-        padding: isMobile ? '1.5rem' : '1.5rem 4rem',
+        padding: isMobile? '1.5rem' : '1.5rem 4rem',
         display: 'flex',
-        flexDirection: isMobile ? 'column' : 'row',
+        flexDirection: isMobile? 'column' : 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '1.5rem',
+        gap: '1rem',
       }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile? 'column' : 'row',
+          gap: isMobile? '0.5rem' : '1.5rem',
+          alignItems: 'center',
+        }}>
+          <p style={{
+            fontFamily: '"Space Mono", monospace',
+            fontSize: '0.75rem',
+            color: textColor,
+            margin: 0,
+            textAlign: isMobile? 'center' : 'left'
+          }}>
+            © 2026 Sujeet Vishwakarma. All Rights Reserved.
+          </p>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <a href="#privacy" style={{ fontSize: '0.7rem', color: textColor, textDecoration: 'none' }}>Privacy</a>
+            <a href="#terms" style={{ fontSize: '0.7rem', color: textColor, textDecoration: 'none' }}>Terms</a>
+          </div>
+        </div>
+
         <p style={{
           fontFamily: '"Space Mono", monospace',
-          fontSize: '0.75rem',
+          fontSize: '0.7rem',
           color: textColor,
           margin: 0,
-          textAlign: isMobile ? 'center' : 'left'
         }}>
-          © 2026 Sujeet Vishwakarma. All Rights Reserved.
+          Built with Next.js & ☕
         </p>
 
-        {/* Back to Home Button */}
+        {/* Back to Top Button */}
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           style={{
@@ -269,6 +521,13 @@ function Footer({ darkMode }) {
         </button>
 
       </div>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
 
     </footer>
   );
