@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, MapPin, Send } from 'lucide-react';
 
-// Custom Icons to avoid lucide-react import issues
 const GithubIcon = ({ size = 20, color = "currentColor" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4" /><path d="M12 18v4" /></svg>
 );
@@ -19,12 +18,14 @@ function Contact({ darkMode }) {
   // Animation States
   const [submitted, setSubmitted] = useState(false);
   const [isFlying, setIsFlying] = useState(false);
-  const [flightPath, setFlightPath] = useState({ startX: 0, startY: 0, endX: 0, endY: 0 });
+  
+  // Path Array
+  const [flightPath, setFlightPath] = useState({ x: [], y: [], rot: [], scale: [], opacity: [] });
 
   const ref = useRef(null);
   const canvasRef = useRef(null);
   const animRef = useRef(null);
-  const submitBtnRef = useRef(null); // Button tracking
+  const submitBtnRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -43,7 +44,6 @@ function Contact({ darkMode }) {
     return () => observer.disconnect();
   }, []);
 
-  // Light mode background canvas animation
   useEffect(() => {
     if (darkMode) {
       if (animRef.current) cancelAnimationFrame(animRef.current);
@@ -100,13 +100,12 @@ function Contact({ darkMode }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Calculate Start and End Positions for the Plane
     const btnRect = submitBtnRef.current.getBoundingClientRect();
     const startX = btnRect.left + btnRect.width / 2;
     const startY = btnRect.top + btnRect.height / 2;
 
-    const logoEl = document.getElementById('nav-logo'); // TARGET NAVBAR LOGO
-    let endX = 20, endY = 20; // Fallback agar logo na mile
+    const logoEl = document.getElementById('nav-logo');
+    let endX = 20, endY = 20; 
     
     if (logoEl) {
       const logoRect = logoEl.getBoundingClientRect();
@@ -114,23 +113,82 @@ function Contact({ darkMode }) {
       endY = logoRect.top + logoRect.height / 2;
     }
 
-    setFlightPath({ startX, startY, endX, endY });
-    setIsFlying(true); // TRIGGER ANIMATION
+    // ✅ ZYADA LAHRATA HUA PATH (More Time, More Waves)
+    const steps = 60; // Smoothness badha di (40 se 60)
+    const pathX = [];
+    const pathY = [];
+    const rotations = [];
+    const scales = [];
+    const opacities = [];
+    
+    const dx = startX - endX;
+    const dy = startY - endY;
+    
+    // Lahar ki chaudaai (Amplitude) badha di
+    const amplitude = isMobile ? 90 : 200; 
+    
+    // Kitni baar lahraayega (Waves badha diye)
+    const waves = 3.5; 
 
-    // 2. Form Submission API
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps; 
+      
+      const lx = startX - dx * t;
+      const ly = startY - dy * t;
+
+      const taper = Math.sin(t * Math.PI); 
+      const offset = Math.sin(t * Math.PI * 2 * waves) * amplitude * taper;
+
+      const angle = Math.atan2(-dy, -dx);
+      const perpAngle = angle + Math.PI / 2;
+
+      pathX.push(lx + Math.cos(perpAngle) * offset);
+      pathY.push(ly + Math.sin(perpAngle) * offset);
+      
+      // Udte time thoda bada aur center mein aur bada dikhega
+      scales.push(i === steps ? 0 : 1.2 + (Math.sin(t * Math.PI) * 0.4)); 
+      opacities.push(i === steps ? 0 : 1);
+    }
+
+    for (let i = 0; i <= steps; i++) {
+      if (i === steps) {
+        rotations.push(rotations[i - 1]);
+      } else {
+        const ax = pathX[i + 1] - pathX[i];
+        const ay = pathY[i + 1] - pathY[i];
+        const deg = Math.atan2(ay, ax) * (180 / Math.PI);
+        rotations.push(deg);
+      }
+    }
+
+    setFlightPath({ x: pathX, y: pathY, rot: rotations, scale: scales, opacity: opacities });
+    setIsFlying(true); 
+
     try {
       await fetch("https://script.google.com/macros/s/AKfycbwg_rnIeQpyDmUjieNEnOqvz7UYBvN5hOxTWSPVwsdm_HpML5CO6swtQi-JkiXVHS7BKQ/exec", {
         method: "POST",
         body: JSON.stringify(formData),
       });
       
+      // ✅ TAKRANE KA EFFECT (Exactly 3.5 seconds baad)
       setTimeout(() => {
-        setIsFlying(false); // End flight animation
+        setIsFlying(false);
         setSubmitted(true);
         setFormData({ name: '', email: '', message: '' });
-      }, 1000); // 1 sec ki animation timing match kar rahe hain
 
-      setTimeout(() => { setSubmitted(false); }, 4000);
+        if (logoEl) {
+          logoEl.style.transform = 'scale(1.4)'; 
+          logoEl.style.boxShadow = `0 0 30px #00F5A0, 0 0 60px #00F5A0`; 
+          
+          setTimeout(() => {
+            logoEl.style.transform = 'scale(1)'; 
+            logoEl.style.boxShadow = 'none'; 
+          }, 500); 
+        }
+
+      }, 3500); // ⏱️ Time badha kar 3.5 second kar diya
+
+      setTimeout(() => { setSubmitted(false); }, 7000);
 
     } catch (error) {
       console.error(error);
@@ -139,7 +197,6 @@ function Contact({ darkMode }) {
     }
   };
 
-  // Theme Variables
   const sectionBg = darkMode ? '#0A0A0A' : '#f8fafc';
   const titleColor = darkMode ? '#ffffff' : '#0f172a';
   const textColor = darkMode ? '#9ca3af' : '#475569';
@@ -160,25 +217,33 @@ function Contact({ darkMode }) {
       background: sectionBg, position: 'relative', overflow: 'hidden', minHeight: '100vh',
     }}>
 
-      {/* FLYING PLANE ANIMATION LAYER (Z-index top par) */}
+      {/* ✅ FLYING PLANE ANIMATION LAYER */}
       <AnimatePresence>
         {isFlying && (
           <motion.div
             initial={{ 
-              position: 'fixed', left: flightPath.startX, top: flightPath.startY,
+              position: 'fixed', 
+              left: flightPath.x[0], 
+              top: flightPath.y[0],
               x: '-50%', y: '-50%', scale: 1, opacity: 1, rotate: -45, zIndex: 99999
             }}
             animate={{ 
-              left: flightPath.endX, top: flightPath.endY, 
-              scale: 0.3, opacity: 0, rotate: 0 
+              left: flightPath.x, 
+              top: flightPath.y, 
+              rotate: flightPath.rot,
+              scale: flightPath.scale, 
+              opacity: flightPath.opacity 
             }}
-            transition={{ duration: 1, ease: "easeInOut" }}
+            transition={{ 
+              duration: 3.5, // ⏱️ Flight ab aaram se 3.5 seconds chalegi
+              ease: "linear",
+            }}
             style={{ pointerEvents: 'none' }}
           >
             <div style={{
               background: glowColor, color: '#000', padding: '15px',
               borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: `0 0 30px ${glowColor}`
+              boxShadow: `0 0 40px ${glowColor}, 0 0 80px ${glowColor}` // Glow thoda aur badha diya
             }}>
               <Send size={28} />
             </div>
@@ -186,7 +251,6 @@ function Contact({ darkMode }) {
         )}
       </AnimatePresence>
 
-      {/* Background Ambience */}
       {!darkMode && <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
         <div style={{ position: 'absolute', top: '20%', right: '5%', width: '300px', height: '300px', background: `radial-gradient(circle, ${glowColor}10 0%, transparent 70%)`, filter: 'blur(60px)' }} />
@@ -194,7 +258,6 @@ function Contact({ darkMode }) {
 
       <div style={{ position: 'relative', zIndex: 10, maxWidth: '1100px', margin: '0 auto' }}>
         
-        {/* Header */}
         <div style={{ textAlign: isMobile ? 'center' : 'left', marginBottom: '4rem' }}>
           <div style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.8rem', letterSpacing: '0.15em', color: glowColor, textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 700 }}>
             07 // Get In Touch
@@ -204,14 +267,12 @@ function Contact({ darkMode }) {
           </h2>
         </div>
 
-        {/* Grid Layout */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 30 }}
           transition={{ duration: 0.8 }}
           style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.2fr', gap: isMobile ? '3rem' : '5rem' }}
         >
-          {/* Left - Contact Info */}
           <div>
             <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: titleColor }}>
               Let's build something great.
@@ -237,7 +298,6 @@ function Contact({ darkMode }) {
             </div>
           </div>
 
-          {/* Right - Form Container */}
           <div style={{ background: darkMode ? 'rgba(24, 24, 31, 0.6)' : 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(20px)', padding: isMobile ? '2rem 1.5rem' : '3rem', borderRadius: '24px', border: `1px solid ${inputBorder}`, boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)' }}>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
@@ -265,7 +325,6 @@ function Contact({ darkMode }) {
                 />
               </div>
 
-              {/* Submit Button - REF attached here for animation tracking */}
               <button 
                 ref={submitBtnRef} 
                 type="submit" 

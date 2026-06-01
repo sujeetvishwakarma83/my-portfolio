@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import profilePic from '../assets/profile.jpg';
 
 const navIcons = {
   about: (
@@ -26,7 +27,7 @@ const navIcons = {
 
 function Navbar({ darkMode, setDarkMode }) {
   const [scrolled, setScrolled] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024); // Adjusted for more links
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024); 
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
   const [scrollDir, setScrollDir] = useState('down');
@@ -35,7 +36,6 @@ function Navbar({ darkMode, setDarkMode }) {
   const lastScrollY = useRef(0);
   const ulRef = useRef(null);
 
-  // ✅ SARE SECTIONS YAHAN ADD KIYE HAIN
   const links = ['about', 'services', 'skills', 'education', 'projects', 'why-hire-me', 'contact'];
 
   useEffect(() => {
@@ -60,7 +60,7 @@ function Navbar({ darkMode, setDarkMode }) {
     };
 
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 1024); // Desktop breakpoint adjusted due to 7 links
+      setIsMobile(window.innerWidth <= 1024); 
       if (window.innerWidth > 1024) setMenuOpen(false);
     };
 
@@ -114,15 +114,33 @@ function Navbar({ darkMode, setDarkMode }) {
       transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
     }}>
 
-      {/* ✅ ID ADDED HERE FOR PLANE ANIMATION TARGET */}
-      <a href="#hero" id="nav-logo" onClick={scrollToHero} style={{
-        fontFamily: '"Space Mono", monospace', fontSize: '1rem', color: glowColor,
-        letterSpacing: '0.05em', textDecoration: 'none', cursor: 'pointer',
-        display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800
-      }}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24"><title>home-alt-twotone</title><path fill="currentColor" fillOpacity="0" d="M10 13h4v8h-4Z"><animate fill="freeze" attributeName="fill-opacity" begin="1.5s" dur="0.15s" to=".3"/></path><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path strokeDasharray="18" d="M4.5 21.5h15"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="18;0"/></path><path strokeDasharray="16" strokeDashoffset="16" d="M4.5 21.5v-13.5M19.5 21.5v-13.5"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.3s" dur="0.3s" to="0"/></path><path strokeDasharray="28" strokeDashoffset="28" d="M2 10l10 -8l10 8"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.4s" to="0"/></path><path strokeDasharray="26" strokeDashoffset="26" d="M9.5 21.5v-9h5v9"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.9s" dur="0.6s" to="0"/></path></g></svg>
-        Sujeet.
-      </a>
+      {/* ✅ Left Side Profile & Name */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+        
+        {/* DP Click Event added here */}
+        <img 
+          id="nav-logo" 
+          src={profilePic}
+          alt="Sujeet Vishwakarma" 
+          onClick={(e) => {
+            e.preventDefault();
+            window.dispatchEvent(new CustomEvent('open-profile-modal'));
+          }}
+          style={{
+            width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover',
+            border: `2px solid ${glowColor}`, padding: '2px', cursor: 'pointer',
+            background: darkMode ? '#111' : '#fff',
+            transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+          }} 
+        />
+        
+        <a href="#hero" onClick={scrollToHero} style={{
+          fontFamily: '"Space Mono", monospace', fontSize: '1rem', color: glowColor,
+          letterSpacing: '0.05em', textDecoration: 'none', cursor: 'pointer', fontWeight: 800
+        }}>
+          Sujeet.
+        </a>
+      </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '1rem' : '1.5rem' }}>
 
@@ -132,7 +150,6 @@ function Navbar({ darkMode, setDarkMode }) {
             <ul ref={ulRef} style={{ display: 'flex', gap: '0.2rem', listStyle: 'none', margin: 0, padding: 0, position: 'relative' }}>
               {links.map((item) => {
                 const isActive = activeSection === item;
-                // Dash hata kar space lagana (why-hire-me -> why hire me)
                 const displayText = item.replace(/-/g, ' '); 
                 return (
                   <li key={item}>
