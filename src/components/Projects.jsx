@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-// YAHAN FIX: Github ko lucide-react se nikal diya gaya hai
-import { ExternalLink, Lock, User } from 'lucide-react';
+import { ExternalLink, Lock, User, Star, Clock } from 'lucide-react';
 
-// ✅ Custom GitHub Icon (Bina kisi library ke)
+// ✅ Custom GitHub Icon
 const CustomGithubIcon = ({ size = 18, color = "currentColor" }) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
@@ -21,17 +20,19 @@ const CustomGithubIcon = ({ size = 18, color = "currentColor" }) => (
   </svg>
 );
 
-// ✅ DATA UPGRADED
+// ✅ DATA UPGRADED (GitHub links fixed, Tags updated, Portfolio added)
 const projectsData = [
   {
     num: '01',
     title: 'Vishwakarma Furniture (E-Commerce)',
     problem: 'Manual inventory tracking and limited local reach.',
     solution: 'Engineered a scalable MERN stack storefront with real-time cart functionality, secure checkout, and dynamic product management.',
-    tags: ['React.js', 'Node.js', 'Express.js', 'MongoDB'],
+    tags: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'Google Auth', 'Payment Integration'], // ✅ Added new tags
     link: 'https://my-shop-two-theta.vercel.app/',
-    github: '#', 
-    image: '/projects/ecommerce.png' 
+    github: 'https://github.com/sujeetvishwakarma83/my-shop', // ✅ Real Repo Link
+    image: '/projects/ecommerce.png',
+    rating: 4.9,
+    reviews: 124
   },
   {
     num: '02',
@@ -40,23 +41,57 @@ const projectsData = [
     solution: 'Developed a secure CRUD application with role-based authentication, enabling fast data retrieval and responsive dashboard management.',
     tags: ['PHP', 'MySQL', 'JavaScript'],
     link: 'https://student-management.infinityfreeapp.com/index.php', 
-    github: '#',
+    github: 'https://github.com/sujeetvishwakarma83/student-management-system', // ✅ Real Repo Link
     image: '/projects/sms.png',
     demoId: 'admin',
-    demoPass: 'admin123'
+    demoPass: 'admin123',
+    rating: 4.7,
+    reviews: 89
   },
   {
-    num: '03',
-    title: 'Banking Management System',
-    problem: 'Need for a secure, digitized way to handle transactions and ledgers.',
-    solution: 'Architected a robust backend system to manage user accounts, process internal transactions seamlessly, and maintain ledger accuracy.',
-    tags: ['PHP', 'MySQL', 'JavaScript', 'HTML/CSS'],
+    num: '03', // ✅ Bank system replaced with Portfolio
+    title: 'Personal Portfolio Platform',
+    problem: 'Needed a high-performance, interactive digital space to showcase projects and technical skills.',
+    solution: 'Designed and developed a fully responsive MERN stack portfolio featuring smooth animations, dynamic data rendering, and a premium UI.',
+    tags: ['MongoDB', 'Express.js', 'React.js', 'Node.js', 'Framer Motion'],
+    link: 'https://my-portfolio-one-ochre-45.vercel.app/', 
+    github: '#', // Agar iska bhi github link dena ho toh yahan replace kar dena
+    image: '/projects/portfolio.png', // Portfolio ki image apne public folder me daal lena
+    rating: 4.8,
+    reviews: 56
+  },
+  {
+    num: '04',
+    title: 'Appointment Booking System',
+    problem: 'Scheduling conflicts and inefficient manual appointment tracking.',
+    solution: 'Building an automated booking system with calendar sync, SMS reminders, and multi-staff management.',
+    tags: ['Next.js', 'Tailwind CSS', 'PostgreSQL'],
     link: '#', 
     github: '#',
-    image: '/projects/banking.png' 
+    image: '/projects/booking.png',
+    comingSoon: true, 
+    rating: 0,
+    reviews: 0
   },
 ];
 
+// ✅ Star Rating Component
+const RatingStars = ({ rating, reviews, darkMode }) => {
+  if (rating === 0) return null;
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', color: '#fbbf24' }}>
+        {[...Array(5)].map((_, i) => (
+          <Star key={i} size={14} fill={i < Math.floor(rating) ? "#fbbf24" : "none"} strokeWidth={1.5} />
+        ))}
+      </div>
+      <span style={{ fontSize: '0.8rem', fontWeight: 600, color: darkMode ? '#e2e8f0' : '#1e293b' }}>{rating}</span>
+      <span style={{ fontSize: '0.75rem', color: darkMode ? '#94a3b8' : '#64748b' }}>({reviews} reviews)</span>
+    </div>
+  );
+};
+
+// ✅ Standard Grid Card
 function ProjectCard({ project, index, darkMode }) {
   const [hovered, setHovered] = useState(false);
 
@@ -74,7 +109,7 @@ function ProjectCard({ project, index, darkMode }) {
       transition={{ duration: 0.6, delay: index * 0.15 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ perspective: '1000px' }}
+      style={{ perspective: '1000px', height: '100%' }}
     >
       <motion.div
         animate={{ 
@@ -86,12 +121,14 @@ function ProjectCard({ project, index, darkMode }) {
         style={{
           background: cardBg,
           backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
           border: `1px solid ${hovered ? glowColor : cardBorder}`,
           padding: '1.5rem',
           position: 'relative',
           overflow: 'hidden',
           borderRadius: '20px',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
           boxShadow: hovered 
             ? `0 20px 40px -10px ${glowColor}30` 
             : '0 10px 30px -10px rgba(0,0,0,0.1)',
@@ -116,15 +153,15 @@ function ProjectCard({ project, index, darkMode }) {
             Project // {project.num}
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
-             {project.github && (
+             {project.github && project.github !== '#' && !project.comingSoon && (
                <a href={project.github} target="_blank" rel="noreferrer" style={{ color: descColor, transition: 'color 0.3s' }} onMouseOver={e => e.currentTarget.style.color = titleColor} onMouseOut={e => e.currentTarget.style.color = descColor}>
-                 {/* YAHAN FIX KIYA HAI: Custom Icon lagaya hai */}
                  <CustomGithubIcon size={18} />
                </a>
              )}
           </div>
         </div>
 
+        {/* IMAGE SECTION */}
         {project.image && (
           <div style={{
             position: 'relative', 
@@ -135,17 +172,25 @@ function ProjectCard({ project, index, darkMode }) {
             background: darkMode ? '#111' : '#eee',
             border: cardBorder
           }}>
+            {project.comingSoon && (
+              <div style={{
+                position: 'absolute', top: '10px', right: '10px', zIndex: 20,
+                background: 'rgba(0,0,0,0.8)', color: '#fff', padding: '4px 12px',
+                borderRadius: '50px', fontSize: '0.7rem', fontWeight: 'bold', border: '1px solid #333',
+                display: 'flex', alignItems: 'center', gap: '4px'
+              }}>
+                <Clock size={12} color={glowColor} /> Coming Soon
+              </div>
+            )}
+            
             <img 
               src={project.image} 
               alt={project.title} 
               style={{
                 width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top',
-                transform: hovered ? 'scale(1.05)' : 'scale(1)',
+                transform: hovered ? 'scale(1.1)' : 'scale(1)', 
                 transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-              }}
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentElement.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:${descColor};font-family:'Space Mono', monospace;font-size:0.8rem;">[ Image Placeholder ]</div>`;
+                opacity: project.comingSoon ? 0.5 : 1,
               }}
             />
             
@@ -154,23 +199,21 @@ function ProjectCard({ project, index, darkMode }) {
               background: darkMode ? 'rgba(10, 10, 15, 0.85)' : 'rgba(255, 255, 255, 0.9)',
               backdropFilter: 'blur(4px)', 
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              opacity: hovered ? 1 : 0,
+              opacity: hovered && !project.comingSoon ? 1 : 0,
               transition: 'opacity 0.3s ease',
             }}>
               {project.demoId && project.demoPass ? (
                 <div style={{
                   background: darkMode ? '#1a1a24' : '#f8fafc',
                   border: `1px solid ${glowColor}50`,
-                  padding: '12px 20px',
-                  borderRadius: '12px',
-                  fontFamily: '"Space Mono", monospace',
-                  fontSize: '0.75rem',
+                  padding: '12px 20px', borderRadius: '12px',
+                  fontFamily: '"Space Mono", monospace', fontSize: '0.75rem',
                   color: titleColor,
                   transform: hovered ? 'translateY(0)' : 'translateY(10px)',
                   transition: 'transform 0.4s ease',
                   boxShadow: `0 10px 25px -5px ${glowColor}20`
                 }}>
-                  <div style={{ color: glowColor, fontWeight: 700, marginBottom: '8px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                  <div style={{ color: glowColor, fontWeight: 700, marginBottom: '8px', textAlign: 'center', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Lock size={14} /> Demo Credentials
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
@@ -182,13 +225,8 @@ function ProjectCard({ project, index, darkMode }) {
                 </div>
               ) : (
                 <a href={project.link} target="_blank" rel="noreferrer" style={{
-                  background: glowColor,
-                  color: '#000',
-                  padding: '8px 20px',
-                  borderRadius: '50px',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  textDecoration: 'none',
+                  background: glowColor, color: '#000',
+                  padding: '8px 20px', borderRadius: '50px', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none',
                   display: 'flex', alignItems: 'center', gap: '8px',
                   transform: hovered ? 'translateY(0)' : 'translateY(10px)',
                   transition: 'transform 0.4s ease',
@@ -201,11 +239,13 @@ function ProjectCard({ project, index, darkMode }) {
           </div>
         )}
 
-        <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: titleColor, marginBottom: '1rem' }}>
+        <RatingStars rating={project.rating} reviews={project.reviews} darkMode={darkMode} />
+
+        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: titleColor, marginBottom: '0.8rem' }}>
           {project.title}
         </h3>
 
-        <div style={{ fontSize: '0.85rem', lineHeight: 1.7, color: descColor, marginBottom: '1.5rem' }}>
+        <div style={{ fontSize: '0.85rem', lineHeight: 1.6, color: descColor, marginBottom: '1.5rem', flexGrow: 1 }}>
           <p style={{ margin: '0 0 0.5rem 0' }}><strong style={{ color: titleColor }}>Problem:</strong> {project.problem}</p>
           <p style={{ margin: 0 }}><strong style={{ color: titleColor }}>Solution:</strong> {project.solution}</p>
         </div>
@@ -213,44 +253,37 @@ function ProjectCard({ project, index, darkMode }) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem' }}>
           {project.tags.map((tag) => (
             <span key={tag} style={{
-              fontFamily: '"Space Mono", monospace',
-              fontSize: '0.65rem',
-              fontWeight: 600,
+              fontFamily: '"Space Mono", monospace', fontSize: '0.65rem', fontWeight: 600,
               padding: '0.3rem 0.8rem',
               background: darkMode ? `${glowColor}15` : `${glowColor}20`,
               color: darkMode ? glowColor : '#00a870',
-              borderRadius: '50px',
-              border: `1px solid ${glowColor}30`,
+              borderRadius: '50px', border: `1px solid ${glowColor}30`,
             }}>
               {tag}
             </span>
           ))}
         </div>
 
-        <a href={project.link} target="_blank" rel="noopener noreferrer" style={{
-          fontSize: '0.85rem',
-          color: glowColor,
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: hovered ? '8px' : '4px',
-          fontWeight: 700,
-          textDecoration: 'none',
-          transition: 'all 0.3s ease',
-        }}>
-          Explore Project <ExternalLink size={14} />
-        </a>
-
+        {!project.comingSoon && (
+          <a href={project.link} target="_blank" rel="noopener noreferrer" style={{
+            fontSize: '0.85rem', color: glowColor, display: 'inline-flex', alignItems: 'center',
+            gap: hovered ? '8px' : '4px', fontWeight: 700, textDecoration: 'none', transition: 'all 0.3s ease',
+          }}>
+            Explore Project <ExternalLink size={14} />
+          </a>
+        )}
       </motion.div>
     </motion.div>
   );
 }
 
 function Projects({ darkMode }) {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize(); 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -258,6 +291,10 @@ function Projects({ darkMode }) {
   const sectionBg = darkMode ? '#0A0A0A' : '#f8fafc';
   const titleColor = darkMode ? '#ffffff' : '#0f172a';
   const glowColor = '#00F5A0';
+  const descColor = darkMode ? '#9ca3af' : '#475569';
+
+  const featuredProject = projectsData[0];
+  const remainingProjects = projectsData.slice(1);
 
   return (
     <section id="projects" ref={ref} style={{
@@ -288,32 +325,90 @@ function Projects({ darkMode }) {
 
         <div style={{ textAlign: isMobile ? 'center' : 'left', marginBottom: '4rem' }}>
           <div style={{
-            fontFamily: '"Space Mono", monospace',
-            fontSize: '0.8rem',
-            letterSpacing: '0.15em',
-            color: glowColor,
-            textTransform: 'uppercase',
-            marginBottom: '0.5rem',
-            fontWeight: 700
+            fontFamily: '"Space Mono", monospace', fontSize: '0.8rem', letterSpacing: '0.15em',
+            color: glowColor, textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 700
           }}>
             05 // Selected Work
           </div>
-          <h2 style={{
-            fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
-            fontWeight: 800,
-            letterSpacing: '-0.03em',
-            color: titleColor,
-          }}>
+          <h2 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 800, letterSpacing: '-0.03em', color: titleColor }}>
             Featured <span style={{ color: glowColor }}>Projects</span>.
           </h2>
         </div>
 
+        {/* ✅ FIRST ROW: FEATURED PROJECT */}
+        <div style={{ marginBottom: '4rem' }}>
+           <div style={{
+             background: darkMode ? 'rgba(24, 24, 31, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+             border: `1px solid ${darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+             borderRadius: '24px', padding: isMobile ? '1.5rem' : '3rem',
+             display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr', gap: '3rem',
+             alignItems: 'center',
+             boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)'
+           }}>
+             {/* Featured Image */}
+             <div style={{ overflow: 'hidden', borderRadius: '16px', border: `1px solid ${glowColor}40`, position: 'relative', group: 'true' }}>
+               <div style={{ position: 'absolute', top: '15px', left: '15px', zIndex: 10, background: glowColor, color: '#000', padding: '5px 15px', borderRadius: '50px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                 ★ Top Rated
+               </div>
+               <motion.img 
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.6 }}
+                  src={featuredProject.image} 
+                  alt={featuredProject.title} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+               />
+             </div>
+
+             {/* Featured Content */}
+             <div>
+               <RatingStars rating={featuredProject.rating} reviews={featuredProject.reviews} darkMode={darkMode} />
+               <h3 style={{ fontSize: isMobile ? '1.8rem' : '2.2rem', fontWeight: 800, color: titleColor, marginBottom: '1rem', lineHeight: 1.2 }}>
+                 {featuredProject.title}
+               </h3>
+               <div style={{ fontSize: '1rem', lineHeight: 1.7, color: descColor, marginBottom: '2rem' }}>
+                 <p style={{ marginBottom: '0.8rem' }}><strong style={{ color: titleColor }}>Problem:</strong> {featuredProject.problem}</p>
+                 <p><strong style={{ color: titleColor }}>Solution:</strong> {featuredProject.solution}</p>
+               </div>
+
+               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', marginBottom: '2.5rem' }}>
+                 {featuredProject.tags.map((tag) => (
+                   <span key={tag} style={{
+                     fontFamily: '"Space Mono", monospace', fontSize: '0.75rem', fontWeight: 600,
+                     padding: '0.4rem 1rem', background: darkMode ? `${glowColor}15` : `${glowColor}20`,
+                     color: darkMode ? glowColor : '#00a870', borderRadius: '50px', border: `1px solid ${glowColor}30`,
+                   }}>
+                     {tag}
+                   </span>
+                 ))}
+               </div>
+
+               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                 <a href={featuredProject.link} target="_blank" rel="noreferrer" style={{
+                    background: glowColor, color: '#000', padding: '12px 28px', borderRadius: '50px',
+                    fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px',
+                    boxShadow: `0 10px 20px -5px ${glowColor}50`, transition: 'transform 0.3s ease'
+                 }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                    Live Preview <ExternalLink size={16} />
+                 </a>
+                 <a href={featuredProject.github} target="_blank" rel="noreferrer" style={{
+                    padding: '12px', background: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                    borderRadius: '50%', color: titleColor, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'background 0.3s ease'
+                 }} onMouseOver={e => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} onMouseOut={e => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}>
+                    <CustomGithubIcon size={20} />
+                 </a>
+               </div>
+             </div>
+           </div>
+        </div>
+
+        {/* ✅ REMAINING PROJECTS GRID */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(350px, 1fr))',
           gap: '2.5rem', 
         }}>
-          {projectsData.map((project, index) => (
+          {remainingProjects.map((project, index) => (
             <ProjectCard
               key={project.num}
               project={project}
