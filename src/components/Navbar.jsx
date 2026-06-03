@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import profilePic from '../assets/profile.jpg';
+import myLogo from '../assets/logo.png';
 
 const navIcons = {
   about: (
@@ -114,31 +114,27 @@ function Navbar({ darkMode, setDarkMode }) {
       transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
     }}>
 
-      {/* ✅ Left Side Profile & Name */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-        
-        {/* DP Click Event added here */}
-        <img 
-          id="nav-logo" 
-          src={profilePic}
-          alt="Sujeet Vishwakarma" 
-          onClick={(e) => {
-            e.preventDefault();
-            window.dispatchEvent(new CustomEvent('open-profile-modal'));
-          }}
-          style={{
-            width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover',
-            border: `2px solid ${glowColor}`, padding: '2px', cursor: 'pointer',
-            background: darkMode ? '#111' : '#fff',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-          }} 
-        />
-        
-        <a href="#hero" onClick={scrollToHero} style={{
-          fontFamily: '"Space Mono", monospace', fontSize: '1rem', color: glowColor,
-          letterSpacing: '0.05em', textDecoration: 'none', cursor: 'pointer', fontWeight: 800
-        }}>
-          Sujeet.
+      {/* ✅ Left Side Logo */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <a 
+          href="#hero" 
+          onClick={scrollToHero} 
+          style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
+        >
+         <img 
+  id="nav-logo" 
+  src={myLogo} 
+  alt="My Logo" 
+  style={{
+    // Ab aap is height ko apne hisab se 45px, 50px, ya 55px tak adjust kar sakte hain
+    height: '75px', 
+    width: 'auto',
+    cursor: 'pointer',
+    transition: 'transform 0.3s ease',
+  }} 
+  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+/>
         </a>
       </div>
 
