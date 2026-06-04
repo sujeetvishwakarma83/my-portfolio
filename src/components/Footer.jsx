@@ -370,7 +370,7 @@ function Footer({ darkMode }) {
               </h4>
 
               <a
-                href="mailto:sujeet8528420907@gmail.com"
+                href="mailto:sujeet83@zohomail.in"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -390,7 +390,7 @@ function Footer({ darkMode }) {
                   <path d="M4 4h16c1.1 0 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                   <polyline points="22,6 12,13 2,6"/>
                 </svg>
-                sujeet8528420907@gmail.com
+                sujeet83@zohomail.in
               </a>
 
               <div style={{

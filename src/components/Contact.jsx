@@ -205,7 +205,7 @@ function Contact({ darkMode }) {
   const inputBorder = darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
   const contactItems = [
-    { icon: <Mail size={18} />, label: 'sujeet8528420907@gmail.com', href: 'mailto:sujeet8528420907@gmail.com' },
+    { icon: <Mail size={18} />, label: 'sujeet83@zohomail.in', href: 'mailto:sujeet83@zohomail.in' },
     { icon: <GithubIcon size={18} />, label: 'github.com/sujeetvishwakarma83', href: 'https://github.com/sujeetvishwakarma83' },
     { icon: <LinkedinIcon size={18} />, label: 'LinkedIn Profile', href: 'https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a/' },
     { icon: <MapPin size={18} />, label: 'Jaunpur, India', href: '#' },
