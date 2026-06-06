@@ -205,7 +205,7 @@ function Contact({ darkMode }) {
   const inputBorder = darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
   const contactItems = [
-    { icon: <Mail size={18} />, label: 'sujeet83@zohomail.in', href: 'mailto:sujeet83@zohomail.in' },
+    { icon: <Mail size={18} />, label: 'sujeet.cabbagecode@gmail.com', href: 'mailto:sujeet.cabbagecode@gmail.com' },
     { icon: <GithubIcon size={18} />, label: 'github.com/sujeetvishwakarma83', href: 'https://github.com/sujeetvishwakarma83' },
     { icon: <LinkedinIcon size={18} />, label: 'LinkedIn Profile', href: 'https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a/' },
     { icon: <MapPin size={18} />, label: 'Jaunpur, India', href: '#' },
@@ -303,7 +303,7 @@ function Contact({ darkMode }) {
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <label style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.75rem', color: glowColor, textTransform: 'uppercase' }}>Your Name</label>
-                <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="John Doe" 
+                <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="sujeet" 
                   style={{ background: inputBg, border: `1px solid ${inputBorder}`, color: titleColor, padding: '1rem', borderRadius: '12px', outline: 'none', transition: 'all 0.3s' }}
                   onFocus={(e) => e.target.style.borderColor = glowColor} onBlur={(e) => e.target.style.borderColor = inputBorder}
                 />
@@ -311,7 +311,7 @@ function Contact({ darkMode }) {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <label style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.75rem', color: glowColor, textTransform: 'uppercase' }}>Email Address</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="john@company.com" 
+                <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="sujeet.cabbagecode@gmail.com" 
                   style={{ background: inputBg, border: `1px solid ${inputBorder}`, color: titleColor, padding: '1rem', borderRadius: '12px', outline: 'none', transition: 'all 0.3s' }}
                   onFocus={(e) => e.target.style.borderColor = glowColor} onBlur={(e) => e.target.style.borderColor = inputBorder}
                 />

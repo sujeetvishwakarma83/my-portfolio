@@ -151,7 +151,7 @@ fill="currentColor" viewBox="0 0 24 24" >
         <p>You have the right to request access, correction, or deletion of your personal data at any time.</p>
 
         <h3>Contact</h3>
-        <p>For privacy-related inquiries: <strong>sujeet8528420907@gmail.com</strong></p>
+        <p>For privacy-related inquiries: <strong>sujeet.cabbagecode@gmail.com</strong></p>
         <p style="margin-top: 1.5rem; font-size: 0.8rem; color: #6b6b7a;">Last updated: June 2026</p>
       `
     },
@@ -196,7 +196,7 @@ fill="currentColor" viewBox="0 0 24 24" >
         <p>I strive for excellence but cannot guarantee uninterrupted service or be liable for indirect damages arising from the use of delivered products.</p>
 
         <h3>Contact</h3>
-        <p>For questions regarding these terms: <strong>sujeet8528420907@gmail.com</strong></p>
+        <p>For questions regarding these terms: <strong>sujeet.cabbagecode@gmail.com</strong></p>
         <p style="margin-top: 1.5rem; font-size: 0.8rem; color: #6b6b7a;">Last updated: June 2026</p>
       `
     }
