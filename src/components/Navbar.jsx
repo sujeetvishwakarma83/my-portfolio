@@ -32,6 +32,7 @@ function Navbar({ darkMode, setDarkMode }) {
   const [activeSection, setActiveSection] = useState('');
   const [scrollDir, setScrollDir] = useState('down');
   const [linePos, setLinePos] = useState(0);
+  const [lineWidth, setLineWidth] = useState(0);
   
   const lastScrollY = useRef(0);
   const ulRef = useRef(null);
@@ -51,7 +52,7 @@ function Navbar({ darkMode, setDarkMode }) {
         const el = document.getElementById(id);
         if (el) {
           const rect = el.getBoundingClientRect();
-          if (rect.top <= 150 && rect.bottom >= 150) {
+          if (rect.top <= 80 && rect.bottom >= 80) {
             current = id;
           }
         }
@@ -79,6 +80,7 @@ function Navbar({ darkMode, setDarkMode }) {
       const ulRect = ulRef.current.getBoundingClientRect();
       const linkRect = activeLink.getBoundingClientRect();
       setLinePos(linkRect.left - ulRect.left);
+      setLineWidth(linkRect.width);
     }
   }, [activeSection]);
 
@@ -92,7 +94,7 @@ function Navbar({ darkMode, setDarkMode }) {
     setMenuOpen(false);
     const el = document.getElementById(id);
     if (el) {
-      const yOffset = -70; 
+      const yOffset = -35; 
       const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
@@ -106,8 +108,8 @@ function Navbar({ darkMode, setDarkMode }) {
   return (
     <nav style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-      display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap',
-      padding: isMobile ? '1rem 1.25rem' : '1rem 4rem',
+      display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: isMobile ? 'wrap' : 'nowrap',
+      padding: isMobile ? '0.3rem 1.25rem' : '0.3rem 4rem',
       background: (scrolled || menuOpen) ? navBg : 'transparent',
       backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
       borderBottom: scrolled ? navBorder : '1px solid transparent',
@@ -115,33 +117,34 @@ function Navbar({ darkMode, setDarkMode }) {
     }}>
 
       {/* ✅ Left Side Logo */}
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', flex: isMobile ? 'none' : '1 1 0%', justifyContent: 'flex-start' }}>
         <a 
           href="#hero" 
           onClick={scrollToHero} 
           style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
         >
-         <img 
-  id="nav-logo" 
-  src={myLogo} 
-  alt="My Logo" 
-  style={{
-    // Ab aap is height ko apne hisab se 45px, 50px, ya 55px tak adjust kar sakte hain
-    height: '75px', 
-    width: 'auto',
-    cursor: 'pointer',
-    transition: 'transform 0.3s ease',
-  }} 
-  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-/>
+          <img 
+            id="nav-logo" 
+            src={myLogo} 
+            alt="My Logo" 
+            style={{
+              height: '32px', 
+              width: 'auto',
+              cursor: 'pointer',
+              transition: 'transform 0.3s ease',
+              filter: darkMode 
+                ? 'brightness(1.3) contrast(1.1) drop-shadow(1px 0px 0px rgba(255, 255, 255, 0.9)) drop-shadow(-1px 0px 0px rgba(255, 255, 255, 0.9)) drop-shadow(0px 1px 0px rgba(255, 255, 255, 0.9)) drop-shadow(0px -1px 0px rgba(255, 255, 255, 0.9)) drop-shadow(0px 0px 8px rgba(0, 245, 160, 0.35))' 
+                : 'none'
+            }} 
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          />
         </a>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '1rem' : '1.5rem' }}>
-
-        {/* Desktop Links */}
-        {!isMobile && (
+      {/* ✅ Center Desktop Links */}
+      {!isMobile && (
+        <div style={{ display: 'flex', justifyContent: 'center', flex: '1 1 0%' }}>
           <div style={{ position: 'relative' }}>
             <ul ref={ulRef} style={{ display: 'flex', gap: '0.2rem', listStyle: 'none', margin: 0, padding: 0, position: 'relative' }}>
               {links.map((item) => {
@@ -153,12 +156,21 @@ function Navbar({ darkMode, setDarkMode }) {
                       style={{
                         fontFamily: '"Space Mono", monospace', fontSize: '0.7rem', letterSpacing: '0.05em',
                         color: isActive ? glowColor : linkColor, textDecoration: 'none', textTransform: 'uppercase',
-                        transition: 'color 0.3s', display: 'flex', alignItems: 'center', gap: '0.3rem',
-                        padding: '0.5rem 0.6rem', fontWeight: isActive ? 700 : 500, borderRadius: '8px',
-                        background: isActive ? (darkMode ? 'rgba(0,245,160,0.05)' : 'rgba(0,180,120,0.05)') : 'transparent'
+                        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)', display: 'flex', alignItems: 'center', gap: '0.3rem',
+                        padding: '0.5rem 0.6rem', fontWeight: isActive ? 800 : 500, borderRadius: '8px',
+                        background: isActive ? (darkMode ? 'rgba(0,245,160,0.08)' : 'rgba(0,180,120,0.08)') : 'transparent',
+                        whiteSpace: 'nowrap',
+                        transform: isActive ? 'scale(1.06)' : 'scale(1)',
+                        textShadow: isActive ? `0 0 10px ${glowColor}60` : 'none',
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = glowColor}
-                      onMouseLeave={(e) => e.currentTarget.style.color = isActive ? glowColor : linkColor}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = glowColor;
+                        e.currentTarget.style.transform = 'scale(1.06)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = isActive ? glowColor : linkColor;
+                        e.currentTarget.style.transform = isActive ? 'scale(1.06)' : 'scale(1)';
+                      }}
                     >
                       <span style={{ opacity: isActive ? 1 : 0.6, transition: 'opacity 0.2s', display: 'flex', alignItems: 'center' }}>
                         {navIcons[item] || ''}
@@ -171,74 +183,82 @@ function Navbar({ darkMode, setDarkMode }) {
 
               {activeSection && (
                 <div style={{
-                  position: 'absolute', bottom: '-8px', left: `${linePos}px`, width: '80px', height: '2px',
+                  position: 'absolute', bottom: '-8px', left: `${linePos}px`, width: `${lineWidth}px`, height: '2px',
                   background: `linear-gradient(90deg, ${glowColor}, #7c3aed)`,
-                  transition: 'left 0.4s cubic-bezier(0.16, 1, 0.3, 1)', borderRadius: '2px',
+                  transition: 'left 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s cubic-bezier(0.16, 1, 0.3, 1)', borderRadius: '2px',
                 }} />
               )}
             </ul>
           </div>
+        </div>
+      )}
+
+      {/* ✅ Right Side Actions */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '1rem', 
+        flex: isMobile ? 'none' : '1 1 0%', 
+        justifyContent: 'flex-end' 
+      }}>
+        
+        {/* Theme Toggle */}
+        <button onClick={() => setDarkMode(!darkMode)}
+          style={{
+            background: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+            border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
+            borderRadius: '50px', padding: '0.4rem', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s',
+            width: '36px', height: '36px'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
+        >
+          <span style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center', color: darkMode ? '#ffffff' : '#0f172a' }}>
+            {darkMode ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><title>clear-day-fill</title><defs><linearGradient id="SVGeq4GoeLw" x1="150" x2="234" y1="119.2" y2="264.8" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#fbbf24"/><stop offset=".5" stopColor="#fbbf24"/><stop offset="1" stopColor="#f59e0b"/></linearGradient><symbol id="SVG0a04Kbxn" viewBox="0 0 384 384"><circle cx="192" cy="192" r="84" fill="url(#SVGeq4GoeLw)" stroke="#f8af18" strokeMiterlimit="10" strokeWidth="6"/><path fill="none" stroke="#fbbf24" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="24" d="M192 61.7V12m0 360v-49.7m92.2-222.5l35-35M64.8 319.2l35.1-35.1m0-184.4l-35-35m254.5 254.5l-35.1-35.1M61.7 192H12m360 0h-49.7"><animateTransform additive="sum" attributeName="transform" dur="6s" repeatCount="indefinite" type="rotate" values="0 192 192; 45 192 192"/></path></symbol></defs><use width="384" height="384" href="#SVG0a04Kbxn" transform="translate(64 64)"/></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><title>falling-stars-fill</title><defs><linearGradient id="SVGpS2jccQh" x1="54.3" x2="187.2" y1="29" y2="259.1" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#86c3db"/><stop offset=".5" stopColor="#86c3db"/><stop offset="1" stopColor="#5eafcf"/></linearGradient><linearGradient id="SVGd7QnDc9f" x1="344.3" x2="375.7" y1="153.9" y2="208.3" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#fcd966"/><stop offset=".5" stopColor="#fcd966"/><stop offset="1" stopColor="#fccd34"/></linearGradient><linearGradient id="SVGQTOPYbHv" x1="294" x2="330" y1="112.8" y2="175.2" href="#SVGd7QnDc9f"/><linearGradient id="SVGK4VCRbuf" x1="356.3" x2="387.7" y1="194.8" y2="249.2" href="#SVGd7QnDc9f"/><clipPath id="SVGt2Tt9c7j"><path fill="none" d="M512 27.5L240 189.1l16 48l40 32l216-96V27.5z"/></clipPath><symbol id="SVG7sC0PeQg" viewBox="0 0 270 270"><path fill="url(#SVGpS2jccQh)" stroke="#72b9d5" strokeLinecap="round" strokeLinejoin="round" strokeWidth="6" d="M252.3 168.6A133.4 133.4 0 0 1 118 36.2A130.5 130.5 0 0 1 122.5 3A133 133 0 0 0 3 134.6C3 207.7 63 267 137.2 267c62.5 0 114.8-42.2 129.8-99.2a135.6 135.6 0 0 1-14.8.8Z"><animateTransform additive="sum" attributeName="transform" dur="6s" repeatCount="indefinite" type="rotate" values="-15 135 135; 9 135 135; -15 135 135"/></path></symbol></defs><use width="270" height="270" href="#SVG7sC0PeQg" transform="translate(121 121)"/></svg>
+            )}
+          </span>
+        </button>
+
+        {/* Hire Me CTA Button */}
+        {!isMobile && (
+          <a href="#contact" onClick={(e) => scrollToSection(e, 'contact')}
+            style={{
+              fontFamily: '"Space Mono", monospace', fontSize: '0.75rem', fontWeight: 700,
+              color: '#000', background: glowColor, padding: '0.5rem 1rem', borderRadius: '50px',
+              textDecoration: 'none', letterSpacing: '0.05em', transition: 'all 0.3s',
+              boxShadow: `0 4px 15px -5px ${glowColor}60`,
+              whiteSpace: 'nowrap'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = `0 8px 20px -5px ${glowColor}`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = `0 4px 15px -5px ${glowColor}60`;
+            }}
+          >
+            Hire Me
+          </a>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          
-          {/* Theme Toggle */}
-          <button onClick={() => setDarkMode(!darkMode)}
+        {/* Mobile Hamburger */}
+        {isMobile && (
+          <button onClick={() => setMenuOpen(!menuOpen)}
             style={{
-              background: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-              border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
-              borderRadius: '50px', padding: '0.4rem', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s',
-              width: '36px', height: '36px'
+              background: 'none', border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
+              color: glowColor, fontFamily: '"Space Mono", monospace', fontSize: '0.9rem',
+              padding: '0.4rem 0.65rem', borderRadius: '8px', cursor: 'pointer',
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
           >
-            <span style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center', color: darkMode ? '#ffffff' : '#0f172a' }}>
-              {darkMode ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><title>clear-day-fill</title><defs><linearGradient id="SVGeq4GoeLw" x1="150" x2="234" y1="119.2" y2="264.8" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#fbbf24"/><stop offset=".5" stopColor="#fbbf24"/><stop offset="1" stopColor="#f59e0b"/></linearGradient><symbol id="SVG0a04Kbxn" viewBox="0 0 384 384"><circle cx="192" cy="192" r="84" fill="url(#SVGeq4GoeLw)" stroke="#f8af18" strokeMiterlimit="10" strokeWidth="6"/><path fill="none" stroke="#fbbf24" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="24" d="M192 61.7V12m0 360v-49.7m92.2-222.5l35-35M64.8 319.2l35.1-35.1m0-184.4l-35-35m254.5 254.5l-35.1-35.1M61.7 192H12m360 0h-49.7"><animateTransform additive="sum" attributeName="transform" dur="6s" repeatCount="indefinite" type="rotate" values="0 192 192; 45 192 192"/></path></symbol></defs><use width="384" height="384" href="#SVG0a04Kbxn" transform="translate(64 64)"/></svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><title>falling-stars-fill</title><defs><linearGradient id="SVGpS2jccQh" x1="54.3" x2="187.2" y1="29" y2="259.1" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#86c3db"/><stop offset=".5" stopColor="#86c3db"/><stop offset="1" stopColor="#5eafcf"/></linearGradient><linearGradient id="SVGd7QnDc9f" x1="344.3" x2="375.7" y1="153.9" y2="208.3" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#fcd966"/><stop offset=".5" stopColor="#fcd966"/><stop offset="1" stopColor="#fccd34"/></linearGradient><linearGradient id="SVGQTOPYbHv" x1="294" x2="330" y1="112.8" y2="175.2" href="#SVGd7QnDc9f"/><linearGradient id="SVGK4VCRbuf" x1="356.3" x2="387.7" y1="194.8" y2="249.2" href="#SVGd7QnDc9f"/><clipPath id="SVGt2Tt9c7j"><path fill="none" d="M512 27.5L240 189.1l16 48l40 32l216-96V27.5z"/></clipPath><symbol id="SVG7sC0PeQg" viewBox="0 0 270 270"><path fill="url(#SVGpS2jccQh)" stroke="#72b9d5" strokeLinecap="round" strokeLinejoin="round" strokeWidth="6" d="M252.3 168.6A133.4 133.4 0 0 1 118 36.2A130.5 130.5 0 0 1 122.5 3A133 133 0 0 0 3 134.6C3 207.7 63 267 137.2 267c62.5 0 114.8-42.2 129.8-99.2a135.6 135.6 0 0 1-14.8.8Z"><animateTransform additive="sum" attributeName="transform" dur="6s" repeatCount="indefinite" type="rotate" values="-15 135 135; 9 135 135; -15 135 135"/></path></symbol></defs><g clipPath="url(#SVGt2Tt9c7j)" opacity="0"><path fill="none" stroke="#fcd34d" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="4" d="m332 193.1l-5.4 2.7"/><path fill="none" stroke="#fcd34d" strokeDasharray="12.6 12.6" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="4" d="M315.4 201.4L231 243.6"/><path fill="none" stroke="#fcd34d" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="4" d="m225.4 246.4l-5.4 2.7"/><path fill="url(#SVGd7QnDc9f)" stroke="#fcd34d" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m329.1 165.3l18 18.3a1.8 1.8 0 0 1 .5 1.8l-6.5 24.9a1.8 1.8 0 0 0 3 1.7l18.4-18a1.8 1.8 0 0 1 1.7-.4l25 6.4a1.8 1.8 0 0 0 1.7-3l-18-18.4a1.8 1.8 0 0 1-.5-1.7l6.4-24.9a1.8 1.8 0 0 0-3-1.7l-18.3 18a1.8 1.8 0 0 1-1.7.4l-25-6.4a1.8 1.8 0 0 0-1.7 3Z"/><animateTransform id="SVGm4hF6cWt" additive="sum" attributeName="transform" begin="0s; x1.end+2s" dur="1s" repeatCount="indefinite" type="translate" values="-126 48; 42 -30"/><animate id="SVGMSOEXcsB" attributeName="opacity" begin="0s; y1.end+2s" calcMode="spline" dur="1s" keySplines=".42, 0, .58, 1; .42, 0, .58, 1; .42, 0, .58, 1" keyTimes="0; .17; .67; 1" values="0; 1; 1; 0"/></g><path fill="url(#SVGQTOPYbHv)" stroke="#fcd34d" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m282.8 162.8l25-6.4a1.8 1.8 0 0 1 1.7.5l18.3 18a1.8 1.8 0 0 0 3-1.7l-6.4-25a1.8 1.8 0 0 1 .5-1.7l18-18.4a1.8 1.8 0 0 0-1.8-3l-24.9 6.5a1.8 1.8 0 0 1-1.7-.5l-18.4-18a1.8 1.8 0 0 0-3 1.7l6.5 25a1.8 1.8 0 0 1-.5 1.7l-18 18.3a1.8 1.8 0 0 0 1.7 3Z"><animateTransform additive="sum" attributeName="transform" calcMode="spline" dur="6s" keySplines=".42, 0, .58, 1; .42, 0, .58, 1" repeatCount="indefinite" type="rotate" values="-15 312 144; 15 312 144; -15 312 144"/><animate attributeName="opacity" calcMode="spline" dur="6s" keySplines=".42, 0, .58, 1; .42, 0, .58, 1; .42, 0, .58, 1; .42, 0, .58, 1; .42, 0, .58, 1; .42, 0, .58, 1" repeatCount="indefinite" values="1; .75; 1; .75; 1; .75; 1"/></path><path fill="url(#SVGK4VCRbuf)" stroke="#fcd34d" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m337.3 223.7l24.8 7a1.8 1.8 0 0 1 1.3 1.2l6.9 24.8a1.8 1.8 0 0 0 3.4 0l7-24.8a1.8 1.8 0 0 1 1.2-1.3l24.8-6.9a1.8 1.8 0 0 0 0-3.4l-24.8-7a1.8 1.8 0 0 1-1.3-1.2l-6.9-24.8a1.8 1.8 0 0 0-3.4 0l-7 24.8a1.8 1.8 0 0 1-1.2 1.3l-24.8 6.9a1.8 1.8 0 0 0 0 3.4Z"><animateTransform additive="sum" attributeName="transform" begin="-.67s" calcMode="spline" dur="6s" keySplines=".42, 0, .58, 1; .42, 0, .58, 1" repeatCount="indefinite" type="rotate" values="-15 372 222; 15 372 222; -15 372 222"/><animate attributeName="opacity" begin="-.67s" calcMode="spline" dur="6s" keySplines=".42, 0, .58, 1; .42, 0, .58, 1; .42, 0, .58, 1; .42, 0, .58, 1; .42, 0, .58, 1; .42, 0, .58, 1" repeatCount="indefinite" values="1; .75; 1; .75; 1; .75; 1"/></path><use width="270" height="270" href="#SVG7sC0PeQg" transform="translate(121 121)"/></svg>
-              )}
-            </span>
+            {menuOpen ? 'X' : '☰'}
           </button>
+        )}
 
-          {/* Hire Me CTA Button */}
-          {!isMobile && (
-            <a href="#contact" onClick={(e) => scrollToSection(e, 'contact')}
-              style={{
-                fontFamily: '"Space Mono", monospace', fontSize: '0.75rem', fontWeight: 700,
-                color: '#000', background: glowColor, padding: '0.5rem 1rem', borderRadius: '50px',
-                textDecoration: 'none', letterSpacing: '0.05em', transition: 'all 0.3s',
-                boxShadow: `0 4px 15px -5px ${glowColor}60`
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = `0 8px 20px -5px ${glowColor}`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = `0 4px 15px -5px ${glowColor}60`;
-              }}
-            >
-              Hire Me
-            </a>
-          )}
-
-          {/* Mobile Hamburger */}
-          {isMobile && (
-            <button onClick={() => setMenuOpen(!menuOpen)}
-              style={{
-                background: 'none', border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
-                color: glowColor, fontFamily: '"Space Mono", monospace', fontSize: '0.9rem',
-                padding: '0.4rem 0.65rem', borderRadius: '8px', cursor: 'pointer',
-              }}
-            >
-              {menuOpen ? 'X' : '☰'}
-            </button>
-          )}
-
-        </div>
       </div>
 
       {/* Mobile Dropdown */}

@@ -155,7 +155,7 @@ function Hero({ darkMode }) {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: isMobile ? '6rem 1.2rem 4rem' : '8rem 4rem 4rem',
+    padding: isMobile ? '4rem 1.2rem 4rem' : '4.8rem 4rem 4rem',
     position: 'relative',
     overflow: 'hidden',
     backgroundColor: bgMain,
