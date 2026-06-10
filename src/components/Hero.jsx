@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import { Player } from '@lottiefiles/react-lottie-player'; // Lottie Animation ke liye import
+import { useState, useEffect } from 'react';
 import resumeFile from '../assets/resume.pdf';
-import codingAnim from '../assets/coding.json';
+import heroVideo from '../assets/hero_video.mp4';
 
 function useTyping(texts, speed, pause) {
   speed = speed || 80;
@@ -46,9 +45,6 @@ function useTyping(texts, speed, pause) {
 function Hero({ darkMode }) {
   var [visible, setVisible] = useState(false);
   var [isMobile, setIsMobile] = useState(window.innerWidth <= 992);
-  var canvasRef = useRef(null);
-  var animRef = useRef(null);
-  var particlesRef = useRef([]);
 
   useEffect(function() {
     var timer = setTimeout(function() { setVisible(true); }, 100);
@@ -60,76 +56,6 @@ function Hero({ darkMode }) {
     window.addEventListener('resize', handleResize);
     return function() { window.removeEventListener('resize', handleResize); };
   }, []);
-
-  // Background Particles
-  useEffect(function() {
-    if (!darkMode) {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
-      return;
-    }
-    var canvas = canvasRef.current;
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-
-    var resize = function() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    particlesRef.current = [];
-    for (var i = 0; i < 50; i++) {
-      particlesRef.current.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 2 + 1,
-        dx: (Math.random() - 0.5) * 0.4,
-        dy: (Math.random() - 0.5) * 0.4,
-        opacity: Math.random() * 0.4 + 0.1,
-        color: Math.random() > 0.5 ? '0,245,160' : '124,58,237',
-      });
-    }
-
-    var draw = function() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      var particles = particlesRef.current;
-
-      for (var a = 0; a < particles.length; a++) {
-        for (var b = a + 1; b < particles.length; b++) {
-          var dist = Math.hypot(particles[a].x - particles[b].x, particles[a].y - particles[b].y);
-          if (dist < 150) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'rgba(124,58,237,' + (0.1 * (1 - dist / 150)) + ')';
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(particles[a].x, particles[a].y);
-            ctx.lineTo(particles[b].x, particles[b].y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      for (var j = 0; j < particles.length; j++) {
-        var p = particles[j];
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(' + p.color + ',' + p.opacity + ')';
-        ctx.fill();
-        p.x += p.dx;
-        p.y += p.dy;
-        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
-      }
-      animRef.current = requestAnimationFrame(draw);
-    };
-
-    draw();
-
-    return function() {
-      cancelAnimationFrame(animRef.current);
-      window.removeEventListener('resize', resize);
-    };
-  }, [darkMode]);
 
   var typedDesc = useTyping(
     [
@@ -307,7 +233,7 @@ function Hero({ darkMode }) {
     whiteSpace: 'nowrap',
   };
 
-  var profileSize = isMobile ? '300px' : '450px'; // Lottie ke hisab se size adjust kiya hai
+  var profileSize = isMobile ? '300px' : '450px';
 
   return (
     <section id="hero" style={sectionStyle}>
@@ -330,8 +256,35 @@ function Hero({ darkMode }) {
         .social-link:hover { color: ${primaryColor}; border-color: ${primaryColor}; transform: translateY(-3px) scale(1.05); }
       `}</style>
 
-      {/* Background Grid & Blobs */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+      {/* Background Video */}
+      <video
+        src={heroVideo}
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          zIndex: 0
+        }}
+      />
+
+      {/* Backdrop Overlay to ensure text legibility */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: darkMode ? 'rgba(10, 10, 10, 0.75)' : 'rgba(248, 250, 252, 0.85)',
+        zIndex: 1,
+        pointerEvents: 'none'
+      }} />
+
+      {/* Cyber Grid & Holographic Glow Overlay */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
         <div style={{ 
           position: 'absolute', inset: 0, 
           backgroundImage: 'linear-gradient(' + (darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)') + ' 1px, transparent 1px), linear-gradient(90deg, ' + (darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)') + ' 1px, transparent 1px)', 
@@ -342,10 +295,6 @@ function Hero({ darkMode }) {
         <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: isMobile ? '300px' : '600px', height: isMobile ? '300px' : '600px', background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 60%)', filter: 'blur(80px)' }} />
         <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', background: 'radial-gradient(circle, rgba(0,245,160,0.15) 0%, transparent 60%)', filter: 'blur(80px)' }} />
       </div>
-
-      {/* Light/Dark Mode Canvas */}
-      {!darkMode && <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1, opacity: 0.6 }} />}
-      {darkMode && <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1, opacity: 0.7 }} />}
 
       {/* Main Content */}
       <div style={containerStyle}>
@@ -404,7 +353,7 @@ function Hero({ darkMode }) {
 
         </div>
 
-        {/* RIGHT COLUMN: LOTTIE ANIMATION & STATS */}
+        {/* RIGHT COLUMN: STATS CARDS */}
         <div style={rightColStyle}>
           
           <div style={{ position: 'relative', width: profileSize, height: profileSize }}>
@@ -412,18 +361,6 @@ function Hero({ darkMode }) {
             {/* Glow Behind Model */}
             <div style={{ position: 'absolute', inset: '-20px', background: 'radial-gradient(circle, ' + primaryColor + '40, transparent 70%)', borderRadius: '50%', filter: 'blur(40px)', zIndex: 0 }}></div>
             
-            {/* LOTTIE PLAYER COMPONENT */}
-            <div style={{ position: 'absolute', inset: 0, zIndex: 10, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Player
-                  autoplay
-                  loop
-                  // Yahan maine ek bahut achhi developer (coding) ki free Lottie URL daali hai. 
-                  // Agar aapko dusri lagani ho to URL change kar lena.
-                  src={codingAnim} 
-                  style={{ height: '110%', width: '110%' }}
-                />
-            </div>
-
             {/* Glassmorphism Stat Cards */}
             <div style={{ 
               ...glassCardStyle, 
@@ -487,19 +424,15 @@ function Hero({ darkMode }) {
             marginTop: isMobile ? '4rem' : '0',
             zIndex: 20
           }}>
-            {/* GitHub */}
             <a href="https://github.com/sujeetvishwakarma83" target="_blank" rel="noopener noreferrer" className="social-link">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
             </a>
-            {/* LinkedIn */}
             <a href="https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a" target="_blank" rel="noopener noreferrer" className="social-link">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 2a2 2 0 1 1-2 2 2 2 0 0 1 2-2z"/></svg>
             </a>
-            {/* Instagram */}
             <a href="https://www.instagram.com/cabbage_code/" target="_blank" rel="noopener noreferrer" className="social-link">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37zM17.5 6.5h.01"/></svg>
             </a>
-            {/* Email */}
             <a href="mailto:sujeet.cabbagecode@gmail.com" className="social-link">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6"/></svg>
             </a>
@@ -523,14 +456,18 @@ function Hero({ darkMode }) {
           zIndex: 10,
           animation: 'float-fast 2s ease-in-out infinite'
         }}
-        onClick={function() { window.scrollTo({ top: window.innerHeight, behavior: 'smooth' }) }}
+        onClick={function() {
+          var aboutEl = document.getElementById('about');
+          if (aboutEl) {
+            aboutEl.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
       >
         <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: 700, color: textMuted }}>
           Scroll Down
         </span>
         <svg style={{ color: primaryColor }} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-
     </section>
   );
 }
