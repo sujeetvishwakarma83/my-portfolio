@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import resumeFile from '../assets/resume.pdf';
-import heroVideo from '../assets/hero_video.mp4';
+import profilePhoto from '../assets/profile.jpg';
 
 function useTyping(texts, speed, pause) {
   speed = speed || 80;
@@ -84,7 +84,7 @@ function Hero({ darkMode }) {
     padding: isMobile ? '4rem 1.2rem 4rem' : '4.8rem 4rem 4rem',
     position: 'relative',
     overflow: 'hidden',
-    backgroundColor: bgMain,
+    background: darkMode ? '#050508' : '#f8fafc',
     color: textMain,
     fontFamily: '"Inter", "Segoe UI", sans-serif',
   };
@@ -236,7 +236,7 @@ function Hero({ darkMode }) {
   var profileSize = isMobile ? '300px' : '450px';
 
   return (
-    <section id="hero" style={sectionStyle}>
+    <section id="hero" className="premium-bg" style={sectionStyle}>
       {/* Embedded CSS for Hover Effects & Keyframes */}
       <style>{`
         @keyframes float-slow { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
@@ -244,6 +244,23 @@ function Hero({ darkMode }) {
         @keyframes blink-cursor { 50% { opacity: 0; } }
         @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(0, 245, 160, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 245, 160, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 245, 160, 0); } }
         
+        @keyframes rotate-slow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes rotate-reverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        
+        @keyframes gradient-bg {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        .premium-bg {
+          background: ${darkMode 
+            ? 'linear-gradient(-45deg, #030305, #080710, #0c0818, #020204)' 
+            : 'linear-gradient(-45deg, #f1f5f9, #f8fafc, #eff6ff, #f8fafc)'};
+          background-size: 400% 400%;
+          animation: gradient-bg 15s ease infinite;
+        }
+
         .hover-btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0, 245, 160, 0.4); }
         .hover-btn-secondary:hover { transform: translateY(-3px); border-color: ${primaryColor}; color: ${darkMode ? primaryColor : '#00a86b'}; background: ${darkMode ? 'rgba(0,245,160,0.05)' : 'rgba(0,245,160,0.1)'}; }
         .tech-pill:hover { border-color: ${primaryColor}; color: ${primaryColor}; }
@@ -256,29 +273,11 @@ function Hero({ darkMode }) {
         .social-link:hover { color: ${primaryColor}; border-color: ${primaryColor}; transform: translateY(-3px) scale(1.05); }
       `}</style>
 
-      {/* Background Video */}
-      <video
-        src={heroVideo}
-        autoPlay
-        loop
-        muted
-        playsInline
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          zIndex: 0
-        }}
-      />
-
       {/* Backdrop Overlay to ensure text legibility */}
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: darkMode ? 'rgba(10, 10, 10, 0.75)' : 'rgba(248, 250, 252, 0.85)',
+        background: darkMode ? 'rgba(10, 10, 10, 0.45)' : 'rgba(248, 250, 252, 0.55)',
         zIndex: 1,
         pointerEvents: 'none'
       }} />
@@ -294,6 +293,7 @@ function Hero({ darkMode }) {
         }} />
         <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: isMobile ? '300px' : '600px', height: isMobile ? '300px' : '600px', background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 60%)', filter: 'blur(80px)' }} />
         <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', background: 'radial-gradient(circle, rgba(0,245,160,0.15) 0%, transparent 60%)', filter: 'blur(80px)' }} />
+        <div style={{ position: 'absolute', top: '40%', left: '30%', width: isMobile ? '200px' : '400px', height: isMobile ? '200px' : '400px', background: 'radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 60%)', filter: 'blur(85px)' }} />
       </div>
 
       {/* Main Content */}
@@ -353,14 +353,64 @@ function Hero({ darkMode }) {
 
         </div>
 
-        {/* RIGHT COLUMN: STATS CARDS */}
+        {/* RIGHT COLUMN: STATS CARDS & PROFILE PICTURE */}
         <div style={rightColStyle}>
           
-          <div style={{ position: 'relative', width: profileSize, height: profileSize }}>
+          <div style={{ position: 'relative', width: profileSize, height: profileSize, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             
             {/* Glow Behind Model */}
-            <div style={{ position: 'absolute', inset: '-20px', background: 'radial-gradient(circle, ' + primaryColor + '40, transparent 70%)', borderRadius: '50%', filter: 'blur(40px)', zIndex: 0 }}></div>
+            <div style={{ position: 'absolute', inset: '-20px', background: 'radial-gradient(circle, ' + primaryColor + '40, ' + secondaryColor + '20, transparent 70%)', borderRadius: '50%', filter: 'blur(40px)', zIndex: 0 }}></div>
             
+            {/* Rotating Cyber Ring 1 - Dashed */}
+            <div style={{
+              position: 'absolute',
+              width: isMobile ? '230px' : '330px',
+              height: isMobile ? '230px' : '330px',
+              borderRadius: '50%',
+              border: `2px dashed ${primaryColor}50`,
+              animation: 'rotate-slow 15s linear infinite',
+              pointerEvents: 'none',
+              zIndex: 1
+            }} />
+
+            {/* Rotating Cyber Ring 2 - Solid/Gradient Accent */}
+            <div style={{
+              position: 'absolute',
+              width: isMobile ? '215px' : '310px',
+              height: isMobile ? '215px' : '310px',
+              borderRadius: '50%',
+              border: `2px solid ${secondaryColor}60`,
+              borderLeftColor: 'transparent',
+              borderRightColor: 'transparent',
+              animation: 'rotate-reverse 12s linear infinite',
+              pointerEvents: 'none',
+              zIndex: 1
+            }} />
+
+            {/* Core Profile Photo Frame */}
+            <div style={{
+              width: isMobile ? '190px' : '280px',
+              height: isMobile ? '190px' : '280px',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              border: `4px solid ${darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'}`,
+              boxShadow: '0 20px 45px -10px rgba(0,0,0,0.5)',
+              zIndex: 10,
+              background: darkMode ? '#111' : '#fff',
+              position: 'relative'
+            }}>
+              <img
+                src={profilePhoto}
+                alt="Sujeet Vishwakarma"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                }}
+              />
+            </div>
+
             {/* Glassmorphism Stat Cards */}
             <div style={{ 
               ...glassCardStyle, 
