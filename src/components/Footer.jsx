@@ -107,7 +107,7 @@ fill="currentColor" viewBox="0 0 24 24" >
 
   const techStack = ['React.js', 'Next.js', 'Node.js', 'MongoDB', 'Express', 'AWS'];
 
-  const footerBg = darkMode? '#0d0d14' : '#e8f5f0';
+  const footerBg = 'transparent';
   const borderColor = darkMode? 'rgba(255,255,255,0.07)' : 'rgba(0,150,100,0.15)';
   const textColor = darkMode? '#6b6b7a' : '#4a7a65';
   const linkColor = darkMode? '#9ca3af' : '#4a7a65';

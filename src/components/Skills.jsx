@@ -131,7 +131,7 @@ function Skills({ darkMode }) {
   }, []);
 
   // Theme Variables
-  const sectionBg = darkMode ? '#0A0A0A' : '#f8fafc';
+  const sectionBg = 'transparent';
   const titleColor = darkMode ? '#ffffff' : '#0f172a';
   const highlightColor = '#00F5A0';
   const glassBg = darkMode ? 'rgba(20, 20, 20, 0.6)' : 'rgba(255, 255, 255, 0.7)';

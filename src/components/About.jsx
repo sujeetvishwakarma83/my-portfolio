@@ -145,7 +145,7 @@ function About({ darkMode }) {
   var badges = ['React.js', 'Node.js', 'MongoDB', 'Express.js', 'PHP', 'MySQL', 'Tailwind'];
 
   // Theme Variables
-  var sectionBg = darkMode ? '#0A0A0A' : '#f8fafc';
+  var sectionBg = 'transparent';
   var titleColor = darkMode ? '#ffffff' : '#0f172a';
   var textColor = darkMode ? '#9ca3af' : '#475569';
   var highlightColor = darkMode ? '#00F5A0' : '#00a86b';

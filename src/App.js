@@ -16,6 +16,7 @@ import Projects from './components/Projects';
 import WhyHireMe from './components/WhyHireMe';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import Background3D from './components/Background3D';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
@@ -50,12 +51,13 @@ function App() {
     <div
       className="App"
       style={{
-        background: darkMode ? '#0a0a0f' : '#f5f5f0',
+        background: 'transparent',
         color: darkMode ? '#e8e8f0' : '#1a1a2e',
         minHeight: '100vh',
         transition: 'background 0.3s, color 0.3s',
       }}
     >
+      <Background3D darkMode={darkMode} />
       <CustomCursor />
       <ShareButton darkMode={darkMode} />
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ExternalLink, Lock, User, Star, Clock } from 'lucide-react';
+import { use3DTilt } from '../hooks/use3DTilt';
 
 // ✅ Custom GitHub Icon
 const CustomGithubIcon = ({ size = 18, color = "currentColor" }) => (
@@ -93,6 +94,7 @@ const RatingStars = ({ rating, reviews, darkMode }) => {
 
 // ✅ Standard Grid Card
 function ProjectCard({ project, index, darkMode }) {
+  const tilt = use3DTilt(8, 1.02);
   const [hovered, setHovered] = useState(false);
 
   const cardBg = darkMode ? 'rgba(24, 24, 31, 0.6)' : 'rgba(255, 255, 255, 0.7)';
@@ -107,17 +109,15 @@ function ProjectCard({ project, index, darkMode }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay: index * 0.15 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       style={{ perspective: '1000px', height: '100%' }}
     >
-      <motion.div
-        animate={{ 
-          rotateX: hovered ? 2 : 0, 
-          rotateY: hovered ? -2 : 0,
-          y: hovered ? -8 : 0
+      <div
+        {...tilt}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => {
+          tilt.onMouseLeave();
+          setHovered(false);
         }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
         style={{
           background: cardBg,
           backdropFilter: 'blur(20px)',
@@ -132,6 +132,9 @@ function ProjectCard({ project, index, darkMode }) {
           boxShadow: hovered 
             ? `0 20px 40px -10px ${glowColor}30` 
             : '0 10px 30px -10px rgba(0,0,0,0.1)',
+          transformStyle: 'preserve-3d',
+          transition: 'border-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease',
+          ...tilt.style
         }}
       >
         <div style={{
@@ -272,7 +275,7 @@ function ProjectCard({ project, index, darkMode }) {
             Explore Project <ExternalLink size={14} />
           </a>
         )}
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -280,6 +283,8 @@ function ProjectCard({ project, index, darkMode }) {
 function Projects({ darkMode }) {
   const [isMobile, setIsMobile] = useState(false);
   const ref = useRef(null);
+  const featuredTilt = use3DTilt(4, 1.01);
+  const [featuredHovered, setFeaturedHovered] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -288,7 +293,7 @@ function Projects({ darkMode }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const sectionBg = darkMode ? '#0A0A0A' : '#f8fafc';
+  const sectionBg = 'transparent';
   const titleColor = darkMode ? '#ffffff' : '#0f172a';
   const glowColor = '#00F5A0';
   const descColor = darkMode ? '#9ca3af' : '#475569';
@@ -336,15 +341,28 @@ function Projects({ darkMode }) {
         </div>
 
         {/* ✅ FIRST ROW: FEATURED PROJECT */}
-        <div style={{ marginBottom: '4rem' }}>
-           <div style={{
-             background: darkMode ? 'rgba(24, 24, 31, 0.6)' : 'rgba(255, 255, 255, 0.7)',
-             border: `1px solid ${darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
-             borderRadius: '24px', padding: isMobile ? '1.5rem' : '3rem',
-             display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr', gap: '3rem',
-             alignItems: 'center',
-             boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)'
-           }}>
+        <div style={{ marginBottom: '4rem', perspective: '1000px' }}>
+           <div 
+             {...featuredTilt}
+             onMouseEnter={() => setFeaturedHovered(true)}
+             onMouseLeave={() => {
+               featuredTilt.onMouseLeave();
+               setFeaturedHovered(false);
+             }}
+             style={{
+               background: darkMode ? 'rgba(24, 24, 31, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+               border: `1px solid ${featuredHovered ? glowColor : (darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)')}`,
+               borderRadius: '24px', padding: isMobile ? '1.5rem' : '3rem',
+               display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr', gap: '3rem',
+               alignItems: 'center',
+               boxShadow: featuredHovered 
+                 ? `0 20px 40px -10px rgba(0,0,0,0.3), 0 0 20px ${glowColor}15`
+                 : '0 20px 40px -10px rgba(0,0,0,0.2)',
+               transformStyle: 'preserve-3d',
+               transition: 'border-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease',
+               ...featuredTilt.style
+             }}
+           >
              {/* Featured Image */}
              <div style={{ overflow: 'hidden', borderRadius: '16px', border: `1px solid ${glowColor}40`, position: 'relative', group: 'true' }}>
                <div style={{ position: 'absolute', top: '15px', left: '15px', zIndex: 10, background: glowColor, color: '#000', padding: '5px 15px', borderRadius: '50px', fontSize: '0.7rem', fontWeight: 'bold' }}>

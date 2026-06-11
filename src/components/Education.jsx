@@ -1,6 +1,92 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, Briefcase } from "lucide-react"; // Icons ke liye
+import { GraduationCap, Briefcase } from "lucide-react";
+import { use3DTilt } from "../hooks/use3DTilt";
+
+function TimelineCard({ item, glassBg, glassBorder, titleColor, textColor, isMobile }) {
+  const tilt = use3DTilt(8, 1.02);
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      {...tilt}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => {
+        tilt.onMouseLeave();
+        setHovered(false);
+      }}
+      style={{
+        width: isMobile ? "100%" : "45%",
+        background: glassBg,
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        border: `1px solid ${glassBorder}`,
+        padding: "2rem",
+        borderRadius: "20px",
+        cursor: "pointer",
+        position: "relative",
+        overflow: "hidden",
+        transformStyle: 'preserve-3d',
+        boxShadow: hovered 
+          ? `0 15px 30px -10px ${item.color}35`
+          : 'none',
+        transition: 'box-shadow 0.3s ease, border-color 0.3s ease, transform 0.1s ease',
+        ...tilt.style
+      }}
+    >
+      {/* Top Accent Line */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: "3px",
+        background: `linear-gradient(90deg, transparent, ${item.color}, transparent)`
+      }} />
+
+      <span style={{
+        display: "inline-block",
+        padding: "0.4rem 1rem",
+        background: `${item.color}15`,
+        color: item.color,
+        borderRadius: "50px",
+        fontSize: "0.75rem",
+        fontWeight: 700,
+        letterSpacing: "0.05em",
+        marginBottom: "1rem",
+        transform: 'translateZ(10px)'
+      }}>
+        {item.year}
+      </span>
+
+      <h3 style={{ 
+        fontSize: "1.4rem", 
+        fontWeight: 800, 
+        color: titleColor, 
+        margin: "0 0 0.5rem 0",
+        transform: 'translateZ(20px)'
+      }}>
+        {item.title}
+      </h3>
+      
+      <div style={{ 
+        fontSize: "0.95rem", 
+        fontWeight: 600, 
+        color: item.color, 
+        marginBottom: "1rem",
+        transform: 'translateZ(15px)'
+      }}>
+        {item.subtitle}
+      </div>
+      
+      <p style={{ 
+        color: textColor, 
+        lineHeight: 1.7, 
+        margin: 0, 
+        fontSize: "0.95rem",
+        transform: 'translateZ(10px)'
+      }}>
+        {item.description}
+      </p>
+    </div>
+  );
+}
 
 const Education = ({ darkMode }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -43,7 +129,7 @@ const Education = ({ darkMode }) => {
   ];
 
   // Theme Variables
-  const sectionBg = darkMode ? "#0A0A0A" : "#f8fafc";
+  const sectionBg = 'transparent';
   const titleColor = darkMode ? "#ffffff" : "#0f172a";
   const textColor = darkMode ? "#9ca3af" : "#475569";
   const glassBg = darkMode ? "rgba(20, 20, 20, 0.6)" : "rgba(255, 255, 255, 0.8)";
@@ -163,72 +249,14 @@ const Education = ({ darkMode }) => {
                 </div>
 
                 {/* CARD CONTENT */}
-                <motion.div
-                  whileHover={{ 
-                    scale: 1.02, 
-                    y: -5,
-                    boxShadow: `0 15px 30px -10px ${item.color}30` 
-                  }}
-                  style={{
-                    width: isMobile ? "100%" : "45%",
-                    background: glassBg,
-                    backdropFilter: "blur(20px)",
-                    WebkitBackdropFilter: "blur(20px)",
-                    border: `1px solid ${glassBorder}`,
-                    padding: "2rem",
-                    borderRadius: "20px",
-                    cursor: "pointer",
-                    position: "relative",
-                    overflow: "hidden"
-                  }}
-                >
-                  {/* Top Accent Line */}
-                  <div style={{
-                    position: "absolute", top: 0, left: 0, right: 0, height: "3px",
-                    background: `linear-gradient(90deg, transparent, ${item.color}, transparent)`
-                  }} />
-
-                  <span style={{
-                    display: "inline-block",
-                    padding: "0.4rem 1rem",
-                    background: `${item.color}15`,
-                    color: item.color,
-                    borderRadius: "50px",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.05em",
-                    marginBottom: "1rem"
-                  }}>
-                    {item.year}
-                  </span>
-
-                  <h3 style={{ 
-                    fontSize: "1.4rem", 
-                    fontWeight: 800, 
-                    color: titleColor, 
-                    margin: "0 0 0.5rem 0" 
-                  }}>
-                    {item.title}
-                  </h3>
-                  
-                  <div style={{ 
-                    fontSize: "0.95rem", 
-                    fontWeight: 600, 
-                    color: item.color, 
-                    marginBottom: "1rem" 
-                  }}>
-                    {item.subtitle}
-                  </div>
-                  
-                  <p style={{ 
-                    color: textColor, 
-                    lineHeight: 1.7, 
-                    margin: 0, 
-                    fontSize: "0.95rem" 
-                  }}>
-                    {item.description}
-                  </p>
-                </motion.div>
+                <TimelineCard
+                  item={item}
+                  glassBg={glassBg}
+                  glassBorder={glassBorder}
+                  titleColor={titleColor}
+                  textColor={textColor}
+                  isMobile={isMobile}
+                />
               </motion.div>
             );
           })}

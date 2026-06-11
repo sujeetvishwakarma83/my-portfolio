@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Mail, MapPin, Send } from 'lucide-react';
 
 const GithubIcon = ({ size = 20, color = "currentColor" }) => (
@@ -19,11 +19,9 @@ function Contact({ darkMode }) {
   const [submitted, setSubmitted] = useState(false);
   const [isFlying, setIsFlying] = useState(false);
   
-  // Path Array
-  const [flightPath, setFlightPath] = useState({ x: [], y: [], rot: [], scale: [], opacity: [] });
-
   const ref = useRef(null);
   const canvasRef = useRef(null);
+  const flightCanvasRef = useRef(null);
   const animRef = useRef(null);
   const submitBtnRef = useRef(null);
 
@@ -93,75 +91,231 @@ function Contact({ darkMode }) {
     return () => { cancelAnimationFrame(animRef.current); window.removeEventListener('resize', resize); };
   }, [darkMode]);
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  useEffect(() => {
+    if (!isFlying) return;
+    const canvas = flightCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animId;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
 
     const btnRect = submitBtnRef.current.getBoundingClientRect();
     const startX = btnRect.left + btnRect.width / 2;
     const startY = btnRect.top + btnRect.height / 2;
 
     const logoEl = document.getElementById('nav-logo');
-    let endX = 20, endY = 20; 
-    
+    let endX = 20, endY = 20;
     if (logoEl) {
       const logoRect = logoEl.getBoundingClientRect();
       endX = logoRect.left + logoRect.width / 2;
       endY = logoRect.top + logoRect.height / 2;
     }
 
-    // ✅ ZYADA LAHRATA HUA PATH (More Time, More Waves)
-    const steps = 60; // Smoothness badha di (40 se 60)
-    const pathX = [];
-    const pathY = [];
-    const rotations = [];
-    const scales = [];
-    const opacities = [];
+    // Bezier control points calculation
+    const dx = endX - startX;
+    const dy = endY - startY;
+    const distance = Math.hypot(dx, dy);
     
-    const dx = startX - endX;
-    const dy = startY - endY;
+    // Normal vector to the trajectory (direction of curved drift)
+    const nx = -dy / distance;
+    const ny = dx / distance;
     
-    // Lahar ki chaudaai (Amplitude) badha di
-    const amplitude = isMobile ? 90 : 200; 
-    
-    // Kitni baar lahraayega (Waves badha diye)
-    const waves = 3.5; 
+    // Beautiful curve controls based on viewport size
+    const curveAmount = isMobile ? 80 : 160;
+    const p0 = { x: startX, y: startY };
+    const p1 = { 
+      x: startX + dx * 0.25 + nx * curveAmount, 
+      y: startY + dy * 0.25 + ny * curveAmount 
+    };
+    const p2 = { 
+      x: startX + dx * 0.75 - nx * curveAmount, 
+      y: startY + dy * 0.75 - ny * curveAmount 
+    };
+    const p3 = { x: endX, y: endY };
 
-    for (let i = 0; i <= steps; i++) {
-      const t = i / steps; 
-      
-      const lx = startX - dx * t;
-      const ly = startY - dy * t;
+    let trailParticles = [];
+    let shockwaves = [];
+    const duration = 2200; // ⏱️ Butler-smooth 2.2 seconds duration
+    const startTime = Date.now();
 
-      const taper = Math.sin(t * Math.PI); 
-      const offset = Math.sin(t * Math.PI * 2 * waves) * amplitude * taper;
-
-      const angle = Math.atan2(-dy, -dx);
-      const perpAngle = angle + Math.PI / 2;
-
-      pathX.push(lx + Math.cos(perpAngle) * offset);
-      pathY.push(ly + Math.sin(perpAngle) * offset);
-      
-      // Udte time thoda bada aur center mein aur bada dikhega
-      scales.push(i === steps ? 0 : 1.2 + (Math.sin(t * Math.PI) * 0.4)); 
-      opacities.push(i === steps ? 0 : 1);
+    function easeInOutCubic(x) {
+      return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
     }
 
-    for (let i = 0; i <= steps; i++) {
-      if (i === steps) {
-        rotations.push(rotations[i - 1]);
-      } else {
-        const ax = pathX[i + 1] - pathX[i];
-        const ay = pathY[i + 1] - pathY[i];
-        const deg = Math.atan2(ay, ax) * (180 / Math.PI);
-        rotations.push(deg);
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const t = easeInOutCubic(progress);
+
+      // Bezier formula
+      const mt = 1 - t;
+      const mt2 = mt * mt;
+      const mt3 = mt2 * mt;
+      const t2 = t * t;
+      const t3 = t2 * t;
+
+      const planeX = mt3 * p0.x + 3 * mt2 * t * p1.x + 3 * mt * t2 * p2.x + t3 * p3.x;
+      const planeY = mt3 * p0.y + 3 * mt2 * t * p1.y + 3 * mt * t2 * p2.y + t3 * p3.y;
+
+      // Tangent/velocity vector for exact Heading rotation
+      const tangentX = 3 * mt2 * (p1.x - p0.x) + 6 * mt * t * (p2.x - p1.x) + 3 * t2 * (p3.x - p2.x);
+      const tangentY = 3 * mt2 * (p1.y - p0.y) + 6 * mt * t * (p2.y - p1.y) + 3 * t2 * (p3.y - p2.y);
+      const angle = Math.atan2(tangentY, tangentX);
+
+      // Spawn trail particles at the back of the plane
+      if (progress < 0.98) {
+        for (let i = 0; i < 2; i++) {
+          trailParticles.push({
+            x: planeX - Math.cos(angle) * 12 + (Math.random() - 0.5) * 4,
+            y: planeY - Math.sin(angle) * 12 + (Math.random() - 0.5) * 4,
+            vx: -Math.cos(angle) * (Math.random() * 2 + 1) + (Math.random() - 0.5) * 1,
+            vy: -Math.sin(angle) * (Math.random() * 2 + 1) + (Math.random() - 0.5) * 1,
+            size: Math.random() * 4 + 2,
+            maxLife: Math.random() * 20 + 25,
+            life: Math.random() * 20 + 25,
+            color: Math.random() > 0.4 ? '0, 245, 160' : '124, 58, 237'
+          });
+        }
       }
-    }
 
-    setFlightPath({ x: pathX, y: pathY, rot: rotations, scale: scales, opacity: opacities });
+      // Update and draw stardust trail
+      for (let i = trailParticles.length - 1; i >= 0; i--) {
+        const p = trailParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        if (p.life <= 0) {
+          trailParticles.splice(i, 1);
+          continue;
+        }
+
+        const ratio = p.life / p.maxLife;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * ratio, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${p.color}, ${ratio * 0.95})`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = `rgb(${p.color})`;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Update and draw shockwaves
+      for (let i = shockwaves.length - 1; i >= 0; i--) {
+        const s = shockwaves[i];
+        s.radius += (s.maxRadius - s.radius) * 0.08;
+        s.life -= s.decay;
+        if (s.life <= 0) {
+          shockwaves.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(0, 245, 160, ${s.life})`;
+        ctx.lineWidth = 4 * s.life;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = '#00F5A0';
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Draw paper plane
+      if (progress < 0.99) {
+        ctx.save();
+        ctx.translate(planeX, planeY);
+        ctx.rotate(angle);
+
+        // Plane scale animation (pop on take-off, shrink when hitting logo)
+        const scale = progress < 0.1 
+          ? (progress / 0.1) * 1.3 
+          : progress > 0.9 
+            ? ((1 - progress) / 0.1) * 1.3 
+            : 1.3;
+
+        ctx.scale(scale, scale);
+
+        // Outer glow
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = '#00F5A0';
+        ctx.fillStyle = '#00F5A0';
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 1.5;
+
+        // Draw standard paper plane pointing right (X-axis)
+        ctx.beginPath();
+        ctx.moveTo(15, 0);       // nose
+        ctx.lineTo(-12, -8);     // left wing
+        ctx.lineTo(-4, 0);       // center back
+        ctx.lineTo(-12, 8);      // right wing
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Center fold line
+        ctx.beginPath();
+        ctx.moveTo(-4, 0);
+        ctx.lineTo(15, 0);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      // Collision trigger
+      if (progress === 1 && shockwaves.length === 0 && elapsed < duration + 100) {
+        shockwaves.push({
+          x: endX,
+          y: endY,
+          radius: 0,
+          maxRadius: 130,
+          life: 1.0,
+          decay: 0.025
+        });
+        
+        if (logoEl) {
+          logoEl.style.transform = 'scale(1.5)';
+          logoEl.style.boxShadow = `0 0 35px #00F5A0, 0 0 70px #00F5A0`;
+          setTimeout(() => {
+            logoEl.style.transform = 'scale(1)';
+            logoEl.style.boxShadow = 'none';
+          }, 600);
+        }
+      }
+
+      // Loop animation
+      if (progress < 1 || trailParticles.length > 0 || shockwaves.length > 0) {
+        animId = requestAnimationFrame(draw);
+      } else {
+        setIsFlying(false);
+        setSubmitted(true);
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => { setSubmitted(false); }, 4000);
+      }
+    };
+
+    animId = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+    };
+  }, [isFlying, isMobile]);
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setIsFlying(true); 
 
     try {
@@ -169,35 +323,13 @@ function Contact({ darkMode }) {
         method: "POST",
         body: JSON.stringify(formData),
       });
-      
-      // ✅ TAKRANE KA EFFECT (Exactly 3.5 seconds baad)
-      setTimeout(() => {
-        setIsFlying(false);
-        setSubmitted(true);
-        setFormData({ name: '', email: '', message: '' });
-
-        if (logoEl) {
-          logoEl.style.transform = 'scale(1.4)'; 
-          logoEl.style.boxShadow = `0 0 30px #00F5A0, 0 0 60px #00F5A0`; 
-          
-          setTimeout(() => {
-            logoEl.style.transform = 'scale(1)'; 
-            logoEl.style.boxShadow = 'none'; 
-          }, 500); 
-        }
-
-      }, 3500); // ⏱️ Time badha kar 3.5 second kar diya
-
-      setTimeout(() => { setSubmitted(false); }, 7000);
-
     } catch (error) {
       console.error(error);
-      setIsFlying(false);
       alert("Error sending message ❌");
     }
   };
 
-  const sectionBg = darkMode ? '#0A0A0A' : '#f8fafc';
+  const sectionBg = 'transparent';
   const titleColor = darkMode ? '#ffffff' : '#0f172a';
   const textColor = darkMode ? '#9ca3af' : '#475569';
   const glowColor = '#00F5A0';
@@ -217,39 +349,21 @@ function Contact({ darkMode }) {
       background: sectionBg, position: 'relative', overflow: 'hidden', minHeight: '100vh',
     }}>
 
-      {/* ✅ FLYING PLANE ANIMATION LAYER */}
-      <AnimatePresence>
-        {isFlying && (
-          <motion.div
-            initial={{ 
-              position: 'fixed', 
-              left: flightPath.x[0], 
-              top: flightPath.y[0],
-              x: '-50%', y: '-50%', scale: 1, opacity: 1, rotate: -45, zIndex: 99999
-            }}
-            animate={{ 
-              left: flightPath.x, 
-              top: flightPath.y, 
-              rotate: flightPath.rot,
-              scale: flightPath.scale, 
-              opacity: flightPath.opacity 
-            }}
-            transition={{ 
-              duration: 3.5, // ⏱️ Flight ab aaram se 3.5 seconds chalegi
-              ease: "linear",
-            }}
-            style={{ pointerEvents: 'none' }}
-          >
-            <div style={{
-              background: glowColor, color: '#000', padding: '15px',
-              borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: `0 0 40px ${glowColor}, 0 0 80px ${glowColor}` // Glow thoda aur badha diya
-            }}>
-              <Send size={28} />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* ✅ FLYING PLANE CANVAS ANIMATION LAYER */}
+      {isFlying && (
+        <canvas
+          ref={flightCanvasRef}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            zIndex: 99999,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
 
       {!darkMode && <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>

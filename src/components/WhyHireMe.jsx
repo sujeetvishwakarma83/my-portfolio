@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Target, MessageSquare, Code2, ShieldCheck } from 'lucide-react';
+import { use3DTilt } from '../hooks/use3DTilt';
 
 const reasonsData = [
   {
@@ -29,6 +30,66 @@ const reasonsData = [
   }
 ];
 
+function ReasonCard({ reason, index, cardBg, cardBorder, glowColor, titleColor, textColor, isMobile }) {
+  const tilt = use3DTilt(8, 1.02);
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: index * 0.15 }}
+      style={{ perspective: '1000px' }}
+    >
+      <div
+        {...tilt}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => {
+          tilt.onMouseLeave();
+          setHovered(false);
+        }}
+        style={{
+          background: cardBg,
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: `1px solid ${hovered ? glowColor : cardBorder}`,
+          padding: isMobile ? '2rem 1.5rem' : '2.5rem',
+          borderRadius: '20px',
+          cursor: 'pointer',
+          transformStyle: 'preserve-3d',
+          boxShadow: hovered 
+            ? `0 15px 30px -10px ${glowColor}25`
+            : 'none',
+          transition: 'border-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease',
+          ...tilt.style
+        }}
+      >
+        <div style={{
+          width: '60px', height: '60px',
+          borderRadius: '16px',
+          background: `${glowColor}15`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: glowColor,
+          marginBottom: '1.5rem',
+          border: `1px solid ${glowColor}30`,
+          transform: 'translateZ(20px)'
+        }}>
+          {reason.icon}
+        </div>
+        
+        <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: titleColor, marginBottom: '0.8rem', transform: 'translateZ(30px)' }}>
+          {reason.title}
+        </h3>
+        
+        <p style={{ color: textColor, lineHeight: 1.7, fontSize: '0.95rem', margin: 0, transform: 'translateZ(10px)' }}>
+          {reason.description}
+        </p>
+      </div>
+    </motion.div>
+  );
+}
+
 function WhyHireMe({ darkMode }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const ref = useRef(null);
@@ -39,7 +100,7 @@ function WhyHireMe({ darkMode }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const sectionBg = darkMode ? '#0A0A0A' : '#f8fafc';
+  const sectionBg = 'transparent';
   const titleColor = darkMode ? '#ffffff' : '#0f172a';
   const textColor = darkMode ? '#9ca3af' : '#475569';
   const glowColor = '#00F5A0';
@@ -105,43 +166,17 @@ function WhyHireMe({ darkMode }) {
           gap: '2rem', 
         }}>
           {reasonsData.map((reason, index) => (
-            <motion.div
+            <ReasonCard
               key={reason.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
-              whileHover={{ y: -5, borderColor: glowColor }}
-              style={{
-                background: cardBg,
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                border: `1px solid ${cardBorder}`,
-                padding: isMobile ? '2rem 1.5rem' : '2.5rem',
-                borderRadius: '20px',
-                transition: 'border-color 0.3s ease',
-              }}
-            >
-              <div style={{
-                width: '60px', height: '60px',
-                borderRadius: '16px',
-                background: `${glowColor}15`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: glowColor,
-                marginBottom: '1.5rem',
-                border: `1px solid ${glowColor}30`
-              }}>
-                {reason.icon}
-              </div>
-              
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: titleColor, marginBottom: '0.8rem' }}>
-                {reason.title}
-              </h3>
-              
-              <p style={{ color: textColor, lineHeight: 1.7, fontSize: '0.95rem', margin: 0 }}>
-                {reason.description}
-              </p>
-            </motion.div>
+              reason={reason}
+              index={index}
+              cardBg={cardBg}
+              cardBorder={cardBorder}
+              glowColor={glowColor}
+              titleColor={titleColor}
+              textColor={textColor}
+              isMobile={isMobile}
+            />
           ))}
         </div>
 

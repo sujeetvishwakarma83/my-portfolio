@@ -1,5 +1,66 @@
 import { useState, useEffect, useRef } from 'react';
 import { Monitor, ShoppingBag, Zap, ShieldCheck, ArrowRight, MessageSquare, PenTool, Code, CheckCircle } from 'lucide-react';
+import { use3DTilt } from '../hooks/use3DTilt';
+
+function ServiceCard({ service, index, visible, darkMode, isMobile, highlightColor, secondaryColor, glassBg, glassBorder, cardHoverBg, textColor, titleColor }) {
+  const tilt = use3DTilt(8, 1.02);
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      {...tilt}
+      onMouseEnter={() => {
+        setHovered(true);
+      }}
+      onMouseLeave={() => {
+        tilt.onMouseLeave();
+        setHovered(false);
+      }}
+      style={{
+        background: hovered ? cardHoverBg : glassBg,
+        backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+        border: glassBorder, borderRadius: '24px', padding: isMobile ? '2rem' : '3rem',
+        opacity: visible ? 1 : 0,
+        transform: visible ? (hovered ? tilt.style.transform : 'translateY(0)') : 'translateY(40px)',
+        transition: visible ? `${tilt.style.transition}, background 0.3s ease, box-shadow 0.3s ease` : `all 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.15}s`,
+        boxShadow: hovered 
+          ? `0 20px 40px -10px rgba(0,0,0,0.3), 0 0 20px ${highlightColor}20` 
+          : '0 10px 30px -10px rgba(0,0,0,0.1)',
+        cursor: 'pointer', position: 'relative', overflow: 'hidden',
+        transformStyle: 'preserve-3d',
+        ...(!visible ? {} : { transform: hovered ? tilt.style.transform : 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)' })
+      }}
+    >
+      <div style={{
+        position: 'absolute', top: 0, left: 0, height: '4px',
+        width: hovered ? '100%' : '0%',
+        background: `linear-gradient(90deg, ${highlightColor}, ${secondaryColor})`, transition: 'width 0.4s ease'
+      }} />
+
+      <div style={{ 
+        background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', 
+        width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        marginBottom: '1.5rem', border: glassBorder,
+        transform: 'translateZ(20px)',
+        transition: 'transform 0.3s ease'
+      }}>
+        {service.icon}
+      </div>
+
+      <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: titleColor, marginBottom: '1rem', transform: 'translateZ(30px)' }}>{service.title}</h3>
+      <p style={{ color: textColor, lineHeight: 1.7, marginBottom: '2rem', minHeight: isMobile ? 'auto' : '80px', transform: 'translateZ(10px)' }}>{service.description}</p>
+
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.8rem', transform: 'translateZ(15px)' }}>
+        {service.features.map((feature, i) => (
+          <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', color: titleColor, fontSize: '0.9rem', fontWeight: 500 }}>
+            <ArrowRight size={16} color={highlightColor} />
+            {feature}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 function Services({ darkMode }) {
   const [visible, setVisible] = useState(false);
@@ -46,7 +107,7 @@ function Services({ darkMode }) {
   }, [visible, progress]);
 
   // Theme Variables
-  const sectionBg = darkMode ? '#0A0A0A' : '#f8fafc';
+  const sectionBg = 'transparent';
   const titleColor = darkMode ? '#ffffff' : '#0f172a';
   const textColor = darkMode ? '#9ca3af' : '#475569';
   const highlightColor = '#00F5A0';
@@ -161,49 +222,21 @@ function Services({ darkMode }) {
           gap: isMobile ? '1.5rem' : '2.5rem', marginBottom: '5rem'
         }}>
           {servicesData.map((service, index) => (
-            <div
+            <ServiceCard
               key={service.id}
-              onMouseEnter={() => setHoveredCard(service.id)}
-              onMouseLeave={() => setHoveredCard(null)}
-              style={{
-                background: hoveredCard === service.id ? cardHoverBg : glassBg,
-                backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-                border: glassBorder, borderRadius: '24px', padding: isMobile ? '2rem' : '3rem',
-                opacity: visible ? 1 : 0,
-                transform: visible ? (hoveredCard === service.id ? 'translateY(-10px)' : 'translateY(0)') : 'translateY(40px)',
-                transition: `all 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${visible ? 0 : index * 0.15}s`,
-                boxShadow: hoveredCard === service.id 
-                  ? `0 20px 40px -10px rgba(0,0,0,0.3), 0 0 20px ${highlightColor}20` 
-                  : '0 10px 30px -10px rgba(0,0,0,0.1)',
-                cursor: 'pointer', position: 'relative', overflow: 'hidden'
-              }}
-            >
-              <div style={{
-                position: 'absolute', top: 0, left: 0, height: '4px',
-                width: hoveredCard === service.id ? '100%' : '0%',
-                background: `linear-gradient(90deg, ${highlightColor}, ${secondaryColor})`, transition: 'width 0.4s ease'
-              }} />
-
-              <div style={{ 
-                background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', 
-                width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: '1.5rem', border: glassBorder
-              }}>
-                {service.icon}
-              </div>
-
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: titleColor, marginBottom: '1rem' }}>{service.title}</h3>
-              <p style={{ color: textColor, lineHeight: 1.7, marginBottom: '2rem', minHeight: isMobile ? 'auto' : '80px' }}>{service.description}</p>
-
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                {service.features.map((feature, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', color: titleColor, fontSize: '0.9rem', fontWeight: 500 }}>
-                    <ArrowRight size={16} color={highlightColor} />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </div>
+              service={service}
+              index={index}
+              visible={visible}
+              darkMode={darkMode}
+              isMobile={isMobile}
+              highlightColor={highlightColor}
+              secondaryColor={secondaryColor}
+              glassBg={glassBg}
+              glassBorder={glassBorder}
+              cardHoverBg={cardHoverBg}
+              textColor={textColor}
+              titleColor={titleColor}
+            />
           ))}
         </div>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import resumeFile from '../assets/resume.pdf';
 import profilePhoto from '../assets/profile.jpg';
+import { use3DTilt } from '../hooks/use3DTilt';
 
 function useTyping(texts, speed, pause) {
   speed = speed || 80;
@@ -45,6 +46,8 @@ function useTyping(texts, speed, pause) {
 function Hero({ darkMode }) {
   var [visible, setVisible] = useState(false);
   var [isMobile, setIsMobile] = useState(window.innerWidth <= 992);
+  var [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  var heroTilt = use3DTilt(10, 1.03);
 
   useEffect(function() {
     var timer = setTimeout(function() { setVisible(true); }, 100);
@@ -56,6 +59,13 @@ function Hero({ darkMode }) {
     window.addEventListener('resize', handleResize);
     return function() { window.removeEventListener('resize', handleResize); };
   }, []);
+
+  var handleMouseMove = function(e) {
+    if (isMobile) return;
+    var x = (e.clientX - window.innerWidth / 2) / 25;
+    var y = (e.clientY - window.innerHeight / 2) / 25;
+    setMousePos({ x: x, y: y });
+  };
 
   var typedDesc = useTyping(
     [
@@ -84,7 +94,7 @@ function Hero({ darkMode }) {
     padding: isMobile ? '4rem 1.2rem 4rem' : '4.8rem 4rem 4rem',
     position: 'relative',
     overflow: 'hidden',
-    background: darkMode ? '#050508' : '#f8fafc',
+    background: 'transparent',
     color: textMain,
     fontFamily: '"Inter", "Segoe UI", sans-serif',
   };
@@ -236,7 +246,7 @@ function Hero({ darkMode }) {
   var profileSize = isMobile ? '300px' : '450px';
 
   return (
-    <section id="hero" className="premium-bg" style={sectionStyle}>
+    <section id="hero" className="premium-bg" onMouseMove={handleMouseMove} style={sectionStyle}>
       {/* Embedded CSS for Hover Effects & Keyframes */}
       <style>{`
         @keyframes float-slow { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
@@ -255,8 +265,8 @@ function Hero({ darkMode }) {
 
         .premium-bg {
           background: ${darkMode 
-            ? 'linear-gradient(-45deg, #030305, #080710, #0c0818, #020204)' 
-            : 'linear-gradient(-45deg, #f1f5f9, #f8fafc, #eff6ff, #f8fafc)'};
+            ? 'linear-gradient(-45deg, rgba(3, 3, 5, 0.4), rgba(8, 7, 16, 0.4), rgba(12, 8, 24, 0.4), rgba(2, 2, 4, 0.4))' 
+            : 'linear-gradient(-45deg, rgba(241, 245, 249, 0.4), rgba(248, 250, 252, 0.4), rgba(239, 246, 255, 0.4), rgba(248, 250, 252, 0.4))'};
           background-size: 400% 400%;
           animation: gradient-bg 15s ease infinite;
         }
@@ -291,9 +301,9 @@ function Hero({ darkMode }) {
           maskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 100%)',
           WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 100%)'
         }} />
-        <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: isMobile ? '300px' : '600px', height: isMobile ? '300px' : '600px', background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 60%)', filter: 'blur(80px)' }} />
-        <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', background: 'radial-gradient(circle, rgba(0,245,160,0.15) 0%, transparent 60%)', filter: 'blur(80px)' }} />
-        <div style={{ position: 'absolute', top: '40%', left: '30%', width: isMobile ? '200px' : '400px', height: isMobile ? '200px' : '400px', background: 'radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 60%)', filter: 'blur(85px)' }} />
+        <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: isMobile ? '300px' : '600px', height: isMobile ? '300px' : '600px', background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 60%)', filter: 'blur(80px)', transform: `translate(${mousePos.x * 0.5}px, ${mousePos.y * 0.5}px)`, transition: 'transform 0.2s ease-out' }} />
+        <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', background: 'radial-gradient(circle, rgba(0,245,160,0.15) 0%, transparent 60%)', filter: 'blur(80px)', transform: `translate(${mousePos.x * -0.5}px, ${mousePos.y * -0.5}px)`, transition: 'transform 0.2s ease-out' }} />
+        <div style={{ position: 'absolute', top: '40%', left: '30%', width: isMobile ? '200px' : '400px', height: isMobile ? '200px' : '400px', background: 'radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 60%)', filter: 'blur(85px)', transform: `translate(${mousePos.x * 0.25}px, ${mousePos.y * 0.25}px)`, transition: 'transform 0.2s ease-out' }} />
       </div>
 
       {/* Main Content */}
@@ -356,7 +366,18 @@ function Hero({ darkMode }) {
         {/* RIGHT COLUMN: STATS CARDS & PROFILE PICTURE */}
         <div style={rightColStyle}>
           
-          <div style={{ position: 'relative', width: profileSize, height: profileSize, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div 
+            {...heroTilt}
+            style={{ 
+              position: 'relative', 
+              width: profileSize, 
+              height: profileSize, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              ...heroTilt.style 
+            }}
+          >
             
             {/* Glow Behind Model */}
             <div style={{ position: 'absolute', inset: '-20px', background: 'radial-gradient(circle, ' + primaryColor + '40, ' + secondaryColor + '20, transparent 70%)', borderRadius: '50%', filter: 'blur(40px)', zIndex: 0 }}></div>
