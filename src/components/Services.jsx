@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Monitor, ShoppingBag, Zap, ShieldCheck, ArrowRight, MessageSquare, PenTool, Code, CheckCircle } from 'lucide-react';
 import { use3DTilt } from '../hooks/use3DTilt';
 
-function ServiceCard({ service, index, visible, darkMode, isMobile, highlightColor, secondaryColor, glassBg, glassBorder, cardHoverBg, textColor, titleColor }) {
-  const tilt = use3DTilt(8, 1.02);
+function ServiceCard({ service, index, visible, darkMode, isMobile, highlightColor, secondaryColor, glassBg, glassBorder, cardHoverBg, textColor, titleColor, bookMode = false }) {
+  const tilt = use3DTilt(bookMode ? 0 : 8, bookMode ? 1 : 1.02);
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -19,7 +19,9 @@ function ServiceCard({ service, index, visible, darkMode, isMobile, highlightCol
       style={{
         background: hovered ? cardHoverBg : glassBg,
         backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-        border: glassBorder, borderRadius: '24px', padding: isMobile ? '2rem' : '3rem',
+        border: hovered && bookMode ? `1px solid ${highlightColor}` : glassBorder,
+        borderRadius: bookMode ? '16px' : '24px',
+        padding: bookMode ? '0.75rem 0.85rem' : (isMobile ? '2rem' : '3rem'),
         opacity: visible ? 1 : 0,
         transform: visible ? (hovered ? tilt.style.transform : 'translateY(0)') : 'translateY(40px)',
         transition: visible ? `${tilt.style.transition}, background 0.3s ease, box-shadow 0.3s ease` : `all 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.15}s`,
@@ -39,21 +41,21 @@ function ServiceCard({ service, index, visible, darkMode, isMobile, highlightCol
 
       <div style={{ 
         background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', 
-        width: '64px', height: '64px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        marginBottom: '1.5rem', border: glassBorder,
+        width: bookMode ? '36px' : '64px', height: bookMode ? '36px' : '64px', borderRadius: bookMode ? '10px' : '16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        marginBottom: bookMode ? '0.5rem' : '1.5rem', border: glassBorder,
         transform: 'translateZ(20px)',
         transition: 'transform 0.3s ease'
       }}>
-        {service.icon}
+        {React.cloneElement(service.icon, { size: bookMode ? 20 : 32 })}
       </div>
 
-      <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: titleColor, marginBottom: '1rem', transform: 'translateZ(30px)' }}>{service.title}</h3>
-      <p style={{ color: textColor, lineHeight: 1.7, marginBottom: '2rem', minHeight: isMobile ? 'auto' : '80px', transform: 'translateZ(10px)' }}>{service.description}</p>
+      <h3 style={{ fontSize: bookMode ? '0.95rem' : '1.5rem', fontWeight: 700, color: titleColor, marginBottom: bookMode ? '0.3rem' : '1rem', transform: 'translateZ(30px)' }}>{service.title}</h3>
+      <p style={{ color: textColor, fontSize: bookMode ? '0.75rem' : '1rem', lineHeight: bookMode ? 1.4 : 1.7, marginBottom: bookMode ? '0.5rem' : '2rem', minHeight: 'auto', transform: 'translateZ(10px)' }}>{service.description}</p>
 
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.8rem', transform: 'translateZ(15px)' }}>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: bookMode ? '0.4rem' : '0.8rem', transform: 'translateZ(15px)' }}>
         {service.features.map((feature, i) => (
-          <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', color: titleColor, fontSize: '0.9rem', fontWeight: 500 }}>
-            <ArrowRight size={16} color={highlightColor} />
+          <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: titleColor, fontSize: bookMode ? '0.75rem' : '0.9rem', fontWeight: 500 }}>
+            <ArrowRight size={bookMode ? 12 : 16} color={highlightColor} />
             {feature}
           </li>
         ))}
@@ -62,10 +64,9 @@ function ServiceCard({ service, index, visible, darkMode, isMobile, highlightCol
   );
 }
 
-function Services({ darkMode }) {
+function Services({ darkMode, bookMode = false }) {
   const [visible, setVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [hoveredCard, setHoveredCard] = useState(null);
   
   // Progress tracking: 0 (hidden), 1 se 4 tak animation
   const [progress, setProgress] = useState(0); 
@@ -80,6 +81,11 @@ function Services({ darkMode }) {
 
   // ✅ AUTO-REPEAT LOGIC: Screen se bahar jane par reset
   useEffect(() => {
+    if (bookMode) {
+      setVisible(true);
+      setProgress(4);
+      return;
+    }
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -94,17 +100,18 @@ function Services({ darkMode }) {
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
-  }, []);
+  }, [bookMode]);
 
   // ✅ SLOWER ANIMATION LOGIC (1.2 seconds per step)
   useEffect(() => {
+    if (bookMode) return;
     if (visible && progress >= 1 && progress < 4) {
       const timer = setTimeout(() => {
         setProgress(prev => prev + 1);
       }, 1200); // 1200ms = 1.2s ka aaram dayak flow
       return () => clearTimeout(timer);
     }
-  }, [visible, progress]);
+  }, [visible, progress, bookMode]);
 
   // Theme Variables
   const sectionBg = 'transparent';
@@ -156,11 +163,11 @@ function Services({ darkMode }) {
 
   return (
     <section id="services" ref={ref} style={{
-      padding: isMobile ? '5rem 1.5rem' : '8rem 4rem',
+      padding: bookMode ? '2rem 1.5rem' : (isMobile ? '5rem 1.5rem' : '8rem 4rem'),
       background: sectionBg,
-      overflow: 'hidden',
+      overflow: bookMode ? 'visible' : 'hidden',
       position: 'relative',
-      minHeight: '100vh',
+      minHeight: bookMode ? 'auto' : '100vh',
     }}>
       
       {/* ✅ NEXT-LEVEL CELEBRATION KEYFRAMES */}
@@ -177,159 +184,164 @@ function Services({ darkMode }) {
       `}</style>
 
       {/* Background Glowing Blobs */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-        <div style={{ 
-          position: 'absolute', top: '10%', right: '-10%', 
-          width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', 
-          background: `radial-gradient(circle, ${highlightColor}15 0%, transparent 70%)`, 
-          filter: 'blur(60px)' 
-        }} />
-        <div style={{ 
-          position: 'absolute', bottom: '10%', left: '-10%', 
-          width: isMobile ? '200px' : '400px', height: isMobile ? '200px' : '400px', 
-          background: `radial-gradient(circle, ${secondaryColor}15 0%, transparent 70%)`, 
-          filter: 'blur(60px)' 
-        }} />
-      </div>
+      {!bookMode && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{ 
+            position: 'absolute', top: '10%', right: '-10%', 
+            width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', 
+            background: `radial-gradient(circle, ${highlightColor}15 0%, transparent 70%)`, 
+            filter: 'blur(60px)' 
+          }} />
+          <div style={{ 
+            position: 'absolute', bottom: '10%', left: '-10%', 
+            width: isMobile ? '200px' : '400px', height: isMobile ? '200px' : '400px', 
+            background: `radial-gradient(circle, ${secondaryColor}15 0%, transparent 70%)`, 
+            filter: 'blur(60px)' 
+          }} />
+        </div>
+      )}
 
-      <div style={{ position: 'relative', zIndex: 10, maxWidth: '1280px', margin: '0 auto' }}>
+      <div style={{ position: 'relative', zIndex: 10, maxWidth: '1280px', margin: '0 auto', height: bookMode ? '100%' : 'auto', display: 'flex', flexDirection: 'column' }}>
         
         {/* Header Section */}
         <div style={{
           textAlign: 'center',
-          marginBottom: isMobile ? '3rem' : '5rem',
+          marginBottom: bookMode ? '0.75rem' : (isMobile ? '3rem' : '5rem'),
           opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'all 0.8s ease'
+          transform: bookMode ? 'none' : (visible ? 'translateY(0)' : 'translateY(30px)'),
+          transition: 'all 0.8s ease',
+          flexShrink: 0
         }}>
           <div style={{
             fontFamily: '"Space Mono", monospace', fontSize: '0.8rem', letterSpacing: '0.15em',
-            color: highlightColor, textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 700
+            color: highlightColor, textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 700
           }}>
             02 // My Services
           </div>
-          <h2 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 800, letterSpacing: '-0.03em', color: titleColor, margin: '0 0 1rem 0' }}>
+          <h2 style={{ fontSize: bookMode ? '1.5rem' : 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 800, letterSpacing: '-0.03em', color: titleColor, margin: '0 0 0.5rem 0' }}>
             Solutions That Drive <span style={{ color: secondaryColor }}>Growth</span>.
           </h2>
-          <p style={{ color: textColor, maxWidth: '600px', margin: '0 auto', fontSize: '1.05rem', lineHeight: 1.7 }}>
-            I don't just write code. I build scalable digital products that solve real business problems and deliver exceptional user experiences.
-          </p>
         </div>
 
-        {/* Services Grid */}
-        <div style={{
-          display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
-          gap: isMobile ? '1.5rem' : '2.5rem', marginBottom: '5rem'
-        }}>
-          {servicesData.map((service, index) => (
-            <ServiceCard
-              key={service.id}
-              service={service}
-              index={index}
-              visible={visible}
-              darkMode={darkMode}
-              isMobile={isMobile}
-              highlightColor={highlightColor}
-              secondaryColor={secondaryColor}
-              glassBg={glassBg}
-              glassBorder={glassBorder}
-              cardHoverBg={cardHoverBg}
-              textColor={textColor}
-              titleColor={titleColor}
-            />
-          ))}
-        </div>
-
-        {/* Development Process Timeline */}
-        <div style={{
-          background: glassBg, backdropFilter: 'blur(20px)', border: glassBorder,
-          borderRadius: '24px', padding: isMobile ? '2.5rem 1.5rem' : '4rem',
-          opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(40px)',
-          transition: 'all 0.8s ease 0.6s'
-        }}>
-          <h3 style={{ fontSize: '1.8rem', fontWeight: 800, color: titleColor, textAlign: 'center', marginBottom: '3rem' }}>
-            My Development Process
-          </h3>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '2rem', position: 'relative' }}>
-            
-            {/* Connecting Line for Desktop */}
-            {!isMobile && (
-              <div style={{ position: 'absolute', top: '24px', left: '12%', right: '12%', height: '2px', background: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', zIndex: 0 }}>
-                {/* Slow Filling Line */}
-                <div style={{
-                  height: '100%', background: `linear-gradient(90deg, ${secondaryColor}, ${highlightColor})`,
-                  width: `${Math.max(0, progress - 1) * (100 / 3)}%`,
-                  transition: 'width 1.2s linear' // ✅ ekdum barabar speed me bharega
-                }} />
-              </div>
-            )}
-
-            {/* Connecting Line for Mobile */}
-            {isMobile && (
-              <div style={{ position: 'absolute', top: '0', bottom: '0', left: '24px', width: '2px', background: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', zIndex: 0 }}>
-                <div style={{
-                  width: '100%', background: `linear-gradient(180deg, ${secondaryColor}, ${highlightColor})`,
-                  height: `${Math.max(0, progress - 1) * (100 / 3)}%`,
-                  transition: 'height 1.2s linear'
-                }} />
-              </div>
-            )}
-
-            {processData.map((step, index) => {
-              const isCompleted = progress > index;
-              const isLastAndCompleted = index === 3 && progress === 4;
-
-              return (
-                <div key={index} style={{ 
-                  position: 'relative', zIndex: 1, textAlign: isMobile ? 'left' : 'center', 
-                  display: isMobile ? 'flex' : 'block', gap: isMobile ? '1.5rem' : '0', alignItems: 'flex-start',
-                  opacity: isCompleted ? 1 : 0.4, transition: 'opacity 0.6s ease'
-                }}>
-                  
-                  {/* Step Icon Container */}
-                  <div style={{ position: 'relative', width: '50px', height: '50px', margin: isMobile ? '0' : '0 auto 1.5rem auto' }}>
-                    
-                    {/* Main Circle */}
-                    <div style={{
-                      position: 'absolute', inset: 0, borderRadius: '50%',
-                      background: darkMode ? '#1A1A1A' : '#ffffff',
-                      border: `2px solid ${isCompleted ? secondaryColor : (darkMode ? '#333' : '#ddd')}`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: isCompleted ? secondaryColor : (darkMode ? '#666' : '#999'),
-                      boxShadow: isCompleted ? `0 0 15px ${secondaryColor}40` : 'none',
-                      transition: 'all 0.6s ease',
-                      animation: isLastAndCompleted ? 'celebratePop 1s ease forwards' : 'none'
-                    }}>
-                      {step.icon}
-                    </div>
-
-                    {/* ✅ RIPPLE SHOCKWAVES (Sirf aakhiri step par fatenge) */}
-                    {isLastAndCompleted && (
-                      <>
-                        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `2px solid ${highlightColor}`, animation: 'sonarRipple 1.2s ease-out forwards', pointerEvents: 'none' }} />
-                        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `2px solid ${highlightColor}`, animation: 'sonarRipple 1.2s ease-out forwards 0.4s', pointerEvents: 'none' }} />
-                      </>
-                    )}
-                  </div>
-                  
-                  {/* Text Content */}
-                  <div>
-                    <h4 style={{ 
-                      fontSize: '1.1rem', fontWeight: 700, 
-                      color: isLastAndCompleted ? highlightColor : titleColor, 
-                      marginBottom: '0.5rem', transition: 'color 0.5s ease'
-                    }}>
-                      {step.title}
-                    </h4>
-                    <p style={{ color: textColor, fontSize: '0.9rem', lineHeight: 1.6 }}>{step.desc}</p>
-                  </div>
-                </div>
-              );
-            })}
+        {/* Scroll Wrapper inside Book */}
+        <div style={bookMode ? { flexGrow: 1 } : {}}>
+          {/* Services Grid */}
+          <div style={{
+            display: 'grid', gridTemplateColumns: bookMode ? 'repeat(2, 1fr)' : (isMobile ? '1fr' : 'repeat(2, 1fr)'),
+            gap: bookMode ? '0.75rem' : (isMobile ? '1.5rem' : '2.5rem'), marginBottom: bookMode ? '0' : '5rem'
+          }}>
+            {servicesData.map((service, index) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                index={index}
+                visible={visible}
+                darkMode={darkMode}
+                isMobile={isMobile}
+                bookMode={bookMode}
+                highlightColor={highlightColor}
+                secondaryColor={secondaryColor}
+                glassBg={glassBg}
+                glassBorder={glassBorder}
+                cardHoverBg={cardHoverBg}
+                textColor={textColor}
+                titleColor={titleColor}
+              />
+            ))}
           </div>
         </div>
 
+        {/* Development Process Timeline - Hidden in Book Mode for space */}
+        {!bookMode && (
+          <div style={{
+            background: glassBg, backdropFilter: 'blur(20px)', border: glassBorder,
+            borderRadius: '24px', padding: isMobile ? '2.5rem 1.5rem' : '4rem',
+            opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(40px)',
+            transition: 'all 0.8s ease 0.6s'
+          }}>
+            <h3 style={{ fontSize: '1.8rem', fontWeight: 800, color: titleColor, textAlign: 'center', marginBottom: '3rem' }}>
+              My Development Process
+            </h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '2rem', position: 'relative' }}>
+              
+              {/* Connecting Line for Desktop */}
+              {!isMobile && (
+                <div style={{ position: 'absolute', top: '24px', left: '12%', right: '12%', height: '2px', background: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', zIndex: 0 }}>
+                  {/* Slow Filling Line */}
+                  <div style={{
+                    height: '100%', background: `linear-gradient(90deg, ${secondaryColor}, ${highlightColor})`,
+                    width: `${Math.max(0, progress - 1) * (100 / 3)}%`,
+                    transition: 'width 1.2s linear'
+                  }} />
+                </div>
+              )}
+
+              {/* Connecting Line for Mobile */}
+              {isMobile && (
+                <div style={{ position: 'absolute', top: '0', bottom: '0', left: '24px', width: '2px', background: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', zIndex: 0 }}>
+                  <div style={{
+                    width: '100%', background: `linear-gradient(180deg, ${secondaryColor}, ${highlightColor})`,
+                    height: `${Math.max(0, progress - 1) * (100 / 3)}%`,
+                    transition: 'height 1.2s linear'
+                  }} />
+                </div>
+              )}
+
+              {processData.map((step, index) => {
+                const isCompleted = progress > index;
+                const isLastAndCompleted = index === 3 && progress === 4;
+
+                return (
+                  <div key={index} style={{ 
+                    position: 'relative', zIndex: 1, textAlign: isMobile ? 'left' : 'center', 
+                    display: isMobile ? 'flex' : 'block', gap: isMobile ? '1.5rem' : '0', alignItems: 'flex-start',
+                    opacity: isCompleted ? 1 : 0.4, transition: 'opacity 0.6s ease'
+                  }}>
+                    
+                    {/* Step Icon Container */}
+                    <div style={{ position: 'relative', width: '50px', height: '50px', margin: isMobile ? '0' : '0 auto 1.5rem auto' }}>
+                      
+                      {/* Main Circle */}
+                      <div style={{
+                        position: 'absolute', inset: 0, borderRadius: '50%',
+                        background: darkMode ? '#1A1A1A' : '#ffffff',
+                        border: `2px solid ${isCompleted ? secondaryColor : (darkMode ? '#333' : '#ddd')}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: isCompleted ? secondaryColor : (darkMode ? '#666' : '#999'),
+                        boxShadow: isCompleted ? `0 0 15px ${secondaryColor}40` : 'none',
+                        transition: 'all 0.6s ease',
+                        animation: isLastAndCompleted ? 'celebratePop 1s ease forwards' : 'none'
+                      }}>
+                        {step.icon}
+                      </div>
+
+                      {/* RIPPLE SHOCKWAVES */}
+                      {isLastAndCompleted && (
+                        <>
+                          <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `2px solid ${highlightColor}`, animation: 'sonarRipple 1.2s ease-out forwards', pointerEvents: 'none' }} />
+                          <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `2px solid ${highlightColor}`, animation: 'sonarRipple 1.2s ease-out forwards 0.4s', pointerEvents: 'none' }} />
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Text Content */}
+                    <div>
+                      <h4 style={{ 
+                        fontSize: '1.1rem', fontWeight: 700, 
+                        color: isLastAndCompleted ? highlightColor : titleColor, 
+                        marginBottom: '0.5rem', transition: 'color 0.5s ease'
+                      }}>
+                        {step.title}
+                      </h4>
+                      <p style={{ color: textColor, fontSize: '0.9rem', lineHeight: 1.6 }}>{step.desc}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

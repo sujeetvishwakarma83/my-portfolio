@@ -18,6 +18,9 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Background3D from './components/Background3D';
 
+import BookPortfolio from './components/BookPortfolio';
+import Testimonials from './components/Testimonials';
+
 function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [showTop, setShowTop] = useState(false);
@@ -25,6 +28,18 @@ function App() {
   
   // ✅ MODAL STATE: Profile DP popup ke liye
   const [showProfileModal, setShowProfileModal] = useState(false);
+
+  // Toggle Scroll vs Book Mode on Desktop
+  const [scrollMode, setScrollMode] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,20 +72,28 @@ function App() {
         transition: 'background 0.3s, color 0.3s',
       }}
     >
-      <Background3D darkMode={darkMode} />
       <CustomCursor />
-      <ShareButton darkMode={darkMode} />
 
-      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
-      <Hero darkMode={darkMode} />
-      <About darkMode={darkMode} />
-      <Services darkMode={darkMode} /> 
-      <Skills darkMode={darkMode} />
-      <Education darkMode={darkMode} />
-      <Projects darkMode={darkMode} />
-      <WhyHireMe darkMode={darkMode} />
-      <Contact darkMode={darkMode} />
-      <Footer darkMode={darkMode} />
+      {isDesktop && !scrollMode ? (
+        <BookPortfolio darkMode={darkMode} onToggleScrollMode={() => setScrollMode(true)} />
+      ) : (
+        <>
+          <Background3D darkMode={darkMode} />
+          <ShareButton darkMode={darkMode} />
+
+          <Navbar darkMode={darkMode} setDarkMode={setDarkMode} onToggleBookMode={() => setScrollMode(false)} />
+          <Hero darkMode={darkMode} />
+          <About darkMode={darkMode} />
+          <Services darkMode={darkMode} /> 
+          <Skills darkMode={darkMode} />
+          <Education darkMode={darkMode} />
+          <Projects darkMode={darkMode} />
+          <WhyHireMe darkMode={darkMode} />
+          <Testimonials darkMode={darkMode} />
+          <Contact darkMode={darkMode} />
+          <Footer darkMode={darkMode} />
+        </>
+      )}
 
       {/* ✅ WHATSAPP DP STYLE PROFILE MODAL */}
       {/* ✅ WHATSAPP DP STYLE PROFILE MODAL WITH DUAL ROTATING RINGS */}

@@ -6,7 +6,6 @@ function ShareButton({ darkMode }) {
 
   // Enter your portfolio URL here — update it after deployment.
   var portfolioUrl = window.location.href;
-  var portfolioTitle = 'Sujeet Vishwakarma — Full Stack Developer Portfolio';
   var portfolioDesc = 'Check out my portfolio! MCA student, Full Stack Developer. Available for freelance & internship.';
 
   var shareLinks = [
@@ -94,7 +93,6 @@ function ShareButton({ darkMode }) {
 
   var panelBg = darkMode ? '#111118' : '#ffffff';
   var panelBorder = darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,150,100,0.15)';
-  var labelColor = darkMode ? '#6b6b7a' : '#4a7a65';
 
   return (
     <div style={{

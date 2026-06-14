@@ -43,7 +43,7 @@ function useTyping(texts, speed, pause) {
   return display;
 }
 
-function Hero({ darkMode }) {
+function Hero({ darkMode, bookMode = false }) {
   var [visible, setVisible] = useState(false);
   var [isMobile, setIsMobile] = useState(window.innerWidth <= 992);
   var [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -61,7 +61,7 @@ function Hero({ darkMode }) {
   }, []);
 
   var handleMouseMove = function(e) {
-    if (isMobile) return;
+    if (isMobile || bookMode) return;
     var x = (e.clientX - window.innerWidth / 2) / 25;
     var y = (e.clientY - window.innerHeight / 2) / 25;
     setMousePos({ x: x, y: y });
@@ -78,8 +78,9 @@ function Hero({ darkMode }) {
     2000
   );
 
+  var isCompact = isMobile || bookMode;
+
   // Theme Colors
-  var bgMain = darkMode ? '#0A0A0A' : '#f8fafc';
   var textMain = darkMode ? '#ffffff' : '#0f172a';
   var textMuted = darkMode ? '#9ca3af' : '#475569';
   var primaryColor = '#00F5A0';
@@ -87,11 +88,11 @@ function Hero({ darkMode }) {
 
   // --- STYLES ---
   var sectionStyle = {
-    minHeight: '100vh',
+    minHeight: bookMode ? 'auto' : '100vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: isMobile ? '4rem 1.2rem 4rem' : '4.8rem 4rem 4rem',
+    padding: bookMode ? '2rem 1.5rem' : (isMobile ? '4rem 1.2rem 4rem' : '4.8rem 4rem 4rem'),
     position: 'relative',
     overflow: 'hidden',
     background: 'transparent',
@@ -104,9 +105,9 @@ function Hero({ darkMode }) {
     width: '100%',
     margin: '0 auto',
     display: 'flex',
-    flexDirection: isMobile ? 'column' : 'row',
+    flexDirection: isCompact ? 'column' : 'row',
     alignItems: 'center',
-    gap: isMobile ? '3rem' : '3rem',
+    gap: isCompact ? '2rem' : '3rem',
     position: 'relative',
     zIndex: 10,
     opacity: visible ? 1 : 0,
@@ -124,14 +125,14 @@ function Hero({ darkMode }) {
 
   var rightColStyle = {
     flex: '0.9',
-    display: 'flex',
+    display: bookMode ? 'none' : 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
     width: '100%',
-    marginTop: isMobile ? '1rem' : '0',
-    paddingBottom: isMobile ? '2rem' : '0',
+    marginTop: isCompact ? '1rem' : '0',
+    paddingBottom: isCompact ? '2rem' : '0',
   };
 
   var badgeStyle = {
@@ -143,19 +144,19 @@ function Hero({ darkMode }) {
     background: darkMode ? 'rgba(0, 245, 160, 0.1)' : 'rgba(0, 245, 160, 0.15)',
     border: '1px solid rgba(0, 245, 160, 0.3)',
     color: darkMode ? primaryColor : '#00a86b',
-    fontSize: isMobile ? '0.75rem' : '0.85rem',
+    fontSize: isCompact ? '0.75rem' : '0.85rem',
     fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
-    marginBottom: '1.5rem',
+    marginBottom: bookMode ? '0.75rem' : '1.5rem',
   };
 
   var h1Style = {
-    fontSize: isMobile ? '2.2rem' : 'clamp(3rem, 4.5vw, 4rem)',
+    fontSize: bookMode ? '1.5rem' : (isMobile ? '2.2rem' : 'clamp(3rem, 4.5vw, 4rem)'),
     fontWeight: 800,
-    lineHeight: 1.1,
+    lineHeight: 1.15,
     letterSpacing: '-0.03em',
-    marginBottom: '1.5rem',
+    marginBottom: bookMode ? '0.75rem' : '1.5rem',
   };
 
   var gradientTextStyle = {
@@ -167,9 +168,9 @@ function Hero({ darkMode }) {
 
   var typedLineStyle = {
     fontFamily: '"Space Mono", monospace',
-    fontSize: isMobile ? '1.1rem' : '1.5rem',
+    fontSize: bookMode ? '1rem' : (isCompact ? '1.1rem' : '1.5rem'),
     color: textMuted,
-    marginBottom: '1.5rem',
+    marginBottom: bookMode ? '0.75rem' : '1.5rem',
     fontWeight: 600,
     display: 'flex',
     alignItems: 'center',
@@ -177,18 +178,18 @@ function Hero({ darkMode }) {
   };
 
   var descStyle = {
-    fontSize: isMobile ? '1rem' : '1.125rem',
+    fontSize: bookMode ? '0.85rem' : (isCompact ? '1rem' : '1.125rem'),
     color: textMuted,
-    lineHeight: 1.7,
+    lineHeight: 1.6,
     maxWidth: '600px',
-    marginBottom: '2.5rem',
+    marginBottom: bookMode ? '1.25rem' : '2.5rem',
   };
 
   var btnPrimaryStyle = {
-    padding: isMobile ? '0.8rem 1.5rem' : '1rem 2rem',
+    padding: bookMode ? '0.6rem 1.2rem' : (isCompact ? '0.8rem 1.2rem' : '1rem 2rem'),
     background: primaryColor,
     color: '#0A0A0A',
-    fontSize: '0.95rem',
+    fontSize: bookMode ? '0.8rem' : '0.9rem',
     fontWeight: 700,
     border: 'none',
     borderRadius: '12px',
@@ -201,10 +202,10 @@ function Hero({ darkMode }) {
   };
 
   var btnSecondaryStyle = {
-    padding: isMobile ? '0.8rem 1.5rem' : '1rem 2rem',
+    padding: bookMode ? '0.6rem 1.2rem' : (isCompact ? '0.8rem 1.2rem' : '1rem 2rem'),
     background: 'transparent',
     color: textMain,
-    fontSize: '0.95rem',
+    fontSize: bookMode ? '0.8rem' : '0.9rem',
     fontWeight: 600,
     border: '1px solid ' + (darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'),
     borderRadius: '12px',
@@ -221,7 +222,7 @@ function Hero({ darkMode }) {
     background: darkMode ? 'rgba(255,255,255,0.05)' : '#ffffff',
     border: '1px solid ' + (darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'),
     borderRadius: '50px',
-    fontSize: '0.85rem',
+    fontSize: '0.8rem',
     fontWeight: 500,
     color: textMuted,
     transition: 'all 0.3s ease',
@@ -233,7 +234,7 @@ function Hero({ darkMode }) {
     backdropFilter: 'blur(16px)',
     WebkitBackdropFilter: 'blur(16px)',
     border: '1px solid ' + (darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'),
-    padding: isMobile ? '8px 12px' : '12px 16px',
+    padding: isCompact ? '8px 12px' : '12px 16px',
     borderRadius: '16px',
     display: 'flex',
     alignItems: 'center',
@@ -243,7 +244,7 @@ function Hero({ darkMode }) {
     whiteSpace: 'nowrap',
   };
 
-  var profileSize = isMobile ? '300px' : '450px';
+  var profileSize = bookMode ? '220px' : (isMobile ? '300px' : '450px');
 
   return (
     <section id="hero" className="premium-bg" onMouseMove={handleMouseMove} style={sectionStyle}>
@@ -284,27 +285,31 @@ function Hero({ darkMode }) {
       `}</style>
 
       {/* Backdrop Overlay to ensure text legibility */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: darkMode ? 'rgba(10, 10, 10, 0.45)' : 'rgba(248, 250, 252, 0.55)',
-        zIndex: 1,
-        pointerEvents: 'none'
-      }} />
+      {!bookMode && (
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: darkMode ? 'rgba(10, 10, 10, 0.45)' : 'rgba(248, 250, 252, 0.55)',
+          zIndex: 1,
+          pointerEvents: 'none'
+        }} />
+      )}
 
       {/* Cyber Grid & Holographic Glow Overlay */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
-        <div style={{ 
-          position: 'absolute', inset: 0, 
-          backgroundImage: 'linear-gradient(' + (darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)') + ' 1px, transparent 1px), linear-gradient(90deg, ' + (darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)') + ' 1px, transparent 1px)', 
-          backgroundSize: '50px 50px', 
-          maskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 100%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 100%)'
-        }} />
-        <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: isMobile ? '300px' : '600px', height: isMobile ? '300px' : '600px', background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 60%)', filter: 'blur(80px)', transform: `translate(${mousePos.x * 0.5}px, ${mousePos.y * 0.5}px)`, transition: 'transform 0.2s ease-out' }} />
-        <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', background: 'radial-gradient(circle, rgba(0,245,160,0.15) 0%, transparent 60%)', filter: 'blur(80px)', transform: `translate(${mousePos.x * -0.5}px, ${mousePos.y * -0.5}px)`, transition: 'transform 0.2s ease-out' }} />
-        <div style={{ position: 'absolute', top: '40%', left: '30%', width: isMobile ? '200px' : '400px', height: isMobile ? '200px' : '400px', background: 'radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 60%)', filter: 'blur(85px)', transform: `translate(${mousePos.x * 0.25}px, ${mousePos.y * 0.25}px)`, transition: 'transform 0.2s ease-out' }} />
-      </div>
+      {!bookMode && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
+          <div style={{ 
+            position: 'absolute', inset: 0, 
+            backgroundImage: 'linear-gradient(' + (darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)') + ' 1px, transparent 1px), linear-gradient(90deg, ' + (darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)') + ' 1px, transparent 1px)', 
+            backgroundSize: '50px 50px', 
+            maskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 100%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 100%)'
+          }} />
+          <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: isMobile ? '300px' : '600px', height: isMobile ? '300px' : '600px', background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 60%)', filter: 'blur(80px)', transform: `translate(${mousePos.x * 0.5}px, ${mousePos.y * 0.5}px)`, transition: 'transform 0.2s ease-out' }} />
+          <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', background: 'radial-gradient(circle, rgba(0,245,160,0.15) 0%, transparent 60%)', filter: 'blur(80px)', transform: `translate(${mousePos.x * -0.5}px, ${mousePos.y * -0.5}px)`, transition: 'transform 0.2s ease-out' }} />
+          <div style={{ position: 'absolute', top: '40%', left: '30%', width: isMobile ? '200px' : '400px', height: isMobile ? '200px' : '400px', background: 'radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 60%)', filter: 'blur(85px)', transform: `translate(${mousePos.x * 0.25}px, ${mousePos.y * 0.25}px)`, transition: 'transform 0.2s ease-out' }} />
+        </div>
+      )}
 
       {/* Main Content */}
       <div style={containerStyle}>
@@ -486,59 +491,63 @@ function Hero({ darkMode }) {
           </div>
 
           {/* Social Links sidebar */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: isMobile ? 'row' : 'column', 
-            gap: '1rem', 
-            position: isMobile ? 'relative' : 'absolute', 
-            right: isMobile ? 'auto' : '-3rem', 
-            marginTop: isMobile ? '4rem' : '0',
-            zIndex: 20
-          }}>
-            <a href="https://github.com/sujeetvishwakarma83" target="_blank" rel="noopener noreferrer" className="social-link">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-            </a>
-            <a href="https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a" target="_blank" rel="noopener noreferrer" className="social-link">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 2a2 2 0 1 1-2 2 2 2 0 0 1 2-2z"/></svg>
-            </a>
-            <a href="https://www.instagram.com/cabbage_code/" target="_blank" rel="noopener noreferrer" className="social-link">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37zM17.5 6.5h.01"/></svg>
-            </a>
-            <a href="mailto:sujeet.cabbagecode@gmail.com" className="social-link">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6"/></svg>
-            </a>
-          </div>
+          {!bookMode && (
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: isMobile ? 'row' : 'column', 
+              gap: '1rem', 
+              position: isMobile ? 'relative' : 'absolute', 
+              right: isMobile ? 'auto' : '-3rem', 
+              marginTop: isMobile ? '4rem' : '0',
+              zIndex: 20
+            }}>
+              <a href="https://github.com/sujeetvishwakarma83" target="_blank" rel="noopener noreferrer" className="social-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              </a>
+              <a href="https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a" target="_blank" rel="noopener noreferrer" className="social-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 2a2 2 0 1 1-2 2 2 2 0 0 1 2-2z"/></svg>
+              </a>
+              <a href="https://www.instagram.com/cabbage_code/" target="_blank" rel="noopener noreferrer" className="social-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37zM17.5 6.5h.01"/></svg>
+              </a>
+              <a href="mailto:sujeet.cabbagecode@gmail.com" className="social-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6"/></svg>
+              </a>
+            </div>
+          )}
 
         </div>
       </div>
 
       {/* Scroll Down Indicator */}
-      <div 
-        style={{ 
-          position: 'absolute', 
-          bottom: isMobile ? '1rem' : '2.5rem', 
-          left: '50%', 
-          transform: 'translateX(-50%)', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          gap: '8px',
-          cursor: 'pointer',
-          zIndex: 10,
-          animation: 'float-fast 2s ease-in-out infinite'
-        }}
-        onClick={function() {
-          var aboutEl = document.getElementById('about');
-          if (aboutEl) {
-            aboutEl.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
-      >
-        <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: 700, color: textMuted }}>
-          Scroll Down
-        </span>
-        <svg style={{ color: primaryColor }} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
+      {!bookMode && (
+        <div 
+          style={{ 
+            position: 'absolute', 
+            bottom: isMobile ? '1rem' : '2.5rem', 
+            left: '50%', 
+            transform: 'translateX(-50%)', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            gap: '8px',
+            cursor: 'pointer',
+            zIndex: 10,
+            animation: 'float-fast 2s ease-in-out infinite'
+          }}
+          onClick={function() {
+            var aboutEl = document.getElementById('about');
+            if (aboutEl) {
+              aboutEl.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        >
+          <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: 700, color: textMuted }}>
+            Scroll Down
+          </span>
+          <svg style={{ color: primaryColor }} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      )}
     </section>
   );
 }

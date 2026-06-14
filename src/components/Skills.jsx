@@ -69,7 +69,7 @@ const skillCategories = [
   }
 ];
 
-function SkillChip({ skill, darkMode, glowColor }) {
+function SkillChip({ skill, darkMode, glowColor, bookMode = false }) {
   const [hovered, setHovered] = useState(false);
   const bg = darkMode ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)';
   const border = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
@@ -82,25 +82,25 @@ function SkillChip({ skill, darkMode, glowColor }) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '12px',
-        padding: '0.8rem 1rem',
+        gap: bookMode ? '6px' : '12px',
+        padding: bookMode ? '0.4rem 0.6rem' : '0.8rem 1rem',
         background: hovered ? (darkMode ? 'rgba(255,255,255,0.08)' : '#ffffff') : bg,
         border: `1px solid ${hovered ? glowColor : border}`,
-        borderRadius: '12px',
+        borderRadius: bookMode ? '8px' : '12px',
         cursor: 'default',
         transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
         transition: 'all 0.3s ease',
         boxShadow: hovered ? `0 8px 20px -5px ${glowColor}40` : 'none',
       }}
     >
-      <div style={{ fontSize: '1.4rem', display: 'flex', alignItems: 'center' }}>
+      <div style={{ fontSize: bookMode ? '1.1rem' : '1.4rem', display: 'flex', alignItems: 'center' }}>
         {skill.icon}
       </div>
       <div>
-        <div style={{ fontSize: '0.9rem', fontWeight: 700, color: nameColor }}>
+        <div style={{ fontSize: bookMode ? '0.75rem' : '0.9rem', fontWeight: 700, color: nameColor }}>
           {skill.name}
         </div>
-        <div style={{ fontSize: '0.7rem', color: glowColor, fontFamily: '"Space Mono", monospace', marginTop: '2px' }}>
+        <div style={{ fontSize: bookMode ? '0.6rem' : '0.7rem', color: glowColor, fontFamily: '"Space Mono", monospace', marginTop: '2px' }}>
           {skill.tag}
         </div>
       </div>
@@ -108,7 +108,7 @@ function SkillChip({ skill, darkMode, glowColor }) {
   );
 }
 
-function Skills({ darkMode }) {
+function Skills({ darkMode, bookMode = false }) {
   const [visible, setVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const ref = useRef(null);
@@ -120,6 +120,10 @@ function Skills({ darkMode }) {
   }, []);
 
   useEffect(() => {
+    if (bookMode) {
+      setVisible(true);
+      return;
+    }
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) setVisible(true);
@@ -128,7 +132,7 @@ function Skills({ darkMode }) {
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
-  }, []);
+  }, [bookMode]);
 
   // Theme Variables
   const sectionBg = 'transparent';
@@ -139,36 +143,38 @@ function Skills({ darkMode }) {
 
   return (
     <section id="skills" ref={ref} style={{
-      padding: isMobile ? '5rem 1.5rem' : '8rem 4rem',
+      padding: bookMode ? '1.5rem 1.25rem' : (isMobile ? '5rem 1.5rem' : '8rem 4rem'),
       background: sectionBg,
       position: 'relative',
-      overflow: 'hidden',
+      overflow: bookMode ? 'visible' : 'hidden',
     }}>
       
       {/* Background Glowing Blobs */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-        <div style={{ 
-          position: 'absolute', top: '10%', left: '-5%', 
-          width: isMobile ? '250px' : '400px', height: isMobile ? '250px' : '400px', 
-          background: `radial-gradient(circle, ${highlightColor}10 0%, transparent 70%)`, 
-          filter: 'blur(60px)' 
-        }} />
-        <div style={{ 
-          position: 'absolute', bottom: '10%', right: '-5%', 
-          width: isMobile ? '200px' : '350px', height: isMobile ? '200px' : '350px', 
-          background: 'radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%)', 
-          filter: 'blur(60px)' 
-        }} />
-      </div>
+      {!bookMode && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{ 
+            position: 'absolute', top: '10%', left: '-5%', 
+            width: isMobile ? '250px' : '400px', height: isMobile ? '250px' : '400px', 
+            background: `radial-gradient(circle, ${highlightColor}10 0%, transparent 70%)`, 
+            filter: 'blur(60px)' 
+          }} />
+          <div style={{ 
+            position: 'absolute', bottom: '10%', right: '-5%', 
+            width: isMobile ? '200px' : '350px', height: isMobile ? '200px' : '350px', 
+            background: 'radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%)', 
+            filter: 'blur(60px)' 
+          }} />
+        </div>
+      )}
 
       <div style={{ position: 'relative', zIndex: 10, maxWidth: '1200px', margin: '0 auto' }}>
 
         {/* Header */}
         <div style={{
           textAlign: isMobile ? 'center' : 'left',
-          marginBottom: '4rem',
+          marginBottom: bookMode ? '1rem' : '4rem',
           opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0)' : 'translateY(30px)',
+          transform: bookMode ? 'none' : (visible ? 'translateY(0)' : 'translateY(30px)'),
           transition: 'all 0.8s ease'
         }}>
           <div style={{
@@ -183,10 +189,11 @@ function Skills({ darkMode }) {
             03 // Tech Stack
           </div>
           <h2 style={{
-            fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+            fontSize: bookMode ? '1.5rem' : 'clamp(2.5rem, 4vw, 3.5rem)',
             fontWeight: 800,
             letterSpacing: '-0.03em',
             color: titleColor,
+            margin: 0
           }}>
             Tools & <span style={{ color: highlightColor }}>Technologies</span>.
           </h2>
@@ -195,28 +202,28 @@ function Skills({ darkMode }) {
         {/* Categorized Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
-          gap: '2rem',
+          gridTemplateColumns: bookMode ? 'repeat(2, 1fr)' : (isMobile ? '1fr' : 'repeat(2, 1fr)'),
+          gap: bookMode ? '0.75rem' : '2rem',
         }}>
           {skillCategories.map((category, idx) => (
             <div 
               key={category.title}
               style={{
-                background: glassBg,
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                border: glassBorder,
+                background: bookMode ? 'transparent' : glassBg,
+                backdropFilter: bookMode ? 'none' : 'blur(20px)',
+                WebkitBackdropFilter: bookMode ? 'none' : 'blur(20px)',
+                border: bookMode ? 'none' : glassBorder,
                 borderRadius: '24px',
-                padding: isMobile ? '2rem 1.5rem' : '2.5rem',
+                padding: bookMode ? '0' : (isMobile ? '2rem 1.5rem' : '2.5rem'),
                 opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(40px)',
-                transition: `all 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 0.15}s`,
+                transform: bookMode ? 'none' : (visible ? 'translateY(0)' : 'translateY(40px)'),
+                transition: bookMode ? 'none' : `all 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 0.15}s`,
               }}
             >
               {/* Category Header */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: bookMode ? '0.75rem' : '1.5rem' }}>
                 <div style={{
-                  width: '40px', height: '40px',
+                  width: bookMode ? '32px' : '40px', height: bookMode ? '32px' : '40px',
                   borderRadius: '10px',
                   background: `${category.color}15`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -224,7 +231,7 @@ function Skills({ darkMode }) {
                 }}>
                   {category.icon}
                 </div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: titleColor, margin: 0 }}>
+                <h3 style={{ fontSize: bookMode ? '1rem' : '1.25rem', fontWeight: 700, color: titleColor, margin: 0 }}>
                   {category.title}
                 </h3>
               </div>
@@ -232,8 +239,8 @@ function Skills({ darkMode }) {
               {/* Skills Chips */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
-                gap: '1rem'
+                gridTemplateColumns: (isMobile || bookMode) ? '1fr' : 'repeat(2, 1fr)',
+                gap: bookMode ? '0.5rem' : '1rem'
               }}>
                 {category.skills.map(skill => (
                   <SkillChip 
@@ -241,6 +248,7 @@ function Skills({ darkMode }) {
                     skill={skill} 
                     darkMode={darkMode} 
                     glowColor={category.color} 
+                    bookMode={bookMode}
                   />
                 ))}
               </div>

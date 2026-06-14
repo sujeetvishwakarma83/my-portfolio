@@ -25,24 +25,22 @@ const navIcons = {
   ),
 };
 
-function Navbar({ darkMode, setDarkMode }) {
+const links = ['about', 'services', 'skills', 'education', 'projects', 'why-hire-me', 'contact'];
+
+function Navbar({ darkMode, setDarkMode, onToggleBookMode = null }) {
   const [scrolled, setScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024); 
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
-  const [scrollDir, setScrollDir] = useState('down');
   const [linePos, setLinePos] = useState(0);
   const [lineWidth, setLineWidth] = useState(0);
   
   const lastScrollY = useRef(0);
   const ulRef = useRef(null);
 
-  const links = ['about', 'services', 'skills', 'education', 'projects', 'why-hire-me', 'contact'];
-
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY;
-      setScrollDir(currentY > lastScrollY.current ? 'down' : 'up');
       lastScrollY.current = currentY;
 
       setScrolled(currentY > 50);
@@ -71,7 +69,7 @@ function Navbar({ darkMode, setDarkMode }) {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
     };
-  }, [links]);
+  }, []);
 
   useEffect(() => {
     if (!ulRef.current || !activeSection) return;
@@ -202,6 +200,24 @@ function Navbar({ darkMode, setDarkMode }) {
         justifyContent: 'flex-end' 
       }}>
         
+        {/* Book Mode Toggle (Desktop only) */}
+        {onToggleBookMode && !isMobile && (
+          <button onClick={onToggleBookMode}
+            title="Switch to Book Layout"
+            style={{
+              background: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+              border: darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
+              borderRadius: '50px', padding: '0.4rem', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s',
+              width: '36px', height: '36px', color: '#D4AF37'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V3a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v16.5m-3-13h-4m4 4h-4m4 4h-4"/></svg>
+          </button>
+        )}
+
         {/* Theme Toggle */}
         <button onClick={() => setDarkMode(!darkMode)}
           style={{

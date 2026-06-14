@@ -42,7 +42,7 @@ function AIStreamText({ content, visible, delayOffset }) {
   );
 }
 
-function About({ darkMode }) {
+function About({ darkMode, bookMode = false }) {
   var [visible, setVisible] = useState(false);
   var [imgHovered, setImgHovered] = useState(false);
   var [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -58,6 +58,10 @@ function About({ darkMode }) {
 
   // Scroll karne par animation trigger karne ke liye
   useEffect(function() {
+    if (bookMode) {
+      setVisible(true);
+      return;
+    }
     var observer = new IntersectionObserver(
       function(entries) {
         if (entries[0].isIntersecting) {
@@ -68,7 +72,7 @@ function About({ darkMode }) {
     );
     if (ref.current) observer.observe(ref.current);
     return function() { observer.disconnect(); };
-  }, []);
+  }, [bookMode]);
 
   // Background Canvas for Light Mode
   useEffect(function() {
@@ -157,42 +161,44 @@ function About({ darkMode }) {
   // YAHAN CHANGE KIYA HAI: textAlign 'justify' add kiya gaya hai
   var paraStyle = {
     fontFamily: '"Inter", "Segoe UI", sans-serif',
-    fontSize: isMobile ? '0.95rem' : '1.05rem',
+    fontSize: bookMode ? '0.85rem' : (isMobile ? '0.95rem' : '1.05rem'),
     color: textColor,
-    lineHeight: 1.8,
-    marginBottom: '1.25rem',
-    textAlign: 'justify', // <--- Text dono taraf se justify ho jayega
+    lineHeight: bookMode ? 1.5 : 1.8,
+    marginBottom: bookMode ? '0.75rem' : '1.25rem',
+    textAlign: 'justify',
   };
 
   return (
     <section id="about" ref={ref} style={{
-      padding: isMobile ? '5rem 1.5rem' : '8rem 4rem',
+      padding: bookMode ? '2rem 1.5rem' : (isMobile ? '5rem 1.5rem' : '8rem 4rem'),
       background: sectionBg,
-      overflow: 'hidden',
+      overflow: bookMode ? 'visible' : 'hidden',
       position: 'relative',
-      minHeight: '100vh',
+      minHeight: bookMode ? 'auto' : '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center'
     }}>
       
       {/* Background Glowing Blobs */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-        <div style={{ 
-          position: 'absolute', top: '20%', left: '-10%', 
-          width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', 
-          background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%)', 
-          filter: 'blur(60px)' 
-        }} />
-        <div style={{ 
-          position: 'absolute', bottom: '10%', right: '-5%', 
-          width: isMobile ? '200px' : '400px', height: isMobile ? '200px' : '400px', 
-          background: 'radial-gradient(circle, rgba(0,245,160,0.12) 0%, transparent 70%)', 
-          filter: 'blur(60px)' 
-        }} />
-      </div>
+      {!bookMode && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+          <div style={{ 
+            position: 'absolute', top: '20%', left: '-10%', 
+            width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', 
+            background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%)', 
+            filter: 'blur(60px)' 
+          }} />
+          <div style={{ 
+            position: 'absolute', bottom: '10%', right: '-5%', 
+            width: isMobile ? '200px' : '400px', height: isMobile ? '200px' : '400px', 
+            background: 'radial-gradient(circle, rgba(0,245,160,0.12) 0%, transparent 70%)', 
+            filter: 'blur(60px)' 
+          }} />
+        </div>
+      )}
 
-      {!darkMode && <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} />}
+      {!bookMode && !darkMode && <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} />}
 
       {/* Main Glassmorphism Container */}
       <div style={{
@@ -200,20 +206,20 @@ function About({ darkMode }) {
         zIndex: 10,
         maxWidth: '1200px',
         width: '100%',
-        background: glassBg,
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: glassBorder,
+        background: bookMode ? 'transparent' : glassBg,
+        backdropFilter: bookMode ? 'none' : 'blur(20px)',
+        WebkitBackdropFilter: bookMode ? 'none' : 'blur(20px)',
+        border: bookMode ? 'none' : glassBorder,
         borderRadius: '24px',
-        padding: isMobile ? '2rem 1.5rem' : '4rem',
-        boxShadow: '0 20px 40px -20px rgba(0,0,0,0.2)',
+        padding: bookMode ? '0' : (isMobile ? '2rem 1.5rem' : '4rem'),
+        boxShadow: bookMode ? 'none' : '0 20px 40px -20px rgba(0,0,0,0.2)',
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(40px)',
+        transform: bookMode ? 'none' : (visible ? 'translateY(0)' : 'translateY(40px)'),
         transition: 'opacity 0.8s ease, transform 0.8s ease'
       }}>
 
         {/* Section Header */}
-        <div style={{ marginBottom: '3rem', textAlign: isMobile ? 'center' : 'left' }}>
+        <div style={{ marginBottom: bookMode ? '1.5rem' : '3rem', textAlign: isMobile ? 'center' : 'left' }}>
           <div style={{
             fontFamily: '"Space Mono", monospace',
             fontSize: '0.8rem',
@@ -226,7 +232,7 @@ function About({ darkMode }) {
             01 // About Me
           </div>
           <h2 style={{
-            fontSize: 'clamp(2.5rem, 4vw, 3.5rem)',
+            fontSize: bookMode ? '1.8rem' : 'clamp(2.5rem, 4vw, 3.5rem)',
             fontWeight: 800,
             letterSpacing: '-0.03em',
             color: titleColor,
@@ -239,80 +245,82 @@ function About({ darkMode }) {
         {/* Grid Layout */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1.5fr',
-          gap: isMobile ? '3rem' : '4rem',
+          gridTemplateColumns: bookMode ? '1fr' : (isMobile ? '1fr' : '1fr 1.5fr'),
+          gap: bookMode ? '1.5rem' : (isMobile ? '3rem' : '4rem'),
           alignItems: 'center',
         }}>
 
           {/* Left: Interactive Photo */}
-          <div style={{ position: 'relative', margin: isMobile ? '0 auto' : '0', maxWidth: '350px', width: '100%' }}>
-            <div style={{
-              position: 'absolute', inset: '-5px',
-              background: 'linear-gradient(135deg, #00F5A0, #7C3AED)',
-              borderRadius: '20px',
-              filter: 'blur(15px)',
-              opacity: imgHovered ? 0.6 : 0.2,
-              transition: 'opacity 0.4s ease'
-            }} />
-
-            <div
-              onMouseEnter={function() { setImgHovered(true); }}
-              onMouseLeave={function() { setImgHovered(false); }}
-              style={{
-                position: 'relative',
-                width: '100%',
-                aspectRatio: '4/5',
-                borderRadius: '16px',
-                overflow: 'hidden',
-                border: glassBorder,
-                zIndex: 2,
-                background: darkMode ? '#111' : '#fff'
-              }}
-            >
-              <img
-                src={profilePhoto}
-                alt="Sujeet Vishwakarma"
-                style={{
-                  width: '100%', height: '100%',
-                  objectFit: 'cover',
-                  transform: imgHovered ? 'scale(1.05)' : 'scale(1)',
-                  transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-                  filter: imgHovered ? 'none' : (darkMode ? 'brightness(0.9) contrast(1.1)' : 'none'),
-                }}
-              />
-            </div>
-            
-            {/* Status Badge */}
-            <div style={{
-              position: 'absolute',
-              bottom: '-15px', right: '-15px',
-              background: darkMode ? '#1A1A1A' : '#ffffff',
-              border: '1px solid ' + highlightColor,
-              padding: '0.75rem 1.25rem',
-              borderRadius: '50px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              zIndex: 3,
-              boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2)'
-            }}>
-              <span style={{
-                width: '10px', height: '10px',
-                borderRadius: '50%',
-                background: highlightColor,
-                display: 'inline-block',
-                boxShadow: '0 0 10px ' + highlightColor,
-                animation: 'pulse-ring 2s infinite',
+          {!bookMode && (
+            <div style={{ position: 'relative', margin: isMobile ? '0 auto' : '0', maxWidth: '350px', width: '100%' }}>
+              <div style={{
+                position: 'absolute', inset: '-5px',
+                background: 'linear-gradient(135deg, #00F5A0, #7C3AED)',
+                borderRadius: '20px',
+                filter: 'blur(15px)',
+                opacity: imgHovered ? 0.6 : 0.2,
+                transition: 'opacity 0.4s ease'
               }} />
-              <span style={{
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                color: titleColor,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em'
-              }}>Available</span>
+
+              <div
+                onMouseEnter={function() { setImgHovered(true); }}
+                onMouseLeave={function() { setImgHovered(false); }}
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  aspectRatio: '4/5',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  border: glassBorder,
+                  zIndex: 2,
+                  background: darkMode ? '#111' : '#fff'
+                }}
+              >
+                <img
+                  src={profilePhoto}
+                  alt="Sujeet Vishwakarma"
+                  style={{
+                    width: '100%', height: '100%',
+                    objectFit: 'cover',
+                    transform: imgHovered ? 'scale(1.05)' : 'scale(1)',
+                    transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                    filter: imgHovered ? 'none' : (darkMode ? 'brightness(0.9) contrast(1.1)' : 'none'),
+                  }}
+                />
+              </div>
+              
+              {/* Status Badge */}
+              <div style={{
+                position: 'absolute',
+                bottom: '-15px', right: '-15px',
+                background: darkMode ? '#1A1A1A' : '#ffffff',
+                border: '1px solid ' + highlightColor,
+                padding: '0.75rem 1.25rem',
+                borderRadius: '50px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                zIndex: 3,
+                boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2)'
+              }}>
+                <span style={{
+                  width: '10px', height: '10px',
+                  borderRadius: '50%',
+                  background: highlightColor,
+                  display: 'inline-block',
+                  boxShadow: '0 0 10px ' + highlightColor,
+                  animation: 'pulse-ring 2s infinite',
+                }} />
+                <span style={{
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  color: titleColor,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>Available</span>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Right: AI Streaming Text (Now Justified!) */}
           <div>
@@ -354,16 +362,16 @@ function About({ darkMode }) {
 
             {/* Tech Stack Pills */}
             <div style={{
-              display: 'flex', flexWrap: 'wrap', gap: '0.75rem',
-              marginTop: '2rem', marginBottom: '2.5rem'
+              display: 'flex', flexWrap: 'wrap', gap: bookMode ? '0.4rem' : '0.75rem',
+              marginTop: bookMode ? '1rem' : '2rem', marginBottom: bookMode ? '1rem' : '2.5rem'
             }}>
               {badges.map(function(badge, i) {
                 return (
                   <span key={badge} style={{
                     fontFamily: '"Space Mono", monospace',
-                    fontSize: '0.75rem',
+                    fontSize: bookMode ? '0.65rem' : '0.75rem',
                     fontWeight: 600,
-                    padding: '0.4rem 1rem',
+                    padding: bookMode ? '0.25rem 0.6rem' : '0.4rem 1rem',
                     background: badgeBg,
                     color: highlightColor,
                     border: badgeBorder,
@@ -382,8 +390,8 @@ function About({ darkMode }) {
             {/* Stats Row */}
             <div style={{
               display: 'flex',
-              gap: isMobile ? '1.5rem' : '3rem',
-              paddingTop: '2rem',
+              gap: bookMode ? '1.5rem' : (isMobile ? '1.5rem' : '3rem'),
+              paddingTop: bookMode ? '1rem' : '2rem',
               borderTop: glassBorder,
               flexWrap: 'wrap',
             }}>
@@ -395,16 +403,16 @@ function About({ darkMode }) {
                     transition: `all 0.5s ease ${3.5 + (i * 0.15)}s` 
                   }}>
                     <div style={{
-                      fontSize: isMobile ? '1.8rem' : '2.2rem',
+                      fontSize: bookMode ? '1.4rem' : (isMobile ? '1.8rem' : '2.2rem'),
                       fontWeight: 800,
                       color: titleColor,
                       lineHeight: 1,
-                      marginBottom: '0.5rem'
+                      marginBottom: '0.3rem'
                     }}>
                       {stat.num}
                     </div>
                     <div style={{
-                      fontSize: '0.8rem',
+                      fontSize: bookMode ? '0.7rem' : '0.8rem',
                       color: textColor,
                       fontWeight: 500,
                       textTransform: 'uppercase',

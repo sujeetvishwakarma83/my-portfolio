@@ -92,9 +92,8 @@ const RatingStars = ({ rating, reviews, darkMode }) => {
   );
 };
 
-// ✅ Standard Grid Card
-function ProjectCard({ project, index, darkMode }) {
-  const tilt = use3DTilt(8, 1.02);
+function ProjectCard({ project, index, darkMode, bookMode = false }) {
+  const tilt = use3DTilt(bookMode ? 0 : 8, bookMode ? 1 : 1.02);
   const [hovered, setHovered] = useState(false);
 
   const cardBg = darkMode ? 'rgba(24, 24, 31, 0.6)' : 'rgba(255, 255, 255, 0.7)';
@@ -105,9 +104,9 @@ function ProjectCard({ project, index, darkMode }) {
   
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      initial={bookMode ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+      whileInView={bookMode ? undefined : { opacity: 1, y: 0 }}
+      viewport={bookMode ? undefined : { once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay: index * 0.15 }}
       style={{ perspective: '1000px', height: '100%' }}
     >
@@ -122,10 +121,10 @@ function ProjectCard({ project, index, darkMode }) {
           background: cardBg,
           backdropFilter: 'blur(20px)',
           border: `1px solid ${hovered ? glowColor : cardBorder}`,
-          padding: '1.5rem',
+          padding: bookMode ? '0.75rem 0.85rem' : '1.5rem',
           position: 'relative',
           overflow: 'hidden',
-          borderRadius: '20px',
+          borderRadius: bookMode ? '12px' : '20px',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
@@ -145,10 +144,10 @@ function ProjectCard({ project, index, darkMode }) {
           transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         }} />
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: bookMode ? '0.4rem' : '1rem' }}>
           <div style={{
             fontFamily: '"Space Mono", monospace',
-            fontSize: '0.8rem',
+            fontSize: bookMode ? '0.65rem' : '0.8rem',
             color: glowColor,
             fontWeight: 700,
             letterSpacing: '0.1em',
@@ -164,8 +163,8 @@ function ProjectCard({ project, index, darkMode }) {
           </div>
         </div>
 
-        {/* IMAGE SECTION */}
-        {project.image && (
+        {/* IMAGE SECTION - Hidden in Book Mode for perfect fit */}
+        {!bookMode && project.image && (
           <div style={{
             position: 'relative', 
             marginBottom: '1.5rem',
@@ -242,22 +241,30 @@ function ProjectCard({ project, index, darkMode }) {
           </div>
         )}
 
-        <RatingStars rating={project.rating} reviews={project.reviews} darkMode={darkMode} />
+        {!bookMode && (
+          <RatingStars rating={project.rating} reviews={project.reviews} darkMode={darkMode} />
+        )}
 
-        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: titleColor, marginBottom: '0.8rem' }}>
+        <h3 style={{ fontSize: bookMode ? '0.9rem' : '1.2rem', fontWeight: 800, color: titleColor, marginBottom: bookMode ? '0.4rem' : '0.8rem' }}>
           {project.title}
         </h3>
 
-        <div style={{ fontSize: '0.85rem', lineHeight: 1.6, color: descColor, marginBottom: '1.5rem', flexGrow: 1 }}>
-          <p style={{ margin: '0 0 0.5rem 0' }}><strong style={{ color: titleColor }}>Problem:</strong> {project.problem}</p>
-          <p style={{ margin: 0 }}><strong style={{ color: titleColor }}>Solution:</strong> {project.solution}</p>
+        <div style={{ fontSize: bookMode ? '0.75rem' : '0.85rem', lineHeight: bookMode ? 1.4 : 1.6, color: descColor, marginBottom: bookMode ? '0.6rem' : '1.5rem', flexGrow: 1 }}>
+          {bookMode ? (
+            <p style={{ margin: 0 }}>{project.solution}</p>
+          ) : (
+            <>
+              <p style={{ margin: '0 0 0.5rem 0' }}><strong style={{ color: titleColor }}>Problem:</strong> {project.problem}</p>
+              <p style={{ margin: 0 }}><strong style={{ color: titleColor }}>Solution:</strong> {project.solution}</p>
+            </>
+          )}
         </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem' }}>
-          {project.tags.map((tag) => (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: bookMode ? '0.6rem' : '1.5rem' }}>
+          {(bookMode ? project.tags.slice(0, 3) : project.tags).map((tag) => (
             <span key={tag} style={{
-              fontFamily: '"Space Mono", monospace', fontSize: '0.65rem', fontWeight: 600,
-              padding: '0.3rem 0.8rem',
+              fontFamily: '"Space Mono", monospace', fontSize: bookMode ? '0.6rem' : '0.65rem', fontWeight: 600,
+              padding: bookMode ? '0.2rem 0.5rem' : '0.3rem 0.8rem',
               background: darkMode ? `${glowColor}15` : `${glowColor}20`,
               color: darkMode ? glowColor : '#00a870',
               borderRadius: '50px', border: `1px solid ${glowColor}30`,
@@ -269,7 +276,7 @@ function ProjectCard({ project, index, darkMode }) {
 
         {!project.comingSoon && (
           <a href={project.link} target="_blank" rel="noopener noreferrer" style={{
-            fontSize: '0.85rem', color: glowColor, display: 'inline-flex', alignItems: 'center',
+            fontSize: bookMode ? '0.75rem' : '0.85rem', color: glowColor, display: 'inline-flex', alignItems: 'center',
             gap: hovered ? '8px' : '4px', fontWeight: 700, textDecoration: 'none', transition: 'all 0.3s ease',
           }}>
             Explore Project <ExternalLink size={14} />
@@ -280,7 +287,7 @@ function ProjectCard({ project, index, darkMode }) {
   );
 }
 
-function Projects({ darkMode }) {
+function Projects({ darkMode, bookMode = false }) {
   const [isMobile, setIsMobile] = useState(false);
   const ref = useRef(null);
   const featuredTilt = use3DTilt(4, 1.01);
@@ -303,138 +310,161 @@ function Projects({ darkMode }) {
 
   return (
     <section id="projects" ref={ref} style={{
-      padding: isMobile ? '5rem 1.5rem' : '8rem 4rem',
+      padding: bookMode ? '2rem 1.5rem' : (isMobile ? '5rem 1.5rem' : '8rem 4rem'),
       background: sectionBg,
       position: 'relative',
-      overflow: 'hidden',
-      minHeight: '100vh',
+      overflow: bookMode ? 'visible' : 'hidden',
+      minHeight: bookMode ? 'auto' : '100vh',
     }}>
       
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-        {darkMode && (
-          <div style={{
-            position: "absolute", inset: 0,
-            backgroundImage: "radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)",
-            backgroundSize: "30px 30px",
+      {!bookMode && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+          {darkMode && (
+            <div style={{
+              position: "absolute", inset: 0,
+              backgroundImage: "radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)",
+              backgroundSize: "30px 30px",
+            }} />
+          )}
+          <div style={{ 
+            position: 'absolute', top: '10%', right: '-5%', 
+            width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', 
+            background: `radial-gradient(circle, ${glowColor}10 0%, transparent 70%)`, 
+            filter: 'blur(60px)' 
           }} />
-        )}
-        <div style={{ 
-          position: 'absolute', top: '10%', right: '-5%', 
-          width: isMobile ? '250px' : '500px', height: isMobile ? '250px' : '500px', 
-          background: `radial-gradient(circle, ${glowColor}10 0%, transparent 70%)`, 
-          filter: 'blur(60px)' 
-        }} />
-      </div>
+        </div>
+      )}
 
       <div style={{ position: 'relative', zIndex: 10, maxWidth: '1200px', margin: '0 auto' }}>
 
-        <div style={{ textAlign: isMobile ? 'center' : 'left', marginBottom: '4rem' }}>
+        <div style={{ textAlign: isMobile ? 'center' : 'left', marginBottom: bookMode ? '1.5rem' : '4rem' }}>
           <div style={{
             fontFamily: '"Space Mono", monospace', fontSize: '0.8rem', letterSpacing: '0.15em',
             color: glowColor, textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 700
           }}>
             05 // Selected Work
           </div>
-          <h2 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 800, letterSpacing: '-0.03em', color: titleColor }}>
+          <h2 style={{ fontSize: bookMode ? '1.8rem' : 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 800, letterSpacing: '-0.03em', color: titleColor, margin: 0 }}>
             Featured <span style={{ color: glowColor }}>Projects</span>.
           </h2>
         </div>
 
-        {/* ✅ FIRST ROW: FEATURED PROJECT */}
-        <div style={{ marginBottom: '4rem', perspective: '1000px' }}>
-           <div 
-             {...featuredTilt}
-             onMouseEnter={() => setFeaturedHovered(true)}
-             onMouseLeave={() => {
-               featuredTilt.onMouseLeave();
-               setFeaturedHovered(false);
-             }}
-             style={{
-               background: darkMode ? 'rgba(24, 24, 31, 0.6)' : 'rgba(255, 255, 255, 0.7)',
-               border: `1px solid ${featuredHovered ? glowColor : (darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)')}`,
-               borderRadius: '24px', padding: isMobile ? '1.5rem' : '3rem',
-               display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr', gap: '3rem',
-               alignItems: 'center',
-               boxShadow: featuredHovered 
-                 ? `0 20px 40px -10px rgba(0,0,0,0.3), 0 0 20px ${glowColor}15`
-                 : '0 20px 40px -10px rgba(0,0,0,0.2)',
-               transformStyle: 'preserve-3d',
-               transition: 'border-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease',
-               ...featuredTilt.style
-             }}
-           >
-             {/* Featured Image */}
-             <div style={{ overflow: 'hidden', borderRadius: '16px', border: `1px solid ${glowColor}40`, position: 'relative', group: 'true' }}>
-               <div style={{ position: 'absolute', top: '15px', left: '15px', zIndex: 10, background: glowColor, color: '#000', padding: '5px 15px', borderRadius: '50px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                 ★ Top Rated
+        {bookMode ? (
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(2, 1fr)', 
+            gap: '0.75rem', 
+            marginTop: '0.5rem' 
+          }}>
+            {projectsData.map((project, index) => (
+              <ProjectCard
+                key={project.num}
+                project={project}
+                index={index}
+                darkMode={darkMode}
+                bookMode={bookMode}
+              />
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* ✅ FIRST ROW: FEATURED PROJECT */}
+            <div style={{ marginBottom: '4rem', perspective: '1000px' }}>
+               <div 
+                 {...featuredTilt}
+                 onMouseEnter={() => setFeaturedHovered(true)}
+                 onMouseLeave={() => {
+                   featuredTilt.onMouseLeave();
+                   setFeaturedHovered(false);
+                 }}
+                 style={{
+                   background: darkMode ? 'rgba(24, 24, 31, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+                   border: `1px solid ${featuredHovered ? glowColor : (darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)')}`,
+                   borderRadius: '24px', padding: isMobile ? '1.5rem' : '3rem',
+                   display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr', gap: '3rem',
+                   alignItems: 'center',
+                   boxShadow: featuredHovered 
+                     ? `0 20px 40px -10px rgba(0,0,0,0.3), 0 0 20px ${glowColor}15`
+                     : '0 20px 40px -10px rgba(0,0,0,0.2)',
+                   transformStyle: 'preserve-3d',
+                   transition: 'border-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease',
+                   ...featuredTilt.style
+                 }}
+               >
+                 {/* Featured Image */}
+                 <div style={{ overflow: 'hidden', borderRadius: '16px', border: `1px solid ${glowColor}40`, position: 'relative', group: 'true' }}>
+                   <div style={{ position: 'absolute', top: '15px', left: '15px', zIndex: 10, background: glowColor, color: '#000', padding: '5px 15px', borderRadius: '50px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                     ★ Top Rated
+                   </div>
+                   <motion.img 
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.6 }}
+                      src={featuredProject.image} 
+                      alt={featuredProject.title} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+                   />
+                 </div>
+    
+                 {/* Featured Content */}
+                 <div>
+                   <RatingStars rating={featuredProject.rating} reviews={featuredProject.reviews} darkMode={darkMode} />
+                   <h3 style={{ fontSize: isMobile ? '1.8rem' : '2.2rem', fontWeight: 800, color: titleColor, marginBottom: '1rem', lineHeight: 1.2 }}>
+                     {featuredProject.title}
+                   </h3>
+                   <div style={{ fontSize: '1rem', lineHeight: 1.7, color: descColor, marginBottom: '2rem' }}>
+                     <p style={{ marginBottom: '0.8rem' }}><strong style={{ color: titleColor }}>Problem:</strong> {featuredProject.problem}</p>
+                     <p><strong style={{ color: titleColor }}>Solution:</strong> {featuredProject.solution}</p>
+                   </div>
+    
+                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', marginBottom: '2.5rem' }}>
+                     {featuredProject.tags.map((tag) => (
+                       <span key={tag} style={{
+                         fontFamily: '"Space Mono", monospace', fontSize: '0.75rem', fontWeight: 600,
+                         padding: '0.4rem 1rem', background: darkMode ? `${glowColor}15` : `${glowColor}20`,
+                         color: darkMode ? glowColor : '#00a870', borderRadius: '50px', border: `1px solid ${glowColor}30`,
+                       }}>
+                         {tag}
+                       </span>
+                     ))}
+                   </div>
+    
+                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                     <a href={featuredProject.link} target="_blank" rel="noreferrer" style={{
+                        background: glowColor, color: '#000', padding: '12px 28px', borderRadius: '50px',
+                        fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px',
+                        boxShadow: `0 10px 20px -5px ${glowColor}50`, transition: 'transform 0.3s ease'
+                     }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                        Live Preview <ExternalLink size={16} />
+                     </a>
+                     <a href={featuredProject.github} target="_blank" rel="noreferrer" style={{
+                        padding: '12px', background: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                        borderRadius: '50%', color: titleColor, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'background 0.3s ease'
+                     }} onMouseOver={e => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} onMouseOut={e => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}>
+                        <CustomGithubIcon size={20} />
+                     </a>
+                   </div>
+                 </div>
                </div>
-               <motion.img 
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.6 }}
-                  src={featuredProject.image} 
-                  alt={featuredProject.title} 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
-               />
-             </div>
-
-             {/* Featured Content */}
-             <div>
-               <RatingStars rating={featuredProject.rating} reviews={featuredProject.reviews} darkMode={darkMode} />
-               <h3 style={{ fontSize: isMobile ? '1.8rem' : '2.2rem', fontWeight: 800, color: titleColor, marginBottom: '1rem', lineHeight: 1.2 }}>
-                 {featuredProject.title}
-               </h3>
-               <div style={{ fontSize: '1rem', lineHeight: 1.7, color: descColor, marginBottom: '2rem' }}>
-                 <p style={{ marginBottom: '0.8rem' }}><strong style={{ color: titleColor }}>Problem:</strong> {featuredProject.problem}</p>
-                 <p><strong style={{ color: titleColor }}>Solution:</strong> {featuredProject.solution}</p>
-               </div>
-
-               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', marginBottom: '2.5rem' }}>
-                 {featuredProject.tags.map((tag) => (
-                   <span key={tag} style={{
-                     fontFamily: '"Space Mono", monospace', fontSize: '0.75rem', fontWeight: 600,
-                     padding: '0.4rem 1rem', background: darkMode ? `${glowColor}15` : `${glowColor}20`,
-                     color: darkMode ? glowColor : '#00a870', borderRadius: '50px', border: `1px solid ${glowColor}30`,
-                   }}>
-                     {tag}
-                   </span>
-                 ))}
-               </div>
-
-               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                 <a href={featuredProject.link} target="_blank" rel="noreferrer" style={{
-                    background: glowColor, color: '#000', padding: '12px 28px', borderRadius: '50px',
-                    fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px',
-                    boxShadow: `0 10px 20px -5px ${glowColor}50`, transition: 'transform 0.3s ease'
-                 }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
-                    Live Preview <ExternalLink size={16} />
-                 </a>
-                 <a href={featuredProject.github} target="_blank" rel="noreferrer" style={{
-                    padding: '12px', background: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                    borderRadius: '50%', color: titleColor, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'background 0.3s ease'
-                 }} onMouseOver={e => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} onMouseOut={e => e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}>
-                    <CustomGithubIcon size={20} />
-                 </a>
-               </div>
-             </div>
-           </div>
-        </div>
-
-        {/* ✅ REMAINING PROJECTS GRID */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(350px, 1fr))',
-          gap: '2.5rem', 
-        }}>
-          {remainingProjects.map((project, index) => (
-            <ProjectCard
-              key={project.num}
-              project={project}
-              index={index}
-              darkMode={darkMode}
-            />
-          ))}
-        </div>
+            </div>
+    
+            {/* ✅ REMAINING PROJECTS GRID */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(350px, 1fr))',
+              gap: '2.5rem', 
+            }}>
+              {remainingProjects.map((project, index) => (
+                <ProjectCard
+                  key={project.num}
+                  project={project}
+                  index={index}
+                  darkMode={darkMode}
+                />
+              ))}
+            </div>
+          </>
+        )}
 
       </div>
     </section>
