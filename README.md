@@ -1,5 +1,7 @@
 # 🚀 Sujeet Vishwakarma — Developer Portfolio
 
+![Portfolio Preview](./preview.png)
+
 Welcome to my personal portfolio website!
 This project showcases my skills, projects, and passion for building modern, responsive, and interactive web applications.
 
