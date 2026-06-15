@@ -286,6 +286,7 @@ function About({ darkMode, bookMode = false, aboutPart = null }) {
                   style={{
                     width: '100%', height: '100%',
                     objectFit: 'cover',
+                    objectPosition: 'top',
                     transform: imgHovered ? 'scale(1.05)' : 'scale(1)',
                     transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                     filter: imgHovered ? 'none' : (darkMode ? 'brightness(0.9) contrast(1.1)' : 'none'),

@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import myLogo from '../assets/logo.png';
 
 function Footer({ darkMode }) {
-  const canvasRef = useRef(null);
-  const animRef = useRef(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showModal, setShowModal] = useState(null);
 
@@ -12,75 +11,21 @@ function Footer({ darkMode }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let t = 0;
-
-    const resize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    const draw = () => {
-      t += 0.005;
-      const w = canvas.width;
-      const h = canvas.height;
-
-      ctx.clearRect(0, 0, w, h);
-
-      const g1x = w * (0.2 + 0.15 * Math.sin(t));
-      const g1y = h * (0.5 + 0.3 * Math.cos(t * 0.7));
-      const grad1 = ctx.createRadialGradient(g1x, g1y, 0, g1x, g1y, w * 0.4);
-      grad1.addColorStop(0, darkMode? 'rgba(0,245,160,0.18)' : 'rgba(0,200,130,0.15)');
-      grad1.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = grad1;
-      ctx.fillRect(0, 0, w, h);
-
-      const g2x = w * (0.75 + 0.15 * Math.cos(t * 0.8));
-      const g2y = h * (0.5 + 0.3 * Math.sin(t * 0.6));
-      const grad2 = ctx.createRadialGradient(g2x, g2y, 0, g2x, g2y, w * 0.35);
-      grad2.addColorStop(0, darkMode? 'rgba(124,58,237,0.2)' : 'rgba(124,58,237,0.12)');
-      grad2.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = grad2;
-      ctx.fillRect(0, 0, w, h);
-
-      const g3x = w * (0.5 + 0.2 * Math.sin(t * 1.1 + 1));
-      const g3y = h * (0.5 + 0.2 * Math.cos(t * 0.9 + 2));
-      const grad3 = ctx.createRadialGradient(g3x, g3y, 0, g3x, g3y, w * 0.25);
-      grad3.addColorStop(0, darkMode? 'rgba(0,180,255,0.1)' : 'rgba(0,150,220,0.08)');
-      grad3.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = grad3;
-      ctx.fillRect(0, 0, w, h);
-
-      animRef.current = requestAnimationFrame(draw);
-    };
-
-    draw();
-
-    return () => {
-      cancelAnimationFrame(animRef.current);
-      window.removeEventListener('resize', resize);
-    };
-  }, [darkMode]);
-
   const socialLinks = [
     {
       label: 'GitHub',
       href: 'https://github.com/sujeetvishwakarma83',
       icon: (
-        
-<svg fill="#000000" width="800px" height="800px" viewBox="0 -0.5 25 25" xmlns="http://www.w3.org/2000/svg"><path d="m12.301 0h.093c2.242 0 4.34.613 6.137 1.68l-.055-.031c1.871 1.094 3.386 2.609 4.449 4.422l.031.058c1.04 1.769 1.654 3.896 1.654 6.166 0 5.406-3.483 10-8.327 11.658l-.087.026c-.063.02-.135.031-.209.031-.162 0-.312-.054-.433-.144l.002.001c-.128-.115-.208-.281-.208-.466 0-.005 0-.01 0-.014v.001q0-.048.008-1.226t.008-2.154c.007-.075.011-.161.011-.249 0-.792-.323-1.508-.844-2.025.618-.061 1.176-.163 1.718-.305l-.076.017c.573-.16 1.073-.373 1.537-.642l-.031.017c.508-.28.938-.636 1.292-1.058l.006-.007c.372-.476.663-1.036.84-1.645l.009-.035c.209-.683.329-1.468.329-2.281 0-.045 0-.091-.001-.136v.007c0-.022.001-.047.001-.072 0-1.248-.482-2.383-1.269-3.23l.003.003c.168-.44.265-.948.265-1.479 0-.649-.145-1.263-.404-1.814l.011.026c-.115-.022-.246-.035-.381-.035-.334 0-.649.078-.929.216l.012-.005c-.568.21-1.054.448-1.512.726l.038-.022-.609.384c-.922-.264-1.981-.416-3.075-.416s-2.153.152-3.157.436l.081-.02q-.256-.176-.681-.433c-.373-.214-.814-.421-1.272-.595l-.066-.022c-.293-.154-.64-.244-1.009-.244-.124 0-.246.01-.364.03l.013-.002c-.248.524-.393 1.139-.393 1.788 0 .531.097 1.04.275 1.509l-.01-.029c-.785.844-1.266 1.979-1.266 3.227 0 .025 0 .051.001.076v-.004c-.001.039-.001.084-.001.13 0 .809.12 1.591.344 2.327l-.015-.057c.189.643.476 1.202.85 1.693l-.009-.013c.354.435.782.793 1.267 1.062l.022.011c.432.252.933.465 1.46.614l.046.011c.466.125 1.024.227 1.595.284l.046.004c-.431.428-.718 1-.784 1.638l-.001.012c-.207.101-.448.183-.699.236l-.021.004c-.256.051-.549.08-.85.08-.022 0-.044 0-.066 0h.003c-.394-.008-.756-.136-1.055-.348l.006.004c-.371-.259-.671-.595-.881-.986l-.007-.015c-.198-.336-.459-.614-.768-.827l-.009-.006c-.225-.169-.49-.301-.776-.38l-.016-.004-.32-.048c-.023-.002-.05-.003-.077-.003-.14 0-.273.028-.394.077l.007-.003q-.128.072-.08.184c.039.086.087.16.145.225l-.001-.001c.061.072.13.135.205.19l.003.002.112.08c.283.148.516.354.693.603l.004.006c.191.237.359.505.494.792l.01.024.16.368c.135.402.38.738.7.981l.005.004c.3.234.662.402 1.057.478l.016.002c.33.064.714.104 1.106.112h.007c.045.002.097.002.15.002.261 0 .517-.021.767-.062l-.027.004.368-.064q0 .609.008 1.418t.008.873v.014c0 .185-.08.351-.208.466h-.001c-.119.089-.268.143-.431.143-.075 0-.147-.011-.214-.032l.005.001c-4.929-1.689-8.409-6.283-8.409-11.69 0-2.268.612-4.393 1.681-6.219l-.032.058c1.094-1.871 2.609-3.386 4.422-4.449l.058-.031c1.739-1.034 3.835-1.645 6.073-1.645h.098-.005zm-7.64 17.666q.048-.112-.112-.192-.16-.048-.208.032-.048.112.112.192.144.096.208-.032zm.497.545q.112-.08-.032-.256-.16-.144-.256-.048-.112.08.032.256.159.157.256.047zm.48.72q.144-.112 0-.304-.128-.208-.272-.096-.144.08 0 .288t.272.112zm.672.673q.128-.128-.064-.304-.192-.192-.32-.048-.144.128.064.304.192.192.32.044zm.913.4q.048-.176-.208-.256-.24-.064-.304.112t.208.24q.24.097.304-.096zm1.009.08q0-.208-.272-.176-.256 0-.256.176 0 .208.272.176.256.001.256-.175zm.929-.16q-.032-.176-.288-.144-.256.048-.224.24t.288.128.225-.224z"/></svg>
+        <svg fill="currentColor" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+        </svg>
       ),
     },
     {
       label: 'LinkedIn',
       href: 'https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a/',
       icon: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0.774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24.774 23.2 0 22.222 0h.003z"/>
         </svg>
       ),
@@ -89,10 +34,9 @@ function Footer({ darkMode }) {
       label: 'Fiverr',
       href: 'https://www.fiverr.com/sujeet83/',
       icon: (
-        <svg  xmlns="http://www.w3.org/2000/svg" width="24" height="24"  
-fill="currentColor" viewBox="0 0 24 24" >
-<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m2.41 5.29a1.06 1.06 0 1 1-1.06 1.06 1.06 1.06 0 0 1 1.06-1.06m2 9.38h-3.89v-1.58h.82v-3.35H10.7v3.35h1v1.58h-4v-1.58h.83v-3.35h-.9v-1.59h.89v-.27c0-2.14 1.86-2.42 2.88-2.42a7 7 0 0 1 .77 0v1.76a2.5 2.5 0 0 0-.53 0c-.31 0-.94 0-.94.64v.32h4.84v4.95h.83z"/>
-</svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m2.41 5.29a1.06 1.06 0 1 1-1.06 1.06 1.06 1.06 0 0 1 1.06-1.06m2 9.38h-3.89v-1.58h.82v-3.35H10.7v3.35h1v1.58h-4v-1.58h.83v-3.35h-.9v-1.59h.89v-.27c0-2.14 1.86-2.42 2.88-2.42a7 7 0 0 1 .77 0v1.76a2.5 2.5 0 0 0-.53 0c-.31 0-.94 0-.94.64v.32h4.84v4.95h.83z"/>
+        </svg>
       ),
     },
   ];
@@ -100,31 +44,29 @@ fill="currentColor" viewBox="0 0 24 24" >
   const quickLinks = [
     { label: 'Home', href: '#hero' },
     { label: 'About', href: '#about' },
-    { label: 'Projects', href: '#projects' },
     { label: 'Services', href: '#services' },
+    { label: 'Skills', href: '#skills' },
+    { label: 'Projects', href: '#projects' },
     { label: 'Contact', href: '#contact' },
   ];
 
-  const techStack = ['React.js', 'Next.js', 'Node.js', 'MongoDB', 'Express', 'AWS'];
+  const techStack = ['React.js', 'Next.js', 'Node.js', 'MongoDB', 'Express', 'AWS', 'Tailwind CSS'];
 
-  const footerBg = 'transparent';
-  const borderColor = darkMode? 'rgba(255,255,255,0.07)' : 'rgba(0,150,100,0.15)';
-  const textColor = darkMode? '#6b6b7a' : '#4a7a65';
-  const linkColor = darkMode? '#9ca3af' : '#4a7a65';
-  const glowColor = '#00f5a0';
-  const cardBg = darkMode? 'rgba(255,255,255,0.03)' : 'rgba(0,150,100,0.05)';
+  const footerBg = darkMode ? 'rgba(8, 12, 24, 0.75)' : 'rgba(248, 250, 252, 0.85)';
+  const borderColor = darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(15, 23, 42, 0.06)';
+  const textColor = darkMode ? '#94a3b8' : '#475569';
+  const headingColor = darkMode ? '#f8fafc' : '#0f172a';
+  const glowColor = '#00F5A0'; // neon green
+  const accentColor = '#D4AF37'; // gold
+  const cardBg = darkMode ? 'rgba(255, 255, 255, 0.02)' : 'rgba(15, 23, 42, 0.02)';
 
   const handleHireMe = () => {
     const contactSection = document.getElementById('contact');
     if (contactSection) {
       contactSection.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      const heroSection = document.getElementById('hero');
-      if (heroSection) heroSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-  // Professional English Content
   const modalContent = {
     privacy: {
       title: 'Privacy Policy',
@@ -170,8 +112,8 @@ fill="currentColor" viewBox="0 0 24 24" >
         6. <strong>Delivery:</strong> Final payment and handover of source code</p>
 
         <h3>Payment Structure</h3>
-        <p><strong>Small Projects (<$500):</strong> 50% upfront, 50% on completion<br/>
-        <strong>Large Projects (>$500):</strong> Milestone-based payments<br/>
+        <p><strong>Small Projects (&lt;$500):</strong> 50% upfront, 50% on completion<br/>
+        <strong>Large Projects (&gt;$500):</strong> Milestone-based payments<br/>
         <strong>Payment Methods:</strong> UPI, Bank Transfer, PayPal, Wise</p>
 
         <h3>Revisions & Changes</h3>
@@ -207,63 +149,90 @@ fill="currentColor" viewBox="0 0 24 24" >
       <footer style={{
         background: footerBg,
         borderTop: `1px solid ${borderColor}`,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
         position: 'relative',
-        overflow: 'hidden',
+        zIndex: 10,
+        transition: 'all 0.3s ease',
       }}>
-
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: 'absolute', inset: 0,
-            width: '100%', height: '100%',
-            pointerEvents: 'none',
-          }}
-        />
+        {/* Luxury gold accent line at the very top */}
+        <div style={{
+          height: '2px',
+          width: '100%',
+          background: `linear-gradient(90deg, transparent 0%, ${accentColor} 50%, transparent 100%)`,
+          opacity: 0.7,
+        }} />
 
         <div style={{
-          position: 'relative', zIndex: 1,
-          padding: isMobile? '3rem 1.5rem 2rem' : '4rem 4rem 2.5rem',
+          maxWidth: '1280px',
+          margin: '0 auto',
+          padding: isMobile ? '3.5rem 1.5rem 2.5rem' : '5rem 4rem 3rem',
         }}>
-
+          {/* Main Grid Section */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: isMobile? '1fr' : '2fr 1fr 1fr',
-            gap: isMobile? '2.5rem' : '3rem',
-            marginBottom: '3rem',
+            gridTemplateColumns: isMobile ? '1fr' : '2.2fr 1fr 1.2fr',
+            gap: isMobile ? '3rem' : '4rem',
+            marginBottom: '4rem',
           }}>
-
-            <div style={{ textAlign: isMobile? 'center' : 'left' }}>
-              <div style={{
-                fontFamily: '"Space Mono", monospace',
-                fontSize: '1.5rem',
-                color: glowColor,
-                letterSpacing: '0.05em',
-                marginBottom: '0.8rem',
-                fontWeight: 800,
-              }}>
-                Sujeet Vishwakarma
-              </div>
+            {/* Column 1: Intro */}
+            <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
+              <a 
+                href="#hero" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setTimeout(() => {
+                    window.location.hash = '';
+                    window.location.reload();
+                  }, 400);
+                }}
+                style={{ 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  textDecoration: 'none', 
+                  marginBottom: '1.2rem',
+                  justifyContent: isMobile ? 'center' : 'flex-start'
+                }}
+              >
+                <img 
+                  src={myLogo} 
+                  alt="My Logo" 
+                  style={{
+                    height: '38px', 
+                    width: 'auto',
+                    cursor: 'pointer',
+                    transition: 'transform 0.3s ease, filter 0.3s ease',
+                    filter: darkMode 
+                      ? 'brightness(1.3) contrast(1.1) drop-shadow(1px 0px 0px rgba(255, 255, 255, 0.9)) drop-shadow(-1px 0px 0px rgba(255, 255, 255, 0.9)) drop-shadow(0px 1px 0px rgba(255, 255, 255, 0.9)) drop-shadow(0px -1px 0px rgba(255, 255, 255, 0.9)) drop-shadow(0px 0px 8px rgba(0, 245, 160, 0.35))' 
+                      : 'none'
+                  }} 
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                />
+              </a>
               <p style={{
-                fontSize: '0.9rem',
+                fontSize: '0.92rem',
                 color: textColor,
-                lineHeight: 1.7,
-                marginBottom: '1.2rem',
-                maxWidth: '400px',
-                margin: isMobile? '0 auto 1.2rem' : '0 0 1.2rem 0'
+                lineHeight: 1.75,
+                marginBottom: '1.5rem',
+                maxWidth: '440px',
+                margin: isMobile ? '0 auto 1.5rem' : '0 0 1.5rem 0'
               }}>
-                Fullstack Developer building scalable web apps & APIs. Specialized in MERN stack with cloud deployment.
+                Fullstack Web Developer building high-performance scalable web applications, custom APIs, and premium digital experiences. Specialized in the MERN stack and cloud deployment.
               </p>
 
+              {/* Status Badge */}
               <div style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.5rem',
                 fontSize: '0.75rem',
                 color: glowColor,
-                background: darkMode? 'rgba(0,245,160,0.1)' : 'rgba(0,200,130,0.15)',
-                padding: '0.4rem 0.9rem',
+                background: 'rgba(0, 245, 160, 0.06)',
+                padding: '0.45rem 1rem',
                 borderRadius: '50px',
-                border: `1px solid ${glowColor}40`,
+                border: `1px solid rgba(0, 245, 160, 0.18)`,
                 marginBottom: '1.5rem',
                 fontFamily: '"Space Mono", monospace',
                 fontWeight: 600,
@@ -274,9 +243,9 @@ fill="currentColor" viewBox="0 0 24 24" >
                   borderRadius: '50%',
                   background: glowColor,
                   boxShadow: `0 0 10px ${glowColor}`,
-                  animation: 'pulse 2s infinite'
-                }}></span>
-                Available for Projects
+                  animation: 'pulse-badge 2s infinite'
+                }} />
+                AVAILABLE FOR PROJECTS
               </div>
 
               <div>
@@ -290,64 +259,71 @@ fill="currentColor" viewBox="0 0 24 24" >
                     fontSize: '0.85rem',
                     color: '#000',
                     background: glowColor,
-                    padding: '0.8rem 1.8rem',
+                    padding: '0.85rem 2rem',
                     borderRadius: '8px',
                     border: 'none',
                     cursor: 'pointer',
                     fontWeight: 700,
-                    letterSpacing: '0.03em',
-                    transition: 'all 0.3s',
-                    boxShadow: `0 4px 15px -3px ${glowColor}80`,
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                    boxShadow: `0 4px 20px -3px rgba(0, 245, 160, 0.35)`,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-3px)';
-                    e.currentTarget.style.boxShadow = `0 8px 25px -5px ${glowColor}`;
+                    e.currentTarget.style.boxShadow = `0 8px 30px -5px ${glowColor}`;
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = `0 4px 15px -3px ${glowColor}80`;
+                    e.currentTarget.style.boxShadow = `0 4px 20px -3px rgba(0, 245, 160, 0.35)`;
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M4 4h16c1.1 0 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                     <polyline points="22,6 12,13 2,6"/>
                   </svg>
-                  Hire Me
+                  Let's Connect
                 </button>
               </div>
             </div>
 
-            <div style={{ textAlign: isMobile? 'center' : 'left' }}>
+            {/* Column 2: Navigation Links */}
+            <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
               <h4 style={{
                 fontFamily: '"Space Mono", monospace',
-                fontSize: '0.9rem',
-                color: darkMode? '#fff' : '#000',
-                marginBottom: '1.2rem',
+                fontSize: '0.95rem',
+                color: headingColor,
+                marginBottom: '1.5rem',
                 textTransform: 'uppercase',
-                letterSpacing: '0.1em',
+                letterSpacing: '0.12em',
                 fontWeight: 700,
               }}>
-                Quick Links
+                Navigation
               </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '1fr 1fr', 
+                gap: '0.8rem 1rem', 
+                maxWidth: '220px', 
+                margin: isMobile ? '0 auto' : '0' 
+              }}>
                 {quickLinks.map((link) => (
                   <a
                     key={link.label}
                     href={link.href}
                     style={{
                       fontSize: '0.85rem',
-                      color: linkColor,
+                      color: textColor,
                       textDecoration: 'none',
-                      transition: 'all 0.2s',
+                      transition: 'all 0.2s ease',
                       fontFamily: '"Space Mono", monospace',
+                      display: 'inline-block'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.color = glowColor;
-                      e.currentTarget.style.paddingLeft = '5px';
+                      e.currentTarget.style.color = accentColor;
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = linkColor;
-                      e.currentTarget.style.paddingLeft = '0';
+                      e.currentTarget.style.color = textColor;
                     }}
                   >
                     {link.label}
@@ -356,35 +332,35 @@ fill="currentColor" viewBox="0 0 24 24" >
               </div>
             </div>
 
-            <div style={{ textAlign: isMobile? 'center' : 'left' }}>
+            {/* Column 3: Contact & Socials */}
+            <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
               <h4 style={{
                 fontFamily: '"Space Mono", monospace',
-                fontSize: '0.9rem',
-                color: darkMode? '#fff' : '#000',
-                marginBottom: '1.2rem',
+                fontSize: '0.95rem',
+                color: headingColor,
+                marginBottom: '1.5rem',
                 textTransform: 'uppercase',
-                letterSpacing: '0.1em',
+                letterSpacing: '0.12em',
                 fontWeight: 700,
               }}>
-                Connect
+                Contact Info
               </h4>
 
               <a
                 href="mailto:sujeet.cabbagecode@gmail.com"
                 style={{
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.6rem',
-                  fontSize: '0.85rem',
-                  color: linkColor,
+                  fontSize: '0.88rem',
+                  color: textColor,
                   textDecoration: 'none',
                   marginBottom: '1rem',
-                  justifyContent: isMobile? 'center' : 'flex-start',
-                  transition: 'color 0.2s',
+                  transition: 'color 0.2s ease',
                   fontFamily: '"Space Mono", monospace',
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.color = glowColor}
-                onMouseLeave={(e) => e.currentTarget.style.color = linkColor}
+                onMouseEnter={(e) => e.currentTarget.style.color = accentColor}
+                onMouseLeave={(e) => e.currentTarget.style.color = textColor}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M4 4h16c1.1 0 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -397,24 +373,24 @@ fill="currentColor" viewBox="0 0 24 24" >
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.6rem',
-                fontSize: '0.85rem',
+                fontSize: '0.88rem',
                 color: textColor,
-                marginBottom: '1.2rem',
-                justifyContent: isMobile? 'center' : 'flex-start',
+                marginBottom: '1.8rem',
+                justifyContent: isMobile ? 'center' : 'flex-start',
                 fontFamily: '"Space Mono", monospace',
               }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                   <circle cx="12" cy="10" r="3"/>
                 </svg>
-                Jaunpur, UP, India | Remote Worldwide
+                Jaunpur, India | Remote
               </div>
 
+              {/* Social Row */}
               <div style={{
                 display: 'flex',
                 gap: '0.8rem',
-                flexWrap: 'wrap',
-                justifyContent: isMobile? 'center' : 'flex-start',
+                justifyContent: isMobile ? 'center' : 'flex-start',
               }}>
                 {socialLinks.map((link) => (
                   <a
@@ -427,25 +403,27 @@ fill="currentColor" viewBox="0 0 24 24" >
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      width: '38px',
-                      height: '38px',
-                      color: linkColor,
+                      width: '42px',
+                      height: '42px',
+                      color: textColor,
                       border: `1px solid ${borderColor}`,
-                      borderRadius: '8px',
+                      borderRadius: '10px',
                       background: cardBg,
-                      transition: 'all 0.3s',
+                      transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.color = glowColor;
-                      e.currentTarget.style.borderColor = glowColor;
-                      e.currentTarget.style.background = darkMode? 'rgba(0,245,160,0.1)' : 'rgba(0,150,100,0.15)';
+                      e.currentTarget.style.color = accentColor;
+                      e.currentTarget.style.borderColor = accentColor;
+                      e.currentTarget.style.background = darkMode ? 'rgba(212, 175, 55, 0.06)' : 'rgba(212, 175, 55, 0.04)';
                       e.currentTarget.style.transform = 'translateY(-3px)';
+                      e.currentTarget.style.boxShadow = `0 6px 15px -3px rgba(212, 175, 55, 0.25)`;
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = linkColor;
+                      e.currentTarget.style.color = textColor;
                       e.currentTarget.style.borderColor = borderColor;
                       e.currentTarget.style.background = cardBg;
                       e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
                     {link.icon}
@@ -453,24 +431,25 @@ fill="currentColor" viewBox="0 0 24 24" >
                 ))}
               </div>
             </div>
-
           </div>
 
+          {/* Tech Stack Horizontal Line */}
           <div style={{
             borderTop: `1px solid ${borderColor}`,
-            paddingTop: '2rem',
-            marginBottom: '2rem',
+            paddingTop: '2.5rem',
+            paddingBottom: '0.5rem',
           }}>
             <p style={{
               fontFamily: '"Space Mono", monospace',
-              fontSize: '0.75rem',
+              fontSize: '0.78rem',
               color: textColor,
-              marginBottom: '1rem',
+              marginBottom: '1.2rem',
               textAlign: 'center',
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
+              letterSpacing: '0.12em',
+              fontWeight: 600
             }}>
-              Tech Stack
+              Preferred Technologies & Tools
             </p>
             <div style={{
               display: 'flex',
@@ -482,11 +461,11 @@ fill="currentColor" viewBox="0 0 24 24" >
                 <span
                   key={tech}
                   style={{
-                    fontSize: '0.7rem',
-                    color: linkColor,
+                    fontSize: '0.72rem',
+                    color: textColor,
                     background: cardBg,
                     border: `1px solid ${borderColor}`,
-                    padding: '0.4rem 0.8rem',
+                    padding: '0.45rem 0.9rem',
                     borderRadius: '6px',
                     fontFamily: '"Space Mono", monospace',
                     fontWeight: 600,
@@ -497,23 +476,23 @@ fill="currentColor" viewBox="0 0 24 24" >
               ))}
             </div>
           </div>
-
         </div>
 
+        {/* Footer Sub-bar */}
         <div style={{
-          position: 'relative', zIndex: 1,
           borderTop: `1px solid ${borderColor}`,
-          padding: isMobile? '1.5rem' : '1.5rem 4rem',
+          background: darkMode ? 'rgba(4, 6, 12, 0.85)' : 'rgba(241, 245, 249, 0.95)',
+          padding: isMobile ? '2rem 1.5rem' : '1.5rem 4rem',
           display: 'flex',
-          flexDirection: isMobile? 'column' : 'row',
+          flexDirection: isMobile ? 'column' : 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '1rem',
+          gap: '1.5rem',
         }}>
           <div style={{
             display: 'flex',
-            flexDirection: isMobile? 'column' : 'row',
-            gap: isMobile? '0.5rem' : '1.5rem',
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: isMobile ? '0.8rem' : '2rem',
             alignItems: 'center',
           }}>
             <p style={{
@@ -521,106 +500,111 @@ fill="currentColor" viewBox="0 0 24 24" >
               fontSize: '0.75rem',
               color: textColor,
               margin: 0,
-              textAlign: isMobile? 'center' : 'left'
+              textAlign: isMobile ? 'center' : 'left'
             }}>
               © 2026 Sujeet Vishwakarma. All Rights Reserved.
             </p>
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1.2rem' }}>
               <button
                 onClick={() => setShowModal('privacy')}
                 style={{
-                  fontSize: '0.7rem',
+                  fontSize: '0.72rem',
                   color: textColor,
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
                   fontFamily: '"Space Mono", monospace',
-                  textDecoration: 'none',
+                  textDecoration: 'underline',
                   transition: 'color 0.2s',
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.color = glowColor}
+                onMouseEnter={(e) => e.currentTarget.style.color = accentColor}
                 onMouseLeave={(e) => e.currentTarget.style.color = textColor}
               >
-                Privacy
+                Privacy Policy
               </button>
               <button
                 onClick={() => setShowModal('terms')}
                 style={{
-                  fontSize: '0.7rem',
+                  fontSize: '0.72rem',
                   color: textColor,
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
                   fontFamily: '"Space Mono", monospace',
-                  textDecoration: 'none',
+                  textDecoration: 'underline',
                   transition: 'color 0.2s',
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.color = glowColor}
+                onMouseEnter={(e) => e.currentTarget.style.color = accentColor}
                 onMouseLeave={(e) => e.currentTarget.style.color = textColor}
               >
-                Terms
+                Terms of Service
               </button>
             </div>
           </div>
 
-          <p style={{
-            fontFamily: '"Space Mono", monospace',
-            fontSize: '0.7rem',
-            color: textColor,
-            margin: 0,
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1.5rem',
+            flexDirection: isMobile ? 'column' : 'row',
           }}>
-            Built with Next.js & ☕
-          </p>
-
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
+            <p style={{
               fontFamily: '"Space Mono", monospace',
-              fontSize: '0.7rem',
-              color: glowColor,
-              background: 'transparent',
-              border: `1px solid ${glowColor}50`,
-              padding: '0.6rem 1.2rem',
-              borderRadius: '50px',
-              cursor: 'pointer',
-              letterSpacing: '0.05em',
-              textTransform: 'uppercase',
-              fontWeight: 700,
-              transition: 'all 0.3s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = glowColor;
-              e.currentTarget.style.color = '#000';
-              e.currentTarget.style.borderColor = glowColor;
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = `0 10px 20px -5px ${glowColor}50`;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = glowColor;
-              e.currentTarget.style.borderColor = `${glowColor}50`;
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="18 15 12 9 6 15" />
-            </svg>
-            Back to Top
-          </button>
+              fontSize: '0.72rem',
+              color: textColor,
+              margin: 0,
+            }}>
+              Handcrafted in India
+            </p>
 
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '0.72rem',
+                color: accentColor,
+                background: 'transparent',
+                border: `1px solid ${accentColor}60`,
+                padding: '0.55rem 1.2rem',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                fontWeight: 700,
+                transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = accentColor;
+                e.currentTarget.style.color = '#000';
+                e.currentTarget.style.borderColor = accentColor;
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = `0 6px 15px -3px rgba(212, 175, 55, 0.3)`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = accentColor;
+                e.currentTarget.style.borderColor = `${accentColor}60`;
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="18 15 12 9 6 15" />
+              </svg>
+              To Top
+            </button>
+          </div>
         </div>
 
         <style>{`
-          @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+          @keyframes pulse-badge {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.95); }
           }
         `}</style>
-
       </footer>
 
       {showModal && (
@@ -632,32 +616,32 @@ fill="currentColor" viewBox="0 0 24 24" >
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0,0,0,0.7)',
+            background: 'rgba(0,0,0,0.8)',
             backdropFilter: 'blur(8px)',
             zIndex: 9999,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '1rem',
-            animation: 'fadeIn 0.2s',
+            animation: 'fadeIn 0.2s ease-out',
           }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: footerBg,
+              background: darkMode ? '#0b0f19' : '#ffffff',
               borderRadius: '16px',
               border: `1px solid ${borderColor}`,
               maxWidth: '650px',
               width: '100%',
               maxHeight: '80vh',
               overflow: 'hidden',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-              animation: 'slideUp 0.3s',
+              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+              animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
             <div style={{
-              padding: '1.5rem 2rem',
+              padding: '1.25rem 2rem',
               borderBottom: `1px solid ${borderColor}`,
               display: 'flex',
               justifyContent: 'space-between',
@@ -665,8 +649,8 @@ fill="currentColor" viewBox="0 0 24 24" >
             }}>
               <h2 style={{
                 fontFamily: '"Space Mono", monospace',
-                fontSize: '1.3rem',
-                color: glowColor,
+                fontSize: '1.25rem',
+                color: darkMode ? accentColor : headingColor,
                 margin: 0,
                 fontWeight: 700,
               }}>
@@ -682,10 +666,13 @@ fill="currentColor" viewBox="0 0 24 24" >
                   padding: '0.5rem',
                   borderRadius: '8px',
                   transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = cardBg;
-                  e.currentTarget.style.color = glowColor;
+                  e.currentTarget.style.color = accentColor;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'none';
@@ -721,10 +708,6 @@ fill="currentColor" viewBox="0 0 24 24" >
         @keyframes slideUp {
           from { transform: translateY(20px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
         }
       `}</style>
     </>

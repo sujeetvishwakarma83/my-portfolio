@@ -1,75 +1,99 @@
-import { useEffect, useRef } from 'react';
+import React from 'react';
 
 function Background3D({ darkMode }) {
-  const myRef = useRef(null);
+  // Styles for the background container
+  const containerStyle = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    zIndex: -1,
+    overflow: 'hidden',
+    background: darkMode ? '#030712' : '#F8FAFC',
+    transition: 'background 0.3s ease',
+    pointerEvents: 'none'
+  };
 
-  useEffect(() => {
-    let effect = null;
+  // Styles for the grid pattern
+  const gridStyle = {
+    position: 'absolute',
+    inset: 0,
+    opacity: 0.8,
+    backgroundImage: darkMode
+      ? 'linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px)'
+      : 'linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px)',
+    backgroundSize: '60px 60px',
+    maskImage: 'radial-gradient(ellipse at 50% 50%, black 40%, transparent 85%)',
+    WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, black 40%, transparent 85%)'
+  };
 
-    // Helper to load CDN scripts dynamically
-    const loadScript = (src, id) => {
-      return new Promise((resolve) => {
-        if (document.getElementById(id)) {
-          resolve();
-          return;
-        }
-        const script = document.createElement('script');
-        script.src = src;
-        script.id = id;
-        script.onload = () => resolve();
-        document.body.appendChild(script);
-      });
-    };
+  // Styles for the floating blurred blobs
+  const blob1Style = {
+    position: 'absolute',
+    top: '10%',
+    left: '15%',
+    width: '500px',
+    height: '500px',
+    borderRadius: '50%',
+    background: darkMode 
+      ? 'radial-gradient(circle, rgba(0, 245, 160, 0.045) 0%, transparent 70%)'
+      : 'radial-gradient(circle, rgba(124, 58, 237, 0.03) 0%, transparent 70%)',
+    filter: 'blur(60px)',
+    animation: 'moveBlob1 25s infinite alternate ease-in-out',
+    pointerEvents: 'none'
+  };
 
-    const initVanta = async () => {
-      // 1. Load Three.js library required by Vanta
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js', 'three-js');
-      // 2. Load Vanta Net effect
-      await loadScript('https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js', 'vanta-net');
-
-      // 3. Initialize Vanta Net
-      if (window.VANTA && window.VANTA.NET && myRef.current) {
-        effect = window.VANTA.NET({
-          el: myRef.current,
-          mouseControls: true,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 200.00,
-          minWidth: 200.00,
-          scale: 1.00,
-          scaleMobile: 1.00,
-          color: darkMode ? 0x00f5a0 : 0x7c3aed,      // Accent Color based on theme
-          backgroundColor: darkMode ? 0x050508 : 0xf8fafc,
-          points: 12.00,
-          maxDistance: 22.00,
-          spacing: 16.00
-        });
-      }
-    };
-
-    initVanta();
-
-    // Cleanup on unmount or theme toggle
-    return () => {
-      if (effect) {
-        effect.destroy();
-      }
-    };
-  }, [darkMode]);
+  const blob2Style = {
+    position: 'absolute',
+    bottom: '15%',
+    right: '10%',
+    width: '600px',
+    height: '600px',
+    borderRadius: '50%',
+    background: darkMode 
+      ? 'radial-gradient(circle, rgba(212, 175, 55, 0.035) 0%, transparent 70%)'
+      : 'radial-gradient(circle, rgba(59, 130, 246, 0.03) 0%, transparent 70%)',
+    filter: 'blur(70px)',
+    animation: 'moveBlob2 30s infinite alternate ease-in-out',
+    pointerEvents: 'none'
+  };
 
   return (
-    <div
-      ref={myRef}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        zIndex: -1, // Sits directly behind all transparent sections
-        pointerEvents: 'none', // Ensure clicks bypass this container to reach buttons/links
-      }}
-    />
+    <div style={containerStyle}>
+      {/* Subtle Dev Grid */}
+      <div style={gridStyle} />
+
+      {/* Floating Ambient Glowing Blobs */}
+      <div style={blob1Style} />
+      <div style={blob2Style} />
+
+      {/* Inline styles for keyframe animations */}
+      <style>{`
+        @keyframes moveBlob1 {
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          50% {
+            transform: translate(100px, 80px) scale(1.15);
+          }
+          100% {
+            transform: translate(-50px, 120px) scale(0.9);
+          }
+        }
+        @keyframes moveBlob2 {
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          50% {
+            transform: translate(-120px, -60px) scale(0.85);
+          }
+          100% {
+            transform: translate(80px, -100px) scale(1.1);
+          }
+        }
+      `}</style>
+    </div>
   );
 }
 

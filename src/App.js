@@ -168,6 +168,7 @@ function App() {
                   style={{
                     width: '100%', height: '100%', borderRadius: '50%',
                     objectFit: 'cover',
+                    objectPosition: 'top',
                     background: darkMode ? '#000' : '#fff',
                     boxShadow: '0 0 30px rgba(0,245,160,0.3)',
                     position: 'relative', zIndex: 10
