@@ -142,7 +142,7 @@ npm start
 
 * 💼 LinkedIn: [www.linkedin.com/in/sujeet-vishwakarma-a19b2323a](http://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a)
 * 💻 GitHub: https://github.com/sujeetvishwakarma83
-* 📧 Email: [sujeet8528420907@gmail.com](mailto:sujeet8528420907@gmail.com)
+* 📧 Email: [sujeet.cabbagecode@gmail.com](mailto:sujeet.cabbagecode@gmail.com)
 
 ---
 
