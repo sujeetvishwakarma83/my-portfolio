@@ -9,6 +9,8 @@ import Projects from './Projects';
 import Services from './Services';
 import Testimonials from './Testimonials';
 import Contact from './Contact';
+import Education from './Education';
+import coverPhoto from '../assets/photo.jpeg';
 
 const GithubIcon = ({ size = 18, color = 'currentColor' }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4" /><path d="M12 18v4" /></svg>
@@ -23,26 +25,26 @@ const TABS = [
   { id: 0, label: 'Cover', sheetIdx: 0, leafFace: 'front' },
   { id: 1, label: 'Home', sheetIdx: 1, leafFace: 'front' },
   { id: 2, label: 'About', sheetIdx: 1, leafFace: 'back' },
-  { id: 3, label: 'Skills', sheetIdx: 2, leafFace: 'front' },
-  { id: 4, label: 'Projects', sheetIdx: 2, leafFace: 'back' },
-  { id: 5, label: 'Services', sheetIdx: 3, leafFace: 'front' },
-  { id: 6, label: 'Reviews', sheetIdx: 3, leafFace: 'back' },
-  { id: 7, label: 'Contact', sheetIdx: 4, leafFace: 'front' },
+  { id: 3, label: 'Journey', sheetIdx: 2, leafFace: 'back' },
+  { id: 4, label: 'Projects', sheetIdx: 4, leafFace: 'back' },
+  { id: 5, label: 'Services', sheetIdx: 6, leafFace: 'back' },
+  { id: 6, label: 'Reviews', sheetIdx: 7, leafFace: 'front' },
+  { id: 7, label: 'Contact', sheetIdx: 7, leafFace: 'back' },
 ];
 
 function BookPortfolio({ darkMode, onToggleScrollMode }) {
-  const [currentSheet, setCurrentSheet] = useState(0); // 0 = Cover, 1 = Hero/About, 2 = Skills/Projects, 3 = Services/Testimonials, 4 = Contact/BackCover, 5 = Closed Back Cover
+  const [currentSheet, setCurrentSheet] = useState(0); // 0 = Cover, 1 = Hero/Intro, 2 = About Part 1/2, 3 = Skills/Edu 1, 4 = Edu 2/3, 5 = Projects 1-2, 6 = Projects 3-4, 7 = Services/Reviews, 8 = Contact/Ending, 9 = Motivation / Closed Back Cover
   const [flippingSheet, setFlippingSheet] = useState(null);
   const canvasRef = useRef(null);
 
-  const totalSheets = 5; // Sheet 0, 1, 2, 3, 4
+  const totalSheets = 9; // Sheet 0 to 9
 
   // Floating particles particle system
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    
+
     let animId;
     const particles = [];
     const maxParticles = 35;
@@ -105,16 +107,41 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
     };
   }, []);
 
+  // Play subtle page flip audio effect dynamically
+  const playFlipSound = () => {
+    try {
+      const audio = new Audio('/page-flip.mp3');
+      audio.volume = 0.45;
+      audio.play().catch(err => console.log("Audio play blocked/failed:", err));
+    } catch (e) {
+      console.log("Audio play error:", e);
+    }
+  };
+
+  // Keyboard navigation for turning pages
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowRight') {
+        handleNext();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrev();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentSheet, flippingSheet]);
+
   // Sequential turning to support Ribbons Navigation (clicking jumps to sheet index)
   const turnToSheet = (targetSheet) => {
     if (targetSheet === currentSheet) return;
-    
+
     // Disable inputs during flip sequence
     if (flippingSheet !== null) return;
 
     let step = currentSheet < targetSheet ? 1 : -1;
     let next = currentSheet + step;
 
+    playFlipSound();
     setFlippingSheet(currentSheet < targetSheet ? currentSheet : next);
     setCurrentSheet(next);
 
@@ -125,6 +152,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
         setFlippingSheet(null);
       } else {
         next += step;
+        playFlipSound();
         setFlippingSheet(step > 0 ? next - 1 : next);
         setCurrentSheet(next);
       }
@@ -133,6 +161,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
 
   const handleNext = () => {
     if (currentSheet < totalSheets && flippingSheet === null) {
+      playFlipSound();
       setFlippingSheet(currentSheet);
       setCurrentSheet(currentSheet + 1);
       setTimeout(() => setFlippingSheet(null), 600);
@@ -141,6 +170,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
 
   const handlePrev = () => {
     if (currentSheet > 0 && flippingSheet === null) {
+      playFlipSound();
       setFlippingSheet(currentSheet - 1);
       setCurrentSheet(currentSheet - 1);
       setTimeout(() => setFlippingSheet(null), 600);
@@ -164,7 +194,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
       fontFamily: '"Inter", sans-serif',
       zIndex: 1000
     }}>
-      
+
       {/* Desk ambient particles */}
       <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} />
 
@@ -198,9 +228,9 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             Interactive Portfolio Book
           </span>
         </div>
-        
+
         {/* Toggle layout mode */}
-        <button 
+        <button
           onClick={onToggleScrollMode}
           style={{
             display: 'flex',
@@ -237,8 +267,13 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
           zIndex: 90
         }}>
           {TABS.slice(1, 8).map((tab) => {
-            const isActive = (currentSheet === tab.sheetIdx && tab.leafFace === 'front') || 
-                             (currentSheet === tab.sheetIdx + 1 && tab.leafFace === 'back');
+            const isJourneyActive = tab.label === 'Journey' && (currentSheet === 3 || currentSheet === 4);
+            const isProjectsActive = tab.label === 'Projects' && (currentSheet === 5 || currentSheet === 6);
+            const isActive = isJourneyActive || isProjectsActive ||
+              (tab.label !== 'Journey' && tab.label !== 'Projects' && (
+                (currentSheet === tab.sheetIdx && tab.leafFace === 'front') ||
+                (currentSheet === tab.sheetIdx + 1 && tab.leafFace === 'back')
+              ));
             return (
               <button
                 key={tab.id}
@@ -293,7 +328,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
       )}
 
       {/* 3D Perspective Book Container */}
-      <div 
+      <div
         style={{
           position: 'relative',
           width: '980px',
@@ -305,11 +340,11 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
           alignItems: 'center',
           transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
           // Shift book to right slightly when closed so front cover sits centered on desk
-          transform: currentSheet === 0 
-            ? 'translateX(240px)' 
-            : currentSheet === totalSheets 
-              ? 'translateX(-240px)' 
-              : 'translateX(0)'
+          transform: currentSheet === 0
+            ? 'translateX(240px) translateY(15px)'
+            : currentSheet === totalSheets
+              ? 'translateX(-240px) translateY(15px)'
+              : 'translateX(0) translateY(15px)'
         }}
       >
         {/* Under-book Desk Shadow */}
@@ -406,7 +441,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
           height: '660px',
           transformStyle: 'preserve-3d',
           transformOrigin: 'left center',
-          zIndex: currentSheet === 0 ? 50 : (flippingSheet === 0 ? 99 : 5),
+          zIndex: currentSheet === 0 ? 50 : (flippingSheet === 0 ? 99 : (currentSheet < 0 ? 9 : 9)),
           transform: currentSheet > 0 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
           transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
@@ -427,7 +462,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             textAlign: 'center',
             cursor: 'pointer'
           }}
-          onClick={handleNext}
+            onClick={handleNext}
           >
             {/* Ornate Gold Frame */}
             <div style={{
@@ -445,19 +480,42 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
               pointerEvents: 'none'
             }} />
 
-            {/* Emblem */}
+            {/* Premium Photo Avatar inside Golden Frame with Glowing Aura */}
             <div style={{
-              width: '80px',
-              height: '80px',
+              position: 'relative',
+              width: '130px',
+              height: '130px',
               borderRadius: '50%',
-              border: '2px solid #D4AF37',
+              margin: '0 auto 1.5rem auto',
+              padding: '4px',
+              background: 'linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%)',
+              boxShadow: '0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(0,0,0,0.5)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: '2rem',
-              color: '#D4AF37'
+              zIndex: 5
             }}>
-              <BookOpen size={40} />
+              {/* Glowing outer aura */}
+              <div style={{
+                position: 'absolute',
+                inset: '-6px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(212,175,55,0.3) 0%, transparent 70%)',
+                filter: 'blur(8px)',
+                zIndex: -1,
+                animation: 'pulse-ring 3s infinite alternate'
+              }} />
+              <img
+                src={coverPhoto}
+                alt="Sujeet Vishwakarma"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '50%',
+                  border: '2px solid #0c101c'
+                }}
+              />
             </div>
 
             <h1 style={{
@@ -522,10 +580,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             flexDirection: 'column',
             justifyContent: 'flex-start'
           }}>
-            {/* Spine Fold Shadow */}
             <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            
-            {/* Page curl effect mock */}
             <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
 
             <div style={{
@@ -551,7 +606,6 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
               Index of Contents
             </h2>
 
-            {/* Clickable Index */}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -559,7 +613,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
               marginTop: '1rem'
             }}>
               {TABS.slice(1, 8).map((tab) => (
-                <div 
+                <div
                   key={tab.id}
                   onClick={() => turnToSheet(tab.leafFace === 'front' ? tab.sheetIdx : tab.sheetIdx + 1)}
                   style={{
@@ -589,7 +643,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
           </div>
         </div>
 
-        {/* SHEET 1 (Hero/Home & About Me) */}
+        {/* SHEET 1 (Hero/Home & About Part 1) */}
         <div style={{
           position: 'absolute',
           left: '50%',
@@ -597,7 +651,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
           height: '660px',
           transformStyle: 'preserve-3d',
           transformOrigin: 'left center',
-          zIndex: currentSheet === 1 ? 50 : (flippingSheet === 1 ? 99 : (currentSheet < 1 ? 4 : 6)),
+          zIndex: currentSheet === 1 ? 50 : (flippingSheet === 1 ? 99 : (currentSheet < 1 ? 8 : 10)),
           transform: currentSheet > 1 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
           transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
@@ -612,16 +666,13 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             boxSizing: 'border-box',
             overflow: 'hidden'
           }}>
-            {/* Spine fold shadow */}
             <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            
-            {/* Page curl effect mock */}
             <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
 
             <Hero darkMode={darkMode} bookMode={true} />
           </div>
 
-          {/* SHEET 1 BACK: About Me */}
+          {/* SHEET 1 BACK: About Part 1 */}
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -636,11 +687,11 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
             <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
 
-            <About darkMode={darkMode} bookMode={true} />
+            <About darkMode={darkMode} bookMode={true} aboutPart={1} />
           </div>
         </div>
 
-        {/* SHEET 2 (Skills & Projects) */}
+        {/* SHEET 2 (About Part 2 & Skills) */}
         <div style={{
           position: 'absolute',
           left: '50%',
@@ -648,11 +699,11 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
           height: '660px',
           transformStyle: 'preserve-3d',
           transformOrigin: 'left center',
-          zIndex: currentSheet === 2 ? 50 : (flippingSheet === 2 ? 99 : (currentSheet < 2 ? 3 : 7)),
+          zIndex: currentSheet === 2 ? 50 : (flippingSheet === 2 ? 99 : (currentSheet < 2 ? 7 : 11)),
           transform: currentSheet > 2 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
           transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
-          {/* SHEET 2 FRONT: Skills */}
+          {/* SHEET 2 FRONT: About Part 2 */}
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -665,30 +716,30 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
           }}>
             <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
             <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+            <About darkMode={darkMode} bookMode={true} aboutPart={2} />
+          </div>
+
+          {/* SHEET 2 BACK: Skills */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            background: '#0c101c',
+            borderRadius: '12px 0 0 12px',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
 
             <Skills darkMode={darkMode} bookMode={true} />
           </div>
-
-          {/* SHEET 2 BACK: Projects */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: '#0c101c',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Projects darkMode={darkMode} bookMode={true} />
-          </div>
         </div>
 
-        {/* SHEET 3 (Services & Testimonials) */}
+        {/* SHEET 3 (Education Item 1 & Education Item 2) */}
         <div style={{
           position: 'absolute',
           left: '50%',
@@ -696,11 +747,11 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
           height: '660px',
           transformStyle: 'preserve-3d',
           transformOrigin: 'left center',
-          zIndex: currentSheet === 3 ? 50 : (flippingSheet === 3 ? 99 : (currentSheet < 3 ? 2 : 8)),
+          zIndex: currentSheet === 3 ? 50 : (flippingSheet === 3 ? 99 : (currentSheet < 3 ? 6 : 12)),
           transform: currentSheet > 3 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
           transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
-          {/* SHEET 3 FRONT: Services */}
+          {/* SHEET 3 FRONT: Education Item 1 */}
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -714,10 +765,10 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
             <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
 
-            <Services darkMode={darkMode} bookMode={true} />
+            <Education darkMode={darkMode} bookMode={true} itemIndex={0} />
           </div>
 
-          {/* SHEET 3 BACK: Testimonials */}
+          {/* SHEET 3 BACK: Education Item 2 */}
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -732,11 +783,11 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
             <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
 
-            <Testimonials darkMode={darkMode} bookMode={true} />
+            <Education darkMode={darkMode} bookMode={true} itemIndex={1} />
           </div>
         </div>
 
-        {/* SHEET 4 (Contact & Back Cover Inner) */}
+        {/* SHEET 4 (Education Item 3 & Project 1) */}
         <div style={{
           position: 'absolute',
           left: '50%',
@@ -744,11 +795,11 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
           height: '660px',
           transformStyle: 'preserve-3d',
           transformOrigin: 'left center',
-          zIndex: currentSheet === 4 ? 50 : (flippingSheet === 4 ? 99 : (currentSheet < 4 ? 1 : 9)),
+          zIndex: currentSheet === 4 ? 50 : (flippingSheet === 4 ? 99 : (currentSheet < 4 ? 5 : 13)),
           transform: currentSheet > 4 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
           transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
-          {/* SHEET 4 FRONT: Contact */}
+          {/* SHEET 4 FRONT: Education Item 3 */}
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -762,17 +813,191 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
             <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
 
-            <Contact darkMode={darkMode} bookMode={true} />
+            <Education darkMode={darkMode} bookMode={true} itemIndex={2} />
           </div>
 
-          {/* SHEET 4 BACK: Inside Back Cover / Interactive Footer Page */}
+          {/* SHEET 4 BACK: Project 1 */}
           <div style={{
             position: 'absolute',
             inset: 0,
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
-            background: 'linear-gradient(135deg, #0c101c 0%, #060810 100%)',
+            background: '#0c101c',
             borderRadius: '12px 0 0 12px',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+            <Projects darkMode={darkMode} bookMode={true} projectIndex={0} />
+          </div>
+        </div>
+
+        {/* SHEET 5 (Project 2 & Project 3) */}
+        <div style={{
+          position: 'absolute',
+          left: '50%',
+          width: '475px',
+          height: '660px',
+          transformStyle: 'preserve-3d',
+          transformOrigin: 'left center',
+          zIndex: currentSheet === 5 ? 50 : (flippingSheet === 5 ? 99 : (currentSheet < 5 ? 4 : 14)),
+          transform: currentSheet > 5 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+        }}>
+          {/* SHEET 5 FRONT: Project 2 */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            background: '#0c101c',
+            borderRadius: '0 12px 12px 0',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+            <Projects darkMode={darkMode} bookMode={true} projectIndex={1} />
+          </div>
+
+          {/* SHEET 5 BACK: Project 3 */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            background: '#0c101c',
+            borderRadius: '12px 0 0 12px',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+            <Projects darkMode={darkMode} bookMode={true} projectIndex={2} />
+          </div>
+        </div>
+
+        {/* SHEET 6 (Project 4 & Services) */}
+        <div style={{
+          position: 'absolute',
+          left: '50%',
+          width: '475px',
+          height: '660px',
+          transformStyle: 'preserve-3d',
+          transformOrigin: 'left center',
+          zIndex: currentSheet === 6 ? 50 : (flippingSheet === 6 ? 99 : (currentSheet < 6 ? 3 : 15)),
+          transform: currentSheet > 6 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+        }}>
+          {/* SHEET 6 FRONT: Project 4 */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            background: '#0c101c',
+            borderRadius: '0 12px 12px 0',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+            <Projects darkMode={darkMode} bookMode={true} projectIndex={3} />
+          </div>
+
+          {/* SHEET 6 BACK: Services */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            background: '#0c101c',
+            borderRadius: '12px 0 0 12px',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+            <Services darkMode={darkMode} bookMode={true} />
+          </div>
+        </div>
+
+        {/* SHEET 7 (Testimonials & Contact) */}
+        <div style={{
+          position: 'absolute',
+          left: '50%',
+          width: '475px',
+          height: '660px',
+          transformStyle: 'preserve-3d',
+          transformOrigin: 'left center',
+          zIndex: currentSheet === 7 ? 50 : (flippingSheet === 7 ? 99 : (currentSheet < 7 ? 2 : 16)),
+          transform: currentSheet > 7 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+        }}>
+          {/* SHEET 7 FRONT: Testimonials */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            background: '#0c101c',
+            borderRadius: '0 12px 12px 0',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+            <Testimonials darkMode={darkMode} bookMode={true} />
+          </div>
+
+          {/* SHEET 7 BACK: Contact */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            background: '#0c101c',
+            borderRadius: '12px 0 0 12px',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+            <Contact darkMode={darkMode} bookMode={true} />
+          </div>
+        </div>
+
+        {/* SHEET 8 (Inside Back Cover & Motivation quote page) */}
+        <div style={{
+          position: 'absolute',
+          left: '50%',
+          width: '475px',
+          height: '660px',
+          transformStyle: 'preserve-3d',
+          transformOrigin: 'left center',
+          zIndex: currentSheet === 8 ? 50 : (flippingSheet === 8 ? 99 : (currentSheet < 8 ? 2 : 18)),
+          transform: currentSheet > 8 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+        }}>
+          {/* SHEET 8 FRONT: Inside Back Cover / Ending Page */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            background: 'linear-gradient(135deg, #0c101c 0%, #060810 100%)',
+            borderRadius: '0 12px 12px 0',
             border: '1px solid rgba(212, 175, 55, 0.3)',
             boxSizing: 'border-box',
             padding: '2.5rem 2rem',
@@ -781,11 +1006,10 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             justifyContent: 'center',
             alignItems: 'center',
             textAlign: 'center',
-          }}
-          >
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-            
+          }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
             <div style={{
               position: 'absolute',
               inset: '16px',
@@ -823,7 +1047,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             `}</style>
 
             <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              
+
               <div style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -884,8 +1108,8 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
               </p>
 
               {/* Direct Mail CTA Button */}
-              <a 
-                href="mailto:sujeet83@zohomail.in"
+              <a
+                href="mailto:sujeet.cabbagecode@gmail.com"
                 className="footer-cta-btn"
                 style={{
                   display: 'inline-flex',
@@ -906,10 +1130,10 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
                 }}
               >
                 <Mail size={14} />
-                sujeet83@zohomail.in
+                sujeet.cabbagecode@gmail.com
               </a>
 
-              <a 
+              <a
                 href="https://www.fiverr.com/sujeet83/"
                 target="_blank"
                 rel="noreferrer"
@@ -932,7 +1156,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
                 {[
                   { icon: <GithubIcon size={16} />, href: 'https://github.com/sujeetvishwakarma83', label: 'GitHub' },
                   { icon: <LinkedinIcon size={16} />, href: 'https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a/', label: 'LinkedIn' },
-                  { icon: <Mail size={16} />, href: 'mailto:sujeet83@zohomail.in', label: 'Email' }
+                  { icon: <Mail size={16} />, href: 'mailto:sujeet.cabbagecode@gmail.com', label: 'Email' }
                 ].map((link, idx) => (
                   <a
                     key={idx}
@@ -964,7 +1188,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
                 © 2026 Sujeet Vishwakarma. All Rights Reserved.
               </p>
 
-              <span 
+              <span
                 onClick={(e) => {
                   e.stopPropagation();
                   handlePrev();
@@ -988,9 +1212,120 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
 
             </div>
           </div>
+
+          {/* SHEET 8 BACK: Motivation Quote Page */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            background: '#0c101c',
+            borderRadius: '12px 0 0 12px',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            padding: '3.5rem 2.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center'
+          }}>
+            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+            <div style={{
+              position: 'absolute',
+              inset: '16px',
+              border: '1px solid rgba(212, 175, 55, 0.15)',
+              borderRadius: '8px',
+              pointerEvents: 'none'
+            }} />
+
+            {/* Glowing quote icon */}
+            <div style={{
+              fontSize: '3rem',
+              color: '#D4AF37',
+              fontFamily: 'serif',
+              lineHeight: 1,
+              marginBottom: '2.2rem',
+              textShadow: '0 0 10px rgba(212, 175, 55, 0.3)'
+            }}>
+              “
+            </div>
+
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.25rem',
+              maxWidth: '325px',
+              zIndex: 5
+            }}>
+              <p style={{
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '0.85rem',
+                color: '#fff',
+                lineHeight: 1.6,
+                margin: 0,
+                letterSpacing: '0.02em'
+              }}>
+                Every great business starts with a bold idea.
+              </p>
+              
+              <div style={{ width: '40px', height: '1px', background: 'rgba(212, 175, 55, 0.2)', margin: '0 auto' }} />
+
+              <p style={{
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '0.85rem',
+                color: '#fff',
+                lineHeight: 1.6,
+                margin: 0,
+                letterSpacing: '0.02em'
+              }}>
+                Every successful website begins with a single decision.
+              </p>
+
+              <div style={{ width: '40px', height: '1px', background: 'rgba(212, 175, 55, 0.2)', margin: '0 auto' }} />
+
+              <p style={{
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '0.85rem',
+                color: '#00F5A0',
+                lineHeight: 1.6,
+                margin: 0,
+                fontWeight: 700,
+                letterSpacing: '0.02em'
+              }}>
+                Let's transform your vision into a powerful digital experience.
+              </p>
+
+              <div style={{ width: '40px', height: '1px', background: 'rgba(212, 175, 55, 0.2)', margin: '0 auto' }} />
+
+              <p style={{
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '0.85rem',
+                color: '#fff',
+                lineHeight: 1.6,
+                margin: 0,
+                letterSpacing: '0.02em'
+              }}>
+                The next success story could be yours.
+              </p>
+            </div>
+
+            <div style={{
+              fontSize: '3rem',
+              color: '#D4AF37',
+              fontFamily: 'serif',
+              lineHeight: 1,
+              marginTop: '2.2rem',
+              textShadow: '0 0 10px rgba(212, 175, 55, 0.3)'
+            }}>
+              ”
+            </div>
+          </div>
         </div>
 
-        {/* SHEET 5 (Closed Back Cover Outer) */}
+        {/* SHEET 9 (Closed Back Cover Outer) */}
         <div style={{
           position: 'absolute',
           left: '50%',
@@ -998,52 +1333,87 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
           height: '660px',
           transformStyle: 'preserve-3d',
           transformOrigin: 'left center',
-          zIndex: currentSheet === 5 ? 50 : (flippingSheet === 5 ? 99 : 2),
-          transform: currentSheet > 5 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          opacity: currentSheet === 5 ? 1 : 0,
+          zIndex: currentSheet === 9 ? 50 : (flippingSheet === 9 ? 99 : (currentSheet < 9 ? 1 : 19)),
+          transform: currentSheet > 9 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+          opacity: currentSheet === 9 ? 1 : 0,
           transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s',
-          pointerEvents: currentSheet === 5 ? 'auto' : 'none'
+          pointerEvents: currentSheet === 9 ? 'auto' : 'none'
         }}>
-          {/* Back Cover Exterior */}
+          {/* SHEET 9 FRONT: Hardcover exterior back with full page photo overlay */}
           <div style={{
             position: 'absolute',
             inset: 0,
             backfaceVisibility: 'hidden',
-            background: 'linear-gradient(135deg, #1a2238 0%, #0d121f 100%)',
             borderRadius: '0 12px 12px 0',
             border: '1px solid rgba(212, 175, 55, 0.5)',
             boxSizing: 'border-box',
+            overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: '3rem',
-            textAlign: 'center',
             cursor: 'pointer'
           }}
           onClick={handlePrev}
           >
+            {/* Full Page Photo */}
+            <img 
+              src={coverPhoto} 
+              alt="Sujeet Vishwakarma Back Cover" 
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                zIndex: 1
+              }}
+            />
+
+            {/* Dark vignette overlay for readability */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(to bottom, rgba(12, 16, 28, 0.65) 0%, rgba(6, 8, 16, 0.9) 100%)',
+              zIndex: 2
+            }} />
+
             <div style={{
               position: 'absolute',
               inset: '20px',
               border: '2px solid rgba(212, 175, 55, 0.4)',
               borderRadius: '8px',
-              pointerEvents: 'none'
+              pointerEvents: 'none',
+              zIndex: 3
             }} />
-            <h3 style={{
-              fontFamily: '"Space Mono", monospace',
-              fontSize: '1.2rem',
-              fontWeight: 700,
-              color: '#D4AF37',
-              marginBottom: '1rem',
-              letterSpacing: '0.1em'
-            }}>
-              THE END
-            </h3>
-            <div style={{ width: '40px', height: '1px', background: '#D4AF37', marginBottom: '1.5rem' }} />
-            <p style={{ fontSize: '0.8rem', color: '#a1a1aa', fontFamily: '"Space Mono", monospace' }}>
-              Jaunpur, India // 2026
-            </p>
+
+            {/* Text Overlay */}
+            <div style={{ position: 'relative', zIndex: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <h3 style={{
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '1.6rem',
+                fontWeight: 800,
+                color: '#D4AF37',
+                marginBottom: '1rem',
+                letterSpacing: '0.15em',
+                textShadow: '0 4px 15px rgba(0,0,0,0.8)'
+              }}>
+                THE END
+              </h3>
+              
+              <div style={{ width: '40px', height: '2px', background: '#D4AF37', marginBottom: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.5)' }} />
+              
+              <p style={{ 
+                fontSize: '0.85rem', 
+                color: '#e4e4e7', 
+                fontFamily: '"Space Mono", monospace',
+                margin: 0,
+                letterSpacing: '0.05em',
+                textShadow: '0 2px 8px rgba(0,0,0,0.8)'
+              }}>
+                Jaunpur, India // 2026
+              </p>
+            </div>
 
             <span style={{
               position: 'absolute',
@@ -1055,11 +1425,25 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
               textTransform: 'uppercase',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px'
+              gap: '6px',
+              zIndex: 4,
+              textShadow: '0 2px 8px rgba(0,0,0,0.8)'
             }}>
               <ChevronLeft size={14} /> Open Book Again
             </span>
           </div>
+
+          {/* SHEET 9 BACK: hardcover back exterior */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            background: 'linear-gradient(135deg, #1a2238 0%, #0d121f 100%)',
+            borderRadius: '12px 0 0 12px',
+            border: '1px solid rgba(212, 175, 55, 0.5)',
+            boxSizing: 'border-box'
+          }} />
         </div>
 
       </div>
@@ -1106,11 +1490,27 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
           letterSpacing: '0.15em',
           textTransform: 'uppercase'
         }}>
-          {currentSheet === 0 
-            ? 'Cover Page' 
-            : currentSheet === totalSheets 
-              ? 'Back Cover' 
-              : `Sheet 0${currentSheet} / 0${totalSheets - 1}`}
+          {currentSheet === 0
+            ? 'Cover Page'
+            : currentSheet === 9
+              ? 'Back Cover'
+              : currentSheet === 1
+                ? 'Index / Intro'
+                : currentSheet === 2
+                  ? 'About Me'
+                  : currentSheet === 3
+                    ? 'Skills / Journey'
+                    : currentSheet === 4
+                      ? 'Journey'
+                      : currentSheet === 5
+                        ? 'Projects 01 - 02'
+                        : currentSheet === 6
+                          ? 'Projects 03 - 04'
+                          : currentSheet === 7
+                            ? 'Services / Reviews'
+                            : currentSheet === 8
+                              ? 'Contact / Ending'
+                              : `Sheet 0${currentSheet} / 0${totalSheets - 1}`}
         </div>
 
         {/* Next Button */}
@@ -1153,6 +1553,15 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
         }
         .book-page-content::-webkit-scrollbar-thumb:hover {
           background: rgba(212, 175, 55, 0.45);
+        }
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes pulse-ring {
+          0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+          70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
         }
       `}</style>
 

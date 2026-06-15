@@ -88,7 +88,7 @@ function TimelineCard({ item, glassBg, glassBorder, titleColor, textColor, isMob
   );
 }
 
-const Education = ({ darkMode }) => {
+const Education = ({ darkMode, bookMode = false, itemIndex = null }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -134,6 +134,108 @@ const Education = ({ darkMode }) => {
   const textColor = darkMode ? "#9ca3af" : "#475569";
   const glassBg = darkMode ? "rgba(20, 20, 20, 0.6)" : "rgba(255, 255, 255, 0.8)";
   const glassBorder = darkMode ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)";
+
+  if (bookMode && itemIndex !== null) {
+    const item = timelineData[itemIndex];
+    if (!item) return null;
+
+    return (
+      <div style={{
+        padding: "2.5rem 1.5rem",
+        fontFamily: '"Inter", sans-serif',
+        color: titleColor,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        boxSizing: 'border-box'
+      }}>
+        {/* Header */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{
+            fontFamily: '"Space Mono", monospace',
+            fontSize: '0.8rem',
+            letterSpacing: '0.15em',
+            color: item.color,
+            textTransform: 'uppercase',
+            marginBottom: '0.5rem',
+            fontWeight: 700
+          }}>
+            04 — Journey // {item.type === 'experience' ? 'Experience' : 'Education'}
+          </div>
+          <h2 style={{
+            fontSize: '1.8rem',
+            fontWeight: 800,
+            letterSpacing: '-0.02em',
+            margin: 0
+          }}>
+            {item.title}
+          </h2>
+          <div style={{
+            fontSize: '1.1rem',
+            fontWeight: 600,
+            color: item.color,
+            marginTop: '0.5rem'
+          }}>
+            {item.subtitle}
+          </div>
+        </div>
+
+        {/* Card Content styled as a single sheet record */}
+        <div style={{
+          background: glassBg,
+          border: `1px solid ${glassBorder}`,
+          borderRadius: '20px',
+          padding: '2rem 1.5rem',
+          position: 'relative',
+          boxShadow: `0 15px 30px -15px ${item.color}25`,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: '1rem',
+          flexGrow: 1,
+          justifyContent: 'center'
+        }}>
+          {/* Timeline Dot with Icon */}
+          <div style={{
+            width: '50px', height: '50px',
+            borderRadius: '50%',
+            border: `2px solid ${item.color}`,
+            background: darkMode ? '#111' : '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: item.color,
+            boxShadow: `0 0 20px ${item.color}40`,
+            marginBottom: '0.5rem'
+          }}>
+            {React.cloneElement(item.icon, { size: 24 })}
+          </div>
+
+          <span style={{
+            display: "inline-block",
+            padding: "0.4rem 1.2rem",
+            background: `${item.color}15`,
+            color: item.color,
+            borderRadius: "50px",
+            fontSize: "0.8rem",
+            fontWeight: 700,
+            letterSpacing: "0.05em",
+          }}>
+            {item.year}
+          </span>
+
+          <p style={{
+            color: textColor,
+            lineHeight: 1.8,
+            fontSize: "0.95rem",
+            margin: 0,
+            textAlign: 'justify'
+          }}>
+            {item.description}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section

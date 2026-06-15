@@ -92,7 +92,7 @@ const RatingStars = ({ rating, reviews, darkMode }) => {
   );
 };
 
-function ProjectCard({ project, index, darkMode, bookMode = false }) {
+function ProjectCard({ project, index, darkMode, bookMode = false, isSingle = false }) {
   const tilt = use3DTilt(bookMode ? 0 : 8, bookMode ? 1 : 1.02);
   const [hovered, setHovered] = useState(false);
 
@@ -163,8 +163,8 @@ function ProjectCard({ project, index, darkMode, bookMode = false }) {
           </div>
         </div>
 
-        {/* IMAGE SECTION - Hidden in Book Mode for perfect fit */}
-        {!bookMode && project.image && (
+        {/* IMAGE SECTION - Hidden in Book Mode unless single project display */}
+        {(!bookMode || isSingle) && project.image && (
           <div style={{
             position: 'relative', 
             marginBottom: '1.5rem',
@@ -241,7 +241,7 @@ function ProjectCard({ project, index, darkMode, bookMode = false }) {
           </div>
         )}
 
-        {!bookMode && (
+        {(!bookMode || isSingle) && (
           <RatingStars rating={project.rating} reviews={project.reviews} darkMode={darkMode} />
         )}
 
@@ -250,7 +250,7 @@ function ProjectCard({ project, index, darkMode, bookMode = false }) {
         </h3>
 
         <div style={{ fontSize: bookMode ? '0.75rem' : '0.85rem', lineHeight: bookMode ? 1.4 : 1.6, color: descColor, marginBottom: bookMode ? '0.6rem' : '1.5rem', flexGrow: 1 }}>
-          {bookMode ? (
+          {bookMode && !isSingle ? (
             <p style={{ margin: 0 }}>{project.solution}</p>
           ) : (
             <>
@@ -261,7 +261,7 @@ function ProjectCard({ project, index, darkMode, bookMode = false }) {
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: bookMode ? '0.6rem' : '1.5rem' }}>
-          {(bookMode ? project.tags.slice(0, 3) : project.tags).map((tag) => (
+          {(bookMode && !isSingle ? project.tags.slice(0, 3) : project.tags).map((tag) => (
             <span key={tag} style={{
               fontFamily: '"Space Mono", monospace', fontSize: bookMode ? '0.6rem' : '0.65rem', fontWeight: 600,
               padding: bookMode ? '0.2rem 0.5rem' : '0.3rem 0.8rem',
@@ -287,7 +287,7 @@ function ProjectCard({ project, index, darkMode, bookMode = false }) {
   );
 }
 
-function Projects({ darkMode, bookMode = false }) {
+function Projects({ darkMode, bookMode = false, projectIndex = null }) {
   const [isMobile, setIsMobile] = useState(false);
   const ref = useRef(null);
   const featuredTilt = use3DTilt(4, 1.01);
@@ -337,35 +337,49 @@ function Projects({ darkMode, bookMode = false }) {
 
       <div style={{ position: 'relative', zIndex: 10, maxWidth: '1200px', margin: '0 auto' }}>
 
-        <div style={{ textAlign: isMobile ? 'center' : 'left', marginBottom: bookMode ? '1.5rem' : '4rem' }}>
-          <div style={{
-            fontFamily: '"Space Mono", monospace', fontSize: '0.8rem', letterSpacing: '0.15em',
-            color: glowColor, textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 700
-          }}>
-            05 // Selected Work
+        {(!bookMode || projectIndex === null) && (
+          <div style={{ textAlign: isMobile ? 'center' : 'left', marginBottom: bookMode ? '1rem' : '4rem' }}>
+            <div style={{
+              fontFamily: '"Space Mono", monospace', fontSize: '0.8rem', letterSpacing: '0.15em',
+              color: glowColor, textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 700
+            }}>
+              05 // Selected Work
+            </div>
+            <h2 style={{ fontSize: bookMode ? '1.8rem' : 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 800, letterSpacing: '-0.03em', color: titleColor, margin: 0 }}>
+              Featured <span style={{ color: glowColor }}>Projects</span>.
+            </h2>
           </div>
-          <h2 style={{ fontSize: bookMode ? '1.8rem' : 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 800, letterSpacing: '-0.03em', color: titleColor, margin: 0 }}>
-            Featured <span style={{ color: glowColor }}>Projects</span>.
-          </h2>
-        </div>
+        )}
 
         {bookMode ? (
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(2, 1fr)', 
-            gap: '0.75rem', 
-            marginTop: '0.5rem' 
-          }}>
-            {projectsData.map((project, index) => (
+          projectIndex !== null ? (
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <ProjectCard
-                key={project.num}
-                project={project}
-                index={index}
+                project={projectsData[projectIndex]}
+                index={projectIndex}
                 darkMode={darkMode}
                 bookMode={bookMode}
+                isSingle={true}
               />
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(2, 1fr)', 
+              gap: '0.75rem', 
+              marginTop: '0.5rem' 
+            }}>
+              {projectsData.map((project, index) => (
+                <ProjectCard
+                  key={project.num}
+                  project={project}
+                  index={index}
+                  darkMode={darkMode}
+                  bookMode={bookMode}
+                />
+              ))}
+            </div>
+          )
         ) : (
           <>
             {/* ✅ FIRST ROW: FEATURED PROJECT */}

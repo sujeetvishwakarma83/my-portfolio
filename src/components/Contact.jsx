@@ -323,13 +323,24 @@ function Contact({ darkMode, bookMode = false }) {
     setIsFlying(true); 
 
     try {
-      await fetch("https://script.google.com/macros/s/AKfycbwg_rnIeQpyDmUjieNEnOqvz7UYBvN5hOxTWSPVwsdm_HpML5CO6swtQi-JkiXVHS7BKQ/exec", {
+      const url = "https://script.google.com/macros/s/AKfycbwg_rnIeQpyDmUjieNEnOqvz7UYBvN5hOxTWSPVwsdm_HpML5CO6swtQi-JkiXVHS7BKQ/exec";
+      await fetch(url, {
         method: "POST",
-        body: JSON.stringify(formData),
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams(formData).toString(),
       });
+      
+      setIsFlying(false);
+      setSubmitted(true);
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => { setSubmitted(false); }, 4000);
     } catch (error) {
       console.error(error);
       alert("Error sending message ❌");
+      setIsFlying(false);
     }
   };
 
@@ -391,7 +402,14 @@ function Contact({ darkMode, bookMode = false }) {
           initial={bookMode ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           animate={bookMode ? { opacity: 1, y: 0 } : { opacity: visible ? 1 : 0, y: visible ? 0 : 30 }}
           transition={{ duration: 0.8 }}
-          style={{ display: 'grid', gridTemplateColumns: bookMode ? 'repeat(2, 1fr)' : (isMobile ? '1fr' : '1fr 1.2fr'), gap: bookMode ? '1rem' : (isMobile ? '3rem' : '5rem'), overflowY: 'visible', flexGrow: bookMode ? 1 : 0 }}
+          style={{
+            display: bookMode ? 'flex' : 'grid',
+            flexDirection: bookMode ? 'column' : 'row',
+            gridTemplateColumns: bookMode ? 'none' : (isMobile ? '1fr' : '1fr 1.2fr'),
+            gap: bookMode ? '0.75rem' : (isMobile ? '3rem' : '5rem'),
+            overflowY: 'visible',
+            flexGrow: bookMode ? 1 : 0
+          }}
         >
           <div>
             <h3 style={{ fontSize: bookMode ? '1.05rem' : '1.4rem', fontWeight: 700, marginBottom: bookMode ? '0.5rem' : '1rem', color: titleColor }}>

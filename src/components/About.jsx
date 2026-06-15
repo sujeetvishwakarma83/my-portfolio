@@ -42,7 +42,7 @@ function AIStreamText({ content, visible, delayOffset }) {
   );
 }
 
-function About({ darkMode, bookMode = false }) {
+function About({ darkMode, bookMode = false, aboutPart = null }) {
   var [visible, setVisible] = useState(false);
   var [imgHovered, setImgHovered] = useState(false);
   var [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -229,7 +229,7 @@ function About({ darkMode, bookMode = false }) {
             marginBottom: '0.5rem',
             fontWeight: 600
           }}>
-            01 // About Me
+            {aboutPart === 2 ? '01 // Skills' : '01 // About Me'}
           </div>
           <h2 style={{
             fontSize: bookMode ? '1.8rem' : 'clamp(2.5rem, 4vw, 3.5rem)',
@@ -238,7 +238,11 @@ function About({ darkMode, bookMode = false }) {
             color: titleColor,
             margin: 0
           }}>
-            Engineering Digital <span style={{ color: highlightColor }}>Success</span>.
+            {aboutPart === 2 ? (
+              <>Core <span style={{ color: highlightColor }}>Stack & Stats</span>.</>
+            ) : (
+              <>Engineering Digital <span style={{ color: highlightColor }}>Success</span>.</>
+            )}
           </h2>
         </div>
 
@@ -322,109 +326,119 @@ function About({ darkMode, bookMode = false }) {
             </div>
           )}
 
-          {/* Right: AI Streaming Text (Now Justified!) */}
+          {/* Right Content */}
           <div>
-            <p style={paraStyle}>
-              <AIStreamText 
-                visible={visible} 
-                delayOffset={0.6} 
-                content={[
-                  { text: "Hello! I'm" },
-                  { text: " Sujeet Vishwakarma,", color: highlightColor, fontWeight: 700 },
-                  { text: " a Full Stack Developer based in Jaunpur, Uttar Pradesh. I bridge the gap between complex technical architecture and seamless user experiences." }
-                ]}
-              />
-            </p>
-            
-            <p style={paraStyle}>
-              <AIStreamText 
-                visible={visible} 
-                delayOffset={1.2} 
-                content={[
-                  { text: "With a solid foundation in BCA and MCA, I don't just write code—I engineer solutions that help businesses grow. Whether it's building a fast, scalable web application using the" },
-                  { text: " MERN stack", color: titleColor, fontWeight: 700 },
-                  { text: " or developing reliable backend systems with" },
-                  { text: " PHP,", color: titleColor, fontWeight: 700 },
-                  { text: " my focus is always on delivering secure and high-performance digital assets." }
-                ]}
-              />
-            </p>
-            
-            <p style={paraStyle}>
-              <AIStreamText 
-                visible={visible} 
-                delayOffset={2.2} 
-                content={[
-                  { text: "My approach is simple: I listen to your business requirements, design the optimal technical architecture, and deliver clean, scalable solutions on time. I am actively available for freelance projects and remote collaborations." }
-                ]}
-              />
-            </p>
+            {/* Part 1 or Scroll Mode: Text Paragraphs */}
+            {(aboutPart === 1 || aboutPart === null) && (
+              <>
+                <p style={paraStyle}>
+                  <AIStreamText 
+                    visible={visible} 
+                    delayOffset={0.6} 
+                    content={[
+                      { text: "Hello! I'm" },
+                      { text: " Sujeet Vishwakarma,", color: highlightColor, fontWeight: 700 },
+                      { text: " a Full Stack Developer based in Jaunpur, Uttar Pradesh. I bridge the gap between complex technical architecture and seamless user experiences." }
+                    ]}
+                  />
+                </p>
+                
+                <p style={paraStyle}>
+                  <AIStreamText 
+                    visible={visible} 
+                    delayOffset={1.2} 
+                    content={[
+                      { text: "With a solid foundation in BCA and MCA, I don't just write code—I engineer solutions that help businesses grow. Whether it's building a fast, scalable web application using the" },
+                      { text: " MERN stack", color: titleColor, fontWeight: 700 },
+                      { text: " or developing reliable backend systems with" },
+                      { text: " PHP,", color: titleColor, fontWeight: 700 },
+                      { text: " my focus is always on delivering secure and high-performance digital assets." }
+                    ]}
+                  />
+                </p>
+                
+                <p style={paraStyle}>
+                  <AIStreamText 
+                    visible={visible} 
+                    delayOffset={2.2} 
+                    content={[
+                      { text: "My approach is simple: I listen to your business requirements, design the optimal technical architecture, and deliver clean, scalable solutions on time. I am actively available for freelance projects and remote collaborations." }
+                    ]}
+                  />
+                </p>
+              </>
+            )}
 
-            {/* Tech Stack Pills */}
-            <div style={{
-              display: 'flex', flexWrap: 'wrap', gap: bookMode ? '0.4rem' : '0.75rem',
-              marginTop: bookMode ? '1rem' : '2rem', marginBottom: bookMode ? '1rem' : '2.5rem'
-            }}>
-              {badges.map(function(badge, i) {
-                return (
-                  <span key={badge} style={{
-                    fontFamily: '"Space Mono", monospace',
-                    fontSize: bookMode ? '0.65rem' : '0.75rem',
-                    fontWeight: 600,
-                    padding: bookMode ? '0.25rem 0.6rem' : '0.4rem 1rem',
-                    background: badgeBg,
-                    color: highlightColor,
-                    border: badgeBorder,
-                    borderRadius: '50px',
-                    letterSpacing: '0.05em',
-                    opacity: visible ? 1 : 0,
-                    transform: visible ? 'translateY(0)' : 'translateY(10px)',
-                    transition: `all 0.4s ease ${3.2 + (i * 0.1)}s` 
-                  }}>
-                    {badge}
-                  </span>
-                );
-              })}
-            </div>
-
-            {/* Stats Row */}
-            <div style={{
-              display: 'flex',
-              gap: bookMode ? '1.5rem' : (isMobile ? '1.5rem' : '3rem'),
-              paddingTop: bookMode ? '1rem' : '2rem',
-              borderTop: glassBorder,
-              flexWrap: 'wrap',
-            }}>
-              {stats.map(function(stat, i) {
-                return (
-                  <div key={stat.label} style={{
-                    opacity: visible ? 1 : 0,
-                    transform: visible ? 'translateY(0)' : 'translateY(15px)',
-                    transition: `all 0.5s ease ${3.5 + (i * 0.15)}s` 
-                  }}>
-                    <div style={{
-                      fontSize: bookMode ? '1.4rem' : (isMobile ? '1.8rem' : '2.2rem'),
-                      fontWeight: 800,
-                      color: titleColor,
-                      lineHeight: 1,
-                      marginBottom: '0.3rem'
+            {/* Part 2 or Scroll Mode: Tech Stack Badges */}
+            {(aboutPart === 2 || aboutPart === null) && (
+              <div style={{
+                display: 'flex', flexWrap: 'wrap', gap: bookMode ? '0.4rem' : '0.75rem',
+                marginTop: aboutPart === 2 ? '0' : (bookMode ? '1rem' : '2rem'),
+                marginBottom: bookMode ? '1rem' : '2.5rem'
+              }}>
+                {badges.map(function(badge, i) {
+                  return (
+                    <span key={badge} style={{
+                      fontFamily: '"Space Mono", monospace',
+                      fontSize: bookMode ? '0.65rem' : '0.75rem',
+                      fontWeight: 600,
+                      padding: bookMode ? '0.25rem 0.6rem' : '0.4rem 1rem',
+                      background: badgeBg,
+                      color: highlightColor,
+                      border: badgeBorder,
+                      borderRadius: '50px',
+                      letterSpacing: '0.05em',
+                      opacity: visible ? 1 : 0,
+                      transform: visible ? 'translateY(0)' : 'translateY(10px)',
+                      transition: aboutPart === 2 ? 'none' : `all 0.4s ease ${3.2 + (i * 0.1)}s` 
                     }}>
-                      {stat.num}
-                    </div>
-                    <div style={{
-                      fontSize: bookMode ? '0.7rem' : '0.8rem',
-                      color: textColor,
-                      fontWeight: 500,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em'
-                    }}>
-                      {stat.label}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                      {badge}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
 
+            {/* Part 2 or Scroll Mode: Stats Row */}
+            {(aboutPart === 2 || aboutPart === null) && (
+              <div style={{
+                display: 'flex',
+                gap: bookMode ? '1.5rem' : (isMobile ? '1.5rem' : '3rem'),
+                paddingTop: bookMode ? '1rem' : '2rem',
+                borderTop: aboutPart === 2 ? 'none' : glassBorder,
+                flexWrap: 'wrap',
+                marginTop: aboutPart === 2 ? '1.5rem' : '0'
+              }}>
+                {stats.map(function(stat, i) {
+                  return (
+                    <div key={stat.label} style={{
+                      opacity: visible ? 1 : 0,
+                      transform: visible ? 'translateY(0)' : 'translateY(15px)',
+                      transition: aboutPart === 2 ? 'none' : `all 0.5s ease ${3.5 + (i * 0.15)}s` 
+                    }}>
+                      <div style={{
+                        fontSize: bookMode ? '1.4rem' : (isMobile ? '1.8rem' : '2.2rem'),
+                        fontWeight: 800,
+                        color: titleColor,
+                        lineHeight: 1,
+                        marginBottom: '0.3rem'
+                      }}>
+                        {stat.num}
+                      </div>
+                      <div style={{
+                        fontSize: bookMode ? '0.7rem' : '0.8rem',
+                        color: textColor,
+                        fontWeight: 500,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                      }}>
+                        {stat.label}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -24,12 +24,12 @@ function Background3D({ darkMode }) {
     const initVanta = async () => {
       // 1. Load Three.js library required by Vanta
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js', 'three-js');
-      // 2. Load Vanta Birds effect
-      await loadScript('https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js', 'vanta-birds');
+      // 2. Load Vanta Net effect
+      await loadScript('https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js', 'vanta-net');
 
-      // 3. Initialize Vanta Birds
-      if (window.VANTA && window.VANTA.BIRDS && myRef.current) {
-        effect = window.VANTA.BIRDS({
+      // 3. Initialize Vanta Net
+      if (window.VANTA && window.VANTA.NET && myRef.current) {
+        effect = window.VANTA.NET({
           el: myRef.current,
           mouseControls: true,
           touchControls: true,
@@ -38,17 +38,11 @@ function Background3D({ darkMode }) {
           minWidth: 200.00,
           scale: 1.00,
           scaleMobile: 1.00,
+          color: darkMode ? 0x00f5a0 : 0x7c3aed,      // Accent Color based on theme
           backgroundColor: darkMode ? 0x050508 : 0xf8fafc,
-          color1: 0x00f5a0,      // Primary Neon Green
-          color2: 0x7c3aed,      // Secondary Neon Purple
-          colorMode: 'variance',
-          birdSize: 1.50,
-          wingSpan: 24.00,
-          speedLimit: 4.00,
-          separation: 40.00,
-          alignment: 30.00,
-          cohesion: 20.00,
-          quantity: 4.00
+          points: 12.00,
+          maxDistance: 22.00,
+          spacing: 16.00
         });
       }
     };
