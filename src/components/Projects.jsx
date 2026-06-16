@@ -63,16 +63,15 @@ const projectsData = [
   },
   {
     num: '04',
-    title: 'Appointment Booking System',
-    problem: 'Scheduling conflicts and inefficient manual appointment tracking.',
-    solution: 'Building an automated booking system with calendar sync, SMS reminders, and multi-staff management.',
-    tags: ['Next.js', 'Tailwind CSS', 'PostgreSQL'],
-    link: '#', 
-    github: '#',
-    image: '/projects/booking.png',
-    comingSoon: true, 
-    rating: 0,
-    reviews: 0
+    title: 'Premium Fine-Dining Platform',
+    problem: 'High-end dining establishments need a digital experience that reflects their exclusivity, craftsmanship, and hospitality standards.',
+    solution: 'Created a sophisticated fine-dining platform with modern UI/UX, interactive gastronomy showcases, responsive layouts, premium branding, and optimized booking flows to elevate the online guest experience.',
+    tags: ['React.js', 'Tailwind CSS', 'JavaScript', 'Framer Motion', 'GSAP', 'Responsive Design'],
+    link: 'https://restaurant-demo-sable.vercel.app/', 
+    github: 'https://github.com/sujeetvishwakarma83/restaurant-demo',
+    image: '/projects/restaurant.png',
+    rating: 4.9,
+    reviews: 86
   },
 ];
 
