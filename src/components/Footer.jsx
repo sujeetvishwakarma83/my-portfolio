@@ -15,6 +15,7 @@ function Footer({ darkMode }) {
     {
       label: 'GitHub',
       href: 'https://github.com/sujeetvishwakarma83',
+      color: darkMode ? '#ffffff' : '#181717',
       icon: (
         <svg fill="currentColor" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
@@ -24,6 +25,7 @@ function Footer({ darkMode }) {
     {
       label: 'LinkedIn',
       href: 'https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a/',
+      color: '#0077B5',
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0.774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24.774 23.2 0 22.222 0h.003z"/>
@@ -33,9 +35,51 @@ function Footer({ darkMode }) {
     {
       label: 'Fiverr',
       href: 'https://www.fiverr.com/sujeet83/',
+      color: '#1DBF73',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m2.41 5.29a1.06 1.06 0 1 1-1.06 1.06 1.06 1.06 0 0 1 1.06-1.06m2 9.38h-3.89v-1.58h.82v-3.35H10.7v3.35h1v1.58h-4v-1.58h.83v-3.35h-.9v-1.59h.89v-.27c0-2.14 1.86-2.42 2.88-2.42a7 7 0 0 1 .77 0v1.76a2.5 2.5 0 0 0-.53 0c-.31 0-.94 0-.94.64v.32h4.84v4.95h.83z"/>
+        </svg>
+      ),
+    },
+    {
+      label: 'YouTube',
+      href: 'https://www.youtube.com/@SujeetCabbageCode',
+      color: '#FF0000',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.108C19.524 3.545 12 3.545 12 3.545s-7.525 0-9.388.51a3.002 3.002 0 0 0-2.11 2.108C0 8.028 0 12 0 12s0 3.972.502 5.837a3.003 3.003 0 0 0 2.11 2.108C4.475 20.455 12 20.455 12 20.455s7.524 0 9.388-.51a3.003 3.003 0 0 0 2.11-2.108C24 15.972 24 12 24 12s0-3.972-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        </svg>
+      ),
+    },
+    {
+      label: 'Instagram',
+      href: 'https://www.instagram.com/cabbage_code/',
+      color: '#E1306C',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37zM17.5 6.5h.01"/>
+        </svg>
+      ),
+    },
+    {
+      label: 'WhatsApp',
+      href: 'https://wa.me/917800383448',
+      color: '#25D366',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 2.519 1.334 4.515 1.335 5.51.001 9.997-4.486 10-10 .002-2.641-1.03-5.124-2.906-7C16.327 1.618 13.847.585 11.993.585 6.492.585 2.005 5.072 2.001 10.572c-.001 1.902.486 3.242 1.366 4.936l-.997 3.642 3.731-.978L6.647 19.15zm10.21-6.141c-.272-.137-1.614-.796-1.863-.887-.249-.09-.431-.137-.613.137-.182.273-.703.887-.862 1.07-.159.182-.317.205-.59.069-.272-.136-1.15-.424-2.19-1.353-.809-.721-1.355-1.614-1.514-1.886-.159-.273-.017-.42.12-.556.122-.122.272-.318.408-.477.136-.159.182-.273.272-.455.09-.182.046-.341-.023-.477-.069-.136-.613-1.477-.84-2.023-.22-.53-.443-.457-.613-.466-.159-.008-.34-.01-.522-.01-.182 0-.476.069-.726.341-.25.272-.953.932-.953 2.273 0 1.341.977 2.636 1.113 2.818.136.182 1.92 2.931 4.65 4.113.65.28 1.157.448 1.554.574.654.208 1.25.179 1.721.109.525-.078 1.614-.659 1.841-1.295.227-.636.227-1.182.159-1.295-.068-.113-.249-.205-.522-.341z"/>
+        </svg>
+      ),
+    },
+    {
+      label: 'Email',
+      href: 'mailto:sujeet.cabbagecode@gmail.com',
+      color: '#EA4335',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6"/>
         </svg>
       ),
     },
@@ -405,23 +449,23 @@ function Footer({ darkMode }) {
                       justifyContent: 'center',
                       width: '42px',
                       height: '42px',
-                      color: textColor,
-                      border: `1px solid ${borderColor}`,
+                      color: link.color,
+                      border: `1px solid ${link.color}40`,
                       borderRadius: '10px',
-                      background: cardBg,
+                      background: darkMode ? 'rgba(255, 255, 255, 0.02)' : 'rgba(15, 23, 42, 0.02)',
                       transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.color = accentColor;
-                      e.currentTarget.style.borderColor = accentColor;
-                      e.currentTarget.style.background = darkMode ? 'rgba(212, 175, 55, 0.06)' : 'rgba(212, 175, 55, 0.04)';
+                      e.currentTarget.style.color = link.color;
+                      e.currentTarget.style.borderColor = link.color;
+                      e.currentTarget.style.background = `${link.color}18`;
                       e.currentTarget.style.transform = 'translateY(-3px)';
-                      e.currentTarget.style.boxShadow = `0 6px 15px -3px rgba(212, 175, 55, 0.25)`;
+                      e.currentTarget.style.boxShadow = `0 6px 15px -3px ${link.color}40`;
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = textColor;
-                      e.currentTarget.style.borderColor = borderColor;
-                      e.currentTarget.style.background = cardBg;
+                      e.currentTarget.style.color = link.color;
+                      e.currentTarget.style.borderColor = `${link.color}40`;
+                      e.currentTarget.style.background = darkMode ? 'rgba(255, 255, 255, 0.02)' : 'rgba(15, 23, 42, 0.02)';
                       e.currentTarget.style.transform = 'translateY(0)';
                       e.currentTarget.style.boxShadow = 'none';
                     }}

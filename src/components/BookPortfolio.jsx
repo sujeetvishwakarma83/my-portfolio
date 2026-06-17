@@ -20,6 +20,10 @@ const LinkedinIcon = ({ size = 18, color = 'currentColor' }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" /></svg>
 );
 
+const WhatsAppIcon = ({ size = 18, color = 'currentColor' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={{ fill: color }}><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 2.519 1.334 4.515 1.335 5.51.001 9.997-4.486 10-10 .002-2.641-1.03-5.124-2.906-7C16.327 1.618 13.847.585 11.993.585 6.492.585 2.005 5.072 2.001 10.572c-.001 1.902.486 3.242 1.366 4.936l-.997 3.642 3.731-.978L6.647 19.15zm10.21-6.141c-.272-.137-1.614-.796-1.863-.887-.249-.09-.431-.137-.613.137-.182.273-.703.887-.862 1.07-.159.182-.317.205-.59.069-.272-.136-1.15-.424-2.19-1.353-.809-.721-1.355-1.614-1.514-1.886-.159-.273-.017-.42.12-.556.122-.122.272-.318.408-.477.136-.159.182-.273.272-.455.09-.182.046-.341-.023-.477-.069-.136-.613-1.477-.84-2.023-.22-.53-.443-.457-.613-.466-.159-.008-.34-.01-.522-.01-.182 0-.476.069-.726.341-.25.272-.953.932-.953 2.273 0 1.341.977 2.636 1.113 2.818.136.182 1.92 2.931 4.65 4.113.65.28 1.157.448 1.554.574.654.208 1.25.179 1.721.109.525-.078 1.614-.659 1.841-1.295.227-.636.227-1.182.159-1.295-.068-.113-.249-.205-.522-.341z" /></svg>
+);
+
 // Bookmark Ribbon Tab config
 const TABS = [
   { id: 0, label: 'Cover', sheetIdx: 0, leafFace: 'front' },
@@ -1154,9 +1158,10 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
               {/* Social Links Row */}
               <div style={{ display: 'flex', gap: '0.8rem', marginBottom: '2rem' }}>
                 {[
-                  { icon: <GithubIcon size={16} />, href: 'https://github.com/sujeetvishwakarma83', label: 'GitHub' },
-                  { icon: <LinkedinIcon size={16} />, href: 'https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a/', label: 'LinkedIn' },
-                  { icon: <Mail size={16} />, href: 'mailto:sujeet.cabbagecode@gmail.com', label: 'Email' }
+                  { icon: <GithubIcon size={16} />, href: 'https://github.com/sujeetvishwakarma83', label: 'GitHub', color: '#ffffff' },
+                  { icon: <LinkedinIcon size={16} />, href: 'https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a/', label: 'LinkedIn', color: '#0077B5' },
+                  { icon: <WhatsAppIcon size={16} />, href: 'https://wa.me/917800383448', label: 'WhatsApp', color: '#25D366' },
+                  { icon: <Mail size={16} />, href: 'mailto:sujeet.cabbagecode@gmail.com', label: 'Email', color: '#EA4335' }
                 ].map((link, idx) => (
                   <a
                     key={idx}
@@ -1171,11 +1176,23 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
                       justifyContent: 'center',
                       width: '34px',
                       height: '34px',
-                      color: '#D4AF37',
-                      border: '1px solid rgba(212, 175, 55, 0.4)',
+                      color: link.color,
+                      border: `1px solid ${link.color}60`,
                       borderRadius: '50%',
                       background: 'rgba(255, 255, 255, 0.02)',
-                      transition: 'all 0.3s',
+                      transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = `${link.color}20`;
+                      e.currentTarget.style.borderColor = link.color;
+                      e.currentTarget.style.boxShadow = `0 0 12px ${link.color}90`;
+                      e.currentTarget.style.transform = 'translateY(-2px) scale(1.08)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
+                      e.currentTarget.style.borderColor = `${link.color}60`;
+                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.transform = 'translateY(0) scale(1)';
                     }}
                   >
                     {link.icon}
