@@ -30,7 +30,7 @@ function App() {
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Toggle Scroll vs Book Mode on Desktop
-  const [scrollMode, setScrollMode] = useState(false);
+  const [scrollMode, setScrollMode] = useState(true);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
   useEffect(() => {
