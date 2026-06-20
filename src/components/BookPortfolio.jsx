@@ -43,6 +43,25 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
 
   const totalSheets = 9; // Sheet 0 to 9
 
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const targetWidth = 1160; // 980 book + ribbons + margin
+      const targetHeight = 880; // 680 book + controls + margin
+      const scaleW = width / targetWidth;
+      const scaleH = height / targetHeight;
+      let newScale = Math.min(scaleW, scaleH);
+      if (newScale > 1) newScale = 1;
+      setScale(newScale);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Floating particles particle system
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -218,17 +237,19 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
       {/* Header controls inside Desk Layout */}
       <div style={{
         position: 'absolute',
-        top: '2rem',
-        left: '4rem',
-        right: '4rem',
+        top: window.innerWidth <= 768 ? '1rem' : '2rem',
+        left: window.innerWidth <= 768 ? '1rem' : '4rem',
+        right: window.innerWidth <= 768 ? '1rem' : '4rem',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        zIndex: 100
+        zIndex: 100,
+        flexDirection: window.innerWidth <= 480 ? 'column' : 'row',
+        gap: '10px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <BookOpen size={24} color="#D4AF37" />
-          <span style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.85rem', fontWeight: 700, color: '#D4AF37', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <BookOpen size={window.innerWidth <= 768 ? 18 : 24} color="#D4AF37" />
+          <span style={{ fontFamily: '"Space Mono", monospace', fontSize: window.innerWidth <= 768 ? '0.7rem' : '0.85rem', fontWeight: 700, color: '#D4AF37', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             Interactive Portfolio Book
           </span>
         </div>
@@ -243,10 +264,10 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             background: 'rgba(255, 255, 255, 0.03)',
             border: '1px solid rgba(212, 175, 55, 0.3)',
             color: '#D4AF37',
-            padding: '0.6rem 1.2rem',
+            padding: window.innerWidth <= 768 ? '0.4rem 0.8rem' : '0.6rem 1.2rem',
             borderRadius: '50px',
             fontFamily: '"Space Mono", monospace',
-            fontSize: '0.75rem',
+            fontSize: window.innerWidth <= 768 ? '0.65rem' : '0.75rem',
             fontWeight: 700,
             cursor: 'pointer',
             transition: 'all 0.3s'
@@ -259,17 +280,31 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
         </button>
       </div>
 
-      {/* Ribbon Bookmark Tabs - Luxury ribbon menu on the right edge */}
-      {isBookOpen && (
-        <div style={{
-          position: 'absolute',
-          right: 'calc(50vw - 570px)',
-          top: '180px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-          zIndex: 90
-        }}>
+      {/* 3D Perspective Wrapper with dynamic scaling */}
+      <div style={{
+        transform: `scale(${scale})`,
+        transformOrigin: 'center center',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '1160px',
+        height: '880px',
+        zIndex: 10
+      }}>
+
+        {/* Ribbon Bookmark Tabs - Luxury ribbon menu on the right edge */}
+        {isBookOpen && (
+          <div style={{
+            position: 'absolute',
+            right: '0px',
+            top: '180px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            zIndex: 90
+          }}>
           {TABS.slice(1, 8).map((tab) => {
             const isJourneyActive = tab.label === 'Journey' && (currentSheet === 3 || currentSheet === 4);
             const isProjectsActive = tab.label === 'Projects' && (currentSheet === 5 || currentSheet === 6);
@@ -1553,6 +1588,8 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
         >
           <ChevronRight size={24} />
         </button>
+      </div>
+
       </div>
 
       {/* Embedded CSS scrollbars & curls styling */}

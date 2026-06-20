@@ -29,17 +29,8 @@ function App() {
   // ✅ MODAL STATE: Profile DP popup ke liye
   const [showProfileModal, setShowProfileModal] = useState(false);
 
-  // Toggle Scroll vs Book Mode on Desktop
+  // Toggle Scroll vs Book Mode
   const [scrollMode, setScrollMode] = useState(true);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,7 +65,7 @@ function App() {
     >
       <CustomCursor />
 
-      {isDesktop && !scrollMode ? (
+      {!scrollMode ? (
         <BookPortfolio darkMode={darkMode} onToggleScrollMode={() => setScrollMode(true)} />
       ) : (
         <>

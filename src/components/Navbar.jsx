@@ -275,8 +275,8 @@ function Navbar({ darkMode, setDarkMode, onToggleBookMode = null }) {
           </div>
         )}
         
-        {/* Book Mode Toggle (Desktop only) */}
-        {onToggleBookMode && !isMobile && (
+        {/* Book Mode Toggle */}
+        {onToggleBookMode && (
           <button onClick={onToggleBookMode}
             title="Switch to Book Layout"
             style={{
@@ -381,6 +381,26 @@ function Navbar({ darkMode, setDarkMode, onToggleBookMode = null }) {
               </li>
             );
           })}
+
+          {onToggleBookMode && (
+            <li>
+              <a href="#book" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onToggleBookMode(); }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.8rem', fontFamily: '"Space Mono", monospace',
+                  fontSize: '0.85rem', letterSpacing: '0.1em', color: '#D4AF37',
+                  textDecoration: 'none', textTransform: 'uppercase', padding: '1rem 1.5rem',
+                  transition: 'all 0.2s', borderBottom: darkMode ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(0,0,0,0.04)',
+                  borderLeft: '3px solid transparent',
+                  background: 'transparent',
+                }}
+              >
+                <span style={{ color: '#D4AF37', display: 'flex', alignItems: 'center' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V3a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v16.5m-3-13h-4m4 4h-4m4 4h-4"/></svg>
+                </span>
+                Book Layout
+              </a>
+            </li>
+          )}
 
           {/* Mobile Social Links Row */}
           <li style={{ 
