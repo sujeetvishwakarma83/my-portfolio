@@ -44,11 +44,66 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
   const totalSheets = 9; // Sheet 0 to 9
 
   const [scale, setScale] = useState(1);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) {
+      handleNextMobile();
+    } else if (isRightSwipe) {
+      handlePrevMobile();
+    }
+  };
+
+  const getMobilePageLabel = (pageIndex) => {
+    switch (pageIndex) {
+      case 0: return 'Cover Page';
+      case 1: return 'Index / Intro';
+      case 2: return 'Home / Hero';
+      case 3: return 'About Me (1/2)';
+      case 4: return 'About Me (2/2)';
+      case 5: return 'Skills';
+      case 6: return 'Journey (1/3)';
+      case 7: return 'Journey (2/3)';
+      case 8: return 'Journey (3/3)';
+      case 9: return 'Projects (1/4)';
+      case 10: return 'Projects (2/4)';
+      case 11: return 'Projects (3/4)';
+      case 12: return 'Projects (4/4)';
+      case 13: return 'Services';
+      case 14: return 'Reviews / Testimonials';
+      case 15: return 'Contact';
+      case 16: return 'Ending Page';
+      case 17: return 'Quote Page';
+      case 18: return 'Back Cover';
+      default: return `Page ${pageIndex + 1}`;
+    }
+  };
 
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
+      setIsMobile(width <= 1024);
+      
       const targetWidth = 1160; // 980 book + ribbons + margin
       const targetHeight = 880; // 680 book + controls + margin
       const scaleW = width / targetWidth;
@@ -61,6 +116,17 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Synchronize states when isMobile flips
+  useEffect(() => {
+    if (isMobile) {
+      const newPage = currentSheet === 0 ? 0 : Math.min(18, currentSheet * 2 - 1);
+      setCurrentPage(newPage);
+    } else {
+      const newSheet = Math.ceil(currentPage / 2);
+      setCurrentSheet(newSheet);
+    }
+  }, [isMobile]);
 
   // Floating particles particle system
   useEffect(() => {
@@ -145,14 +211,22 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowRight') {
-        handleNext();
+        if (isMobile) {
+          handleNextMobile();
+        } else {
+          handleNext();
+        }
       } else if (e.key === 'ArrowLeft') {
-        handlePrev();
+        if (isMobile) {
+          handlePrevMobile();
+        } else {
+          handlePrev();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentSheet, flippingSheet]);
+  }, [currentSheet, flippingSheet, isMobile, currentPage]);
 
   // Sequential turning to support Ribbons Navigation (clicking jumps to sheet index)
   const turnToSheet = (targetSheet) => {
@@ -167,6 +241,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
     playFlipSound();
     setFlippingSheet(currentSheet < targetSheet ? currentSheet : next);
     setCurrentSheet(next);
+    setCurrentPage(next === 0 ? 0 : Math.min(18, next * 2 - 1));
 
     // If target is further, turn sequential sheets
     const timer = setInterval(() => {
@@ -178,6 +253,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
         playFlipSound();
         setFlippingSheet(step > 0 ? next - 1 : next);
         setCurrentSheet(next);
+        setCurrentPage(next === 0 ? 0 : Math.min(18, next * 2 - 1));
       }
     }, 600); // matches the 3D transition duration
   };
@@ -186,7 +262,9 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
     if (currentSheet < totalSheets && flippingSheet === null) {
       playFlipSound();
       setFlippingSheet(currentSheet);
-      setCurrentSheet(currentSheet + 1);
+      const nextSheet = currentSheet + 1;
+      setCurrentSheet(nextSheet);
+      setCurrentPage(nextSheet === 0 ? 0 : Math.min(18, nextSheet * 2 - 1));
       setTimeout(() => setFlippingSheet(null), 600);
     }
   };
@@ -195,12 +273,565 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
     if (currentSheet > 0 && flippingSheet === null) {
       playFlipSound();
       setFlippingSheet(currentSheet - 1);
-      setCurrentSheet(currentSheet - 1);
+      const prevSheet = currentSheet - 1;
+      setCurrentSheet(prevSheet);
+      setCurrentPage(prevSheet === 0 ? 0 : Math.min(18, prevSheet * 2 - 1));
       setTimeout(() => setFlippingSheet(null), 600);
     }
   };
 
+  const handleNextMobile = () => {
+    if (currentPage < 18) {
+      playFlipSound();
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      setCurrentSheet(Math.ceil(nextPage / 2));
+    }
+  };
+
+  const handlePrevMobile = () => {
+    if (currentPage > 0) {
+      playFlipSound();
+      const prevPage = currentPage - 1;
+      setCurrentPage(prevPage);
+      setCurrentSheet(Math.ceil(prevPage / 2));
+    }
+  };
+
   const isBookOpen = currentSheet > 0 && currentSheet < totalSheets;
+
+  const getTabTargetPage = (tabLabel) => {
+    switch (tabLabel) {
+      case 'Cover': return 0;
+      case 'Home': return 2;
+      case 'About': return 3;
+      case 'Journey': return 6; // Education 1
+      case 'Projects': return 9; // Project 1
+      case 'Services': return 13; // Services
+      case 'Reviews': return 14; // Testimonials
+      case 'Contact': return 15; // Contact
+      default: return 0;
+    }
+  };
+
+  const renderPageContent = (index) => {
+    switch (index) {
+      case 0:
+        return (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(135deg, #1a2238 0%, #0d121f 100%)',
+            borderRadius: '12px',
+            border: '1px solid rgba(212, 175, 55, 0.5)',
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '2rem 1.5rem',
+            textAlign: 'center',
+            cursor: 'pointer',
+            height: '100%'
+          }}
+          onClick={handleNextMobile}
+          >
+            {/* Ornate Gold Frame */}
+            <div style={{
+              position: 'absolute',
+              inset: '12px',
+              border: '2px solid rgba(212, 175, 55, 0.4)',
+              borderRadius: '8px',
+              pointerEvents: 'none'
+            }} />
+            <div style={{
+              position: 'absolute',
+              inset: '16px',
+              border: '1px dashed rgba(212, 175, 55, 0.2)',
+              borderRadius: '6px',
+              pointerEvents: 'none'
+            }} />
+
+            {/* Premium Photo Avatar */}
+            <div style={{
+              position: 'relative',
+              width: '110px',
+              height: '110px',
+              borderRadius: '50%',
+              margin: '0 auto 1.2rem auto',
+              padding: '3px',
+              background: 'linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%)',
+              boxShadow: '0 0 15px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(0,0,0,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 5
+            }}>
+              <img
+                src={coverPhoto}
+                alt="Sujeet Vishwakarma"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '50%',
+                  border: '2px solid #0c101c'
+                }}
+              />
+            </div>
+
+            <h1 style={{
+              fontFamily: '"Space Mono", monospace',
+              fontSize: '1.6rem',
+              fontWeight: 800,
+              color: '#D4AF37',
+              margin: '0 0 0.8rem 0',
+              letterSpacing: '0.05em',
+              lineHeight: 1.2
+            }}>
+              SUJEET VISHWAKARMA
+            </h1>
+
+            <div style={{
+              width: '40px',
+              height: '2px',
+              background: '#D4AF37',
+              margin: '0.8rem 0 1.2rem 0'
+            }} />
+
+            <p style={{
+              fontFamily: '"Space Mono", monospace',
+              fontSize: '0.75rem',
+              letterSpacing: '0.2em',
+              color: '#a1a1aa',
+              textTransform: 'uppercase',
+              margin: 0
+            }}>
+              Developer Portfolio
+            </p>
+
+            <span style={{
+              position: 'absolute',
+              bottom: '2.5rem',
+              fontFamily: '"Space Mono", monospace',
+              fontSize: '0.7rem',
+              color: '#D4AF37',
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              animation: 'float-slow 2s infinite'
+            }}>
+              Swipe or Click to Open <ChevronRight size={12} />
+            </span>
+          </div>
+        );
+
+      case 1:
+        return (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: '#0c101c',
+            borderRadius: '12px 0 0 12px',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            padding: '2rem 1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            height: '100%'
+          }}>
+            <div style={{
+              fontFamily: '"Space Mono", monospace',
+              fontSize: '0.7rem',
+              color: '#D4AF37',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              marginBottom: '1rem',
+              borderBottom: '1px solid rgba(212,175,55,0.2)',
+              paddingBottom: '0.4rem'
+            }}>
+              Intro // Index
+            </div>
+
+            <h2 style={{
+              fontFamily: '"Space Mono", monospace',
+              fontSize: '1.4rem',
+              fontWeight: 800,
+              color: '#fff',
+              margin: '0 0 1rem 0'
+            }}>
+              Index of Contents
+            </h2>
+
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.8rem',
+              marginTop: '0.5rem'
+            }}>
+              {TABS.slice(1, 8).map((tab) => (
+                <div
+                  key={tab.id}
+                  onClick={() => setCurrentPage(getTabTargetPage(tab.label))}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    fontFamily: '"Space Mono", monospace',
+                    fontSize: '0.8rem',
+                    color: '#d1d5db',
+                    cursor: 'pointer',
+                    paddingBottom: '3px',
+                    borderBottom: '1px dotted rgba(255,255,255,0.1)'
+                  }}
+                >
+                  <span>{tab.label}</span>
+                  <span style={{ color: '#D4AF37' }}>0{tab.id}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ marginTop: 'auto', fontSize: '0.7rem', color: '#6b7280', fontFamily: '"Space Mono", monospace', lineHeight: 1.4 }}>
+              * Swipe left/right or use navigation arrows at the bottom to browse pages.
+            </div>
+          </div>
+        );
+
+      case 2:
+        return <Hero darkMode={darkMode} bookMode={true} />;
+      case 3:
+        return <About darkMode={darkMode} bookMode={true} aboutPart={1} />;
+      case 4:
+        return <About darkMode={darkMode} bookMode={true} aboutPart={2} />;
+      case 5:
+        return <Skills darkMode={darkMode} bookMode={true} />;
+      case 6:
+        return <Education darkMode={darkMode} bookMode={true} itemIndex={0} />;
+      case 7:
+        return <Education darkMode={darkMode} bookMode={true} itemIndex={1} />;
+      case 8:
+        return <Education darkMode={darkMode} bookMode={true} itemIndex={2} />;
+      case 9:
+        return <Projects darkMode={darkMode} bookMode={true} projectIndex={0} />;
+      case 10:
+        return <Projects darkMode={darkMode} bookMode={true} projectIndex={1} />;
+      case 11:
+        return <Projects darkMode={darkMode} bookMode={true} projectIndex={2} />;
+      case 12:
+        return <Projects darkMode={darkMode} bookMode={true} projectIndex={3} />;
+      case 13:
+        return <Services darkMode={darkMode} bookMode={true} />;
+      case 14:
+        return <Testimonials darkMode={darkMode} bookMode={true} />;
+      case 15:
+        return <Contact darkMode={darkMode} bookMode={true} />;
+
+      case 16:
+        return (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(135deg, #0c101c 0%, #060810 100%)',
+            borderRadius: '12px',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            padding: '2rem 1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            height: '100%'
+          }}>
+            <div style={{
+              position: 'absolute',
+              inset: '12px',
+              border: '2px solid rgba(212, 175, 55, 0.2)',
+              borderRadius: '8px',
+              pointerEvents: 'none'
+            }} />
+            <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontSize: '0.65rem',
+                color: '#00F5A0',
+                background: 'rgba(0, 245, 160, 0.08)',
+                padding: '0.25rem 0.65rem',
+                borderRadius: '50px',
+                border: '1px solid rgba(0, 245, 160, 0.2)',
+                marginBottom: '0.8rem',
+                fontFamily: '"Space Mono", monospace',
+                fontWeight: 600,
+              }}>
+                <span style={{
+                  width: '5px',
+                  height: '5px',
+                  borderRadius: '50%',
+                  background: '#00F5A0',
+                }}></span>
+                Available for Projects
+              </div>
+
+              <h2 style={{
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '1.2rem',
+                fontWeight: 800,
+                color: '#D4AF37',
+                margin: '0 0 0.2rem 0',
+                letterSpacing: '0.05em'
+              }}>
+                SUJEET VISHWAKARMA
+              </h2>
+              <p style={{
+                fontFamily: '"Inter", sans-serif',
+                fontSize: '0.75rem',
+                color: '#9ca3af',
+                margin: '0 0 1rem 0',
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                fontWeight: 600
+              }}>
+                Let's Build Something Legendary
+              </p>
+
+              <p style={{
+                fontSize: '0.75rem',
+                color: '#d1d5db',
+                lineHeight: 1.4,
+                maxWidth: '280px',
+                marginBottom: '1rem'
+              }}>
+                Got an idea or a project in mind? Let's collaborate to bring it to life.
+              </p>
+
+              <a
+                href="mailto:sujeet.cabbagecode@gmail.com"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  fontFamily: '"Space Mono", monospace',
+                  fontSize: '0.75rem',
+                  color: '#000',
+                  background: '#00F5A0',
+                  padding: '0.5rem 1.2rem',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                  fontWeight: 700,
+                  transition: 'all 0.3s',
+                  boxShadow: '0 4px 10px rgba(0, 245, 160, 0.3)',
+                  marginBottom: '0.5rem'
+                }}
+              >
+                <Mail size={12} />
+                sujeet.cabbagecode@gmail.com
+              </a>
+
+              {/* Social Links Row */}
+              <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.2rem', marginTop: '0.5rem' }}>
+                {[
+                  { icon: <GithubIcon size={14} />, href: 'https://github.com/sujeetvishwakarma83', color: '#ffffff' },
+                  { icon: <LinkedinIcon size={14} />, href: 'https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a/', color: '#0077B5' },
+                  { icon: <WhatsAppIcon size={14} />, href: 'https://wa.me/917800383448', color: '#25D366' }
+                ].map((link, idx) => (
+                  <a
+                    key={idx}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '28px',
+                      height: '28px',
+                      color: link.color,
+                      border: `1px solid ${link.color}60`,
+                      borderRadius: '50%',
+                      background: 'rgba(255, 255, 255, 0.02)',
+                    }}
+                  >
+                    {link.icon}
+                  </a>
+                ))}
+              </div>
+
+              <p style={{ fontSize: '0.6rem', color: '#6b7280', fontFamily: '"Space Mono", monospace', margin: 0 }}>
+                © 2026 Sujeet Vishwakarma.
+              </p>
+            </div>
+          </div>
+        );
+
+      case 17:
+        return (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: '#0c101c',
+            borderRadius: '12px 0 0 12px',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            boxSizing: 'border-box',
+            padding: '2rem 1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            height: '100%'
+          }}>
+            <div style={{
+              position: 'absolute',
+              inset: '12px',
+              border: '1px solid rgba(212, 175, 55, 0.15)',
+              borderRadius: '8px',
+              pointerEvents: 'none'
+            }} />
+
+            <div style={{
+              fontSize: '2rem',
+              color: '#D4AF37',
+              fontFamily: 'serif',
+              lineHeight: 1,
+              marginBottom: '1rem'
+            }}>
+              “
+            </div>
+
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.8rem',
+              maxWidth: '280px',
+              zIndex: 5
+            }}>
+              <p style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.75rem', color: '#fff', lineHeight: 1.5, margin: 0 }}>
+                Every great business starts with a bold idea.
+              </p>
+              <div style={{ width: '30px', height: '1px', background: 'rgba(212, 175, 55, 0.2)', margin: '0 auto' }} />
+              <p style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.75rem', color: '#00F5A0', lineHeight: 1.5, margin: 0, fontWeight: 700 }}>
+                Let's transform your vision into a powerful digital experience.
+              </p>
+              <div style={{ width: '30px', height: '1px', background: 'rgba(212, 175, 55, 0.2)', margin: '0 auto' }} />
+              <p style={{ fontFamily: '"Space Mono", monospace', fontSize: '0.75rem', color: '#fff', lineHeight: 1.5, margin: 0 }}>
+                The next success story could be yours.
+              </p>
+            </div>
+
+            <div style={{
+              fontSize: '2rem',
+              color: '#D4AF37',
+              fontFamily: 'serif',
+              lineHeight: 1,
+              marginTop: '1rem'
+            }}>
+              ”
+            </div>
+          </div>
+        );
+
+      case 18:
+        return (
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '12px',
+            border: '1px solid rgba(212, 175, 55, 0.5)',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            cursor: 'pointer',
+            height: '100%'
+          }}
+          onClick={handlePrevMobile}
+          >
+            {/* Full Page Photo */}
+            <img 
+              src={coverPhoto} 
+              alt="Sujeet Vishwakarma Back Cover" 
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                zIndex: 1
+              }}
+            />
+
+            {/* Dark vignette overlay */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(to bottom, rgba(12, 16, 28, 0.6) 0%, rgba(6, 8, 16, 0.95) 100%)',
+              zIndex: 2
+            }} />
+
+            <div style={{
+              position: 'absolute',
+              inset: '12px',
+              border: '2px solid rgba(212, 175, 55, 0.4)',
+              borderRadius: '8px',
+              pointerEvents: 'none',
+              zIndex: 3
+            }} />
+
+            {/* Text Overlay */}
+            <div style={{ position: 'relative', zIndex: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <h3 style={{
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '1.4rem',
+                fontWeight: 800,
+                color: '#D4AF37',
+                marginBottom: '0.8rem',
+                letterSpacing: '0.12em',
+              }}>
+                THE END
+              </h3>
+              
+              <div style={{ width: '30px', height: '2px', background: '#D4AF37', marginBottom: '1rem' }} />
+              
+              <p style={{ 
+                fontSize: '0.75rem', 
+                color: '#e4e4e7', 
+                fontFamily: '"Space Mono", monospace',
+                margin: 0,
+                letterSpacing: '0.05em',
+              }}>
+                Jaunpur, India // 2026
+              </p>
+            </div>
+
+            <span style={{
+              position: 'absolute',
+              bottom: '2.5rem',
+              fontFamily: '"Space Mono", monospace',
+              fontSize: '0.7rem',
+              color: '#D4AF37',
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              zIndex: 4,
+            }}>
+              <ChevronLeft size={12} /> Open Book Again
+            </span>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <div style={{
@@ -237,19 +868,19 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
       {/* Header controls inside Desk Layout */}
       <div style={{
         position: 'absolute',
-        top: window.innerWidth <= 768 ? '1rem' : '2rem',
-        left: window.innerWidth <= 768 ? '1rem' : '4rem',
-        right: window.innerWidth <= 768 ? '1rem' : '4rem',
+        top: isMobile ? '1rem' : '2rem',
+        left: isMobile ? '1rem' : '4rem',
+        right: isMobile ? '1rem' : '4rem',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         zIndex: 100,
-        flexDirection: window.innerWidth <= 480 ? 'column' : 'row',
+        flexDirection: isMobile ? 'column' : 'row',
         gap: '10px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <BookOpen size={window.innerWidth <= 768 ? 18 : 24} color="#D4AF37" />
-          <span style={{ fontFamily: '"Space Mono", monospace', fontSize: window.innerWidth <= 768 ? '0.7rem' : '0.85rem', fontWeight: 700, color: '#D4AF37', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <BookOpen size={isMobile ? 18 : 24} color="#D4AF37" />
+          <span style={{ fontFamily: '"Space Mono", monospace', fontSize: isMobile ? '0.7rem' : '0.85rem', fontWeight: 700, color: '#D4AF37', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             Interactive Portfolio Book
           </span>
         </div>
@@ -264,10 +895,10 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             background: 'rgba(255, 255, 255, 0.03)',
             border: '1px solid rgba(212, 175, 55, 0.3)',
             color: '#D4AF37',
-            padding: window.innerWidth <= 768 ? '0.4rem 0.8rem' : '0.6rem 1.2rem',
+            padding: isMobile ? '0.4rem 0.8rem' : '0.6rem 1.2rem',
             borderRadius: '50px',
             fontFamily: '"Space Mono", monospace',
-            fontSize: window.innerWidth <= 768 ? '0.65rem' : '0.75rem',
+            fontSize: isMobile ? '0.65rem' : '0.75rem',
             fontWeight: 700,
             cursor: 'pointer',
             transition: 'all 0.3s'
@@ -281,7 +912,18 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
       </div>
 
       {/* 3D Perspective Wrapper with dynamic scaling */}
-      <div style={{
+      <div style={isMobile ? {
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
+        zIndex: 10,
+        padding: '1rem',
+        boxSizing: 'border-box'
+      } : {
         transform: `scale(${scale})`,
         transformOrigin: 'center center',
         position: 'relative',
@@ -295,7 +937,7 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
       }}>
 
         {/* Ribbon Bookmark Tabs - Luxury ribbon menu on the right edge */}
-        {isBookOpen && (
+        {isBookOpen && !isMobile && (
           <div style={{
             position: 'absolute',
             right: '0px',
@@ -366,1156 +1008,1258 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
         </div>
       )}
 
-      {/* 3D Perspective Book Container */}
-      <div
-        style={{
-          position: 'relative',
-          width: '980px',
-          height: '680px',
-          perspective: '2000px',
-          zIndex: 10,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-          // Shift book to right slightly when closed so front cover sits centered on desk
-          transform: currentSheet === 0
-            ? 'translateX(240px) translateY(15px)'
-            : currentSheet === totalSheets
-              ? 'translateX(-240px) translateY(15px)'
-              : 'translateX(0) translateY(15px)'
-        }}
-      >
-        {/* Under-book Desk Shadow */}
-        <div style={{
-          position: 'absolute',
-          inset: '-10px -20px -30px -20px',
-          background: 'rgba(0, 0, 0, 0.7)',
-          filter: 'blur(30px)',
-          borderRadius: '30px',
-          transform: 'translateZ(-40px)',
-          pointerEvents: 'none',
-          zIndex: -2
-        }} />
-
-        {/* LEFT HARDCOVER (Revealed when book is open) */}
-        <div style={{
-          position: 'absolute',
-          right: '50%',
-          width: '490px',
-          height: '690px',
-          background: 'linear-gradient(135deg, #161d31 0%, #0d121f 100%)',
-          borderRadius: '16px 0 0 16px',
-          border: '1px solid rgba(212, 175, 55, 0.4)',
-          borderRight: 'none',
-          boxShadow: '-10px 15px 35px rgba(0,0,0,0.6)',
-          transformOrigin: 'right center',
-          transform: currentSheet > 0 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          opacity: currentSheet > 0 ? 1 : 0,
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s',
-          zIndex: 1,
-          pointerEvents: currentSheet > 0 ? 'auto' : 'none'
-        }}>
-          {/* Cover Inner styling (felt/silk endpaper look) */}
-          <div style={{
-            position: 'absolute',
-            inset: '8px',
-            borderRadius: '12px 0 0 12px',
-            border: '2px solid rgba(212, 175, 55, 0.2)',
-            background: '#0c101c'
-          }} />
-        </div>
-
-        {/* RIGHT HARDCOVER */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          width: '490px',
-          height: '690px',
-          background: 'linear-gradient(135deg, #161d31 0%, #0d121f 100%)',
-          borderRadius: '0 16px 16px 0',
-          border: '1px solid rgba(212, 175, 55, 0.4)',
-          borderLeft: 'none',
-          boxShadow: '10px 15px 35px rgba(0,0,0,0.6)',
-          transformOrigin: 'left center',
-          transform: currentSheet < totalSheets ? 'rotateY(0deg)' : 'rotateY(180deg)',
-          opacity: currentSheet < totalSheets ? 1 : 0,
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s',
-          zIndex: 1,
-          pointerEvents: currentSheet < totalSheets ? 'auto' : 'none'
-        }}>
-          <div style={{
-            position: 'absolute',
-            inset: '8px',
-            borderRadius: '0 12px 12px 0',
-            border: '2px solid rgba(212, 175, 55, 0.2)',
-            background: '#0c101c'
-          }} />
-        </div>
-
-        {/* CENTER SPINE (Grandy spine connector) */}
-        {isBookOpen && (
-          <div style={{
-            position: 'absolute',
-            top: '-5px',
-            bottom: '-5px',
-            width: '24px',
-            zIndex: 100,
-            background: 'linear-gradient(90deg, #090c13 0%, #1a233a 50%, #090c13 100%)',
-            boxShadow: '0 0 15px rgba(0,0,0,0.8)',
-            borderTop: '1px solid rgba(212, 175, 55, 0.4)',
-            borderBottom: '1px solid rgba(212, 175, 55, 0.4)'
-          }} />
-        )}
-
-        {/* ============================================================== */}
-        {/* SHEET PAGES STACK */}
-        {/* ============================================================== */}
-
-        {/* SHEET 0 (Front Cover & Endpaper index) */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          width: '475px',
-          height: '660px',
-          transformStyle: 'preserve-3d',
-          transformOrigin: 'left center',
-          zIndex: currentSheet === 0 ? 50 : (flippingSheet === 0 ? 99 : (currentSheet < 0 ? 9 : 9)),
-          transform: currentSheet > 0 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}>
-          {/* SHEET 0 FRONT: Hardcover exterior */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            background: 'linear-gradient(135deg, #1a2238 0%, #0d121f 100%)',
-            borderRadius: '0 12px 12px 0',
-            border: '1px solid rgba(212, 175, 55, 0.5)',
-            boxSizing: 'border-box',
+      {isMobile ? (
+        /* Mobile/Tablet Single Page Swipe View */
+        <div
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          style={{
+            width: '100%',
+            maxWidth: '500px',
+            height: '70vh',
+            maxHeight: '600px',
+            position: 'relative',
             display: 'flex',
-            flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: '3rem',
-            textAlign: 'center',
-            cursor: 'pointer'
+            perspective: '1500px',
+            zIndex: 10,
+            boxSizing: 'border-box'
           }}
-            onClick={handleNext}
-          >
-            {/* Ornate Gold Frame */}
-            <div style={{
-              position: 'absolute',
-              inset: '20px',
-              border: '2px solid rgba(212, 175, 55, 0.4)',
-              borderRadius: '8px',
-              pointerEvents: 'none'
-            }} />
-            <div style={{
-              position: 'absolute',
-              inset: '26px',
-              border: '1px dashed rgba(212, 175, 55, 0.2)',
-              borderRadius: '6px',
-              pointerEvents: 'none'
-            }} />
-
-            {/* Premium Photo Avatar inside Golden Frame with Glowing Aura */}
-            <div style={{
-              position: 'relative',
-              width: '130px',
-              height: '130px',
-              borderRadius: '50%',
-              margin: '0 auto 1.5rem auto',
-              padding: '4px',
-              background: 'linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%)',
-              boxShadow: '0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(0,0,0,0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 5
-            }}>
-              {/* Glowing outer aura */}
-              <div style={{
-                position: 'absolute',
-                inset: '-6px',
-                borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(212,175,55,0.3) 0%, transparent 70%)',
-                filter: 'blur(8px)',
-                zIndex: -1,
-                animation: 'pulse-ring 3s infinite alternate'
-              }} />
-              <img
-                src={coverPhoto}
-                alt="Sujeet Vishwakarma"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  borderRadius: '50%',
-                  border: '2px solid #0c101c'
-                }}
-              />
-            </div>
-
-            <h1 style={{
-              fontFamily: '"Space Mono", monospace',
-              fontSize: '2rem',
-              fontWeight: 800,
-              color: '#D4AF37',
-              margin: '0 0 1rem 0',
-              letterSpacing: '0.05em',
-              lineHeight: 1.2
-            }}>
-              SUJEET VISHWAKARMA
-            </h1>
-
-            <div style={{
-              width: '60px',
-              height: '2px',
-              background: '#D4AF37',
-              margin: '1rem 0 1.5rem 0'
-            }} />
-
-            <p style={{
-              fontFamily: '"Space Mono", monospace',
-              fontSize: '0.85rem',
-              letterSpacing: '0.25em',
-              color: '#a1a1aa',
-              textTransform: 'uppercase',
-              margin: 0
-            }}>
-              Developer Portfolio
-            </p>
-
-            <span style={{
-              position: 'absolute',
-              bottom: '3rem',
-              fontFamily: '"Space Mono", monospace',
-              fontSize: '0.75rem',
-              color: '#D4AF37',
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              animation: 'float-slow 2s infinite'
-            }}>
-              Click Cover to Open <ChevronRight size={14} />
-            </span>
-          </div>
-
-          {/* SHEET 0 BACK: Welcome Endpaper & Table of Contents */}
+        >
+          {/* Under-book Desk Shadow */}
           <div style={{
             position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: '#0c101c',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            padding: '3rem 2.5rem',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start'
+            inset: '-5px -10px -20px -10px',
+            background: 'rgba(0, 0, 0, 0.6)',
+            filter: 'blur(20px)',
+            borderRadius: '20px',
+            pointerEvents: 'none',
+            zIndex: -2
+          }} />
+
+          {/* Hardcover Backing */}
+          <div style={{
+            position: 'absolute',
+            inset: '-6px -4px -6px -4px',
+            background: 'linear-gradient(135deg, #161d31 0%, #0d121f 100%)',
+            borderRadius: '16px',
+            border: '1px solid rgba(212, 175, 55, 0.4)',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+            zIndex: 1,
+            pointerEvents: 'none'
+          }} />
+
+          {/* Spine accent line */}
+          <div style={{
+            position: 'absolute',
+            left: '0px',
+            top: '0px',
+            bottom: '0px',
+            width: '8px',
+            background: 'linear-gradient(90deg, #090c13 0%, #1a233a 50%, #090c13 100%)',
+            borderRadius: '16px 0 0 16px',
+            zIndex: 100,
+            borderRight: '1px solid rgba(212,175,55,0.2)'
+          }} />
+
+          {/* Slide pages stack */}
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+            borderRadius: '12px',
+            zIndex: 5
           }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+            {Array.from({ length: 19 }).map((_, idx) => {
+              const isActive = idx === currentPage;
+              const isPrev = idx < currentPage;
 
+              let transformStyle = 'translateX(100%) scale(0.95)';
+              if (isActive) {
+                transformStyle = 'translateX(0) scale(1)';
+              } else if (isPrev) {
+                transformStyle = 'translateX(-100%) scale(0.95)';
+              }
+
+              return (
+                <div
+                  key={idx}
+                  className="book-page-content"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    transform: transformStyle,
+                    opacity: isActive ? 1 : 0,
+                    transition: 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease-in-out',
+                    zIndex: isActive ? 5 : 1,
+                    background: '#0c101c',
+                    overflowY: 'auto',
+                    WebkitOverflowScrolling: 'touch'
+                  }}
+                >
+                  {renderPageContent(idx)}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        /* Desktop 3D Perspective Book Container */
+        <div
+          style={{
+            position: 'relative',
+            width: '980px',
+            height: '680px',
+            perspective: '2000px',
+            zIndex: 10,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+            // Shift book to right slightly when closed so front cover sits centered on desk
+            transform: currentSheet === 0
+              ? 'translateX(240px) translateY(15px)'
+              : currentSheet === totalSheets
+                ? 'translateX(-240px) translateY(15px)'
+                : 'translateX(0) translateY(15px)'
+          }}
+        >
+          {/* Under-book Desk Shadow */}
+          <div style={{
+            position: 'absolute',
+            inset: '-10px -20px -30px -20px',
+            background: 'rgba(0, 0, 0, 0.7)',
+            filter: 'blur(30px)',
+            borderRadius: '30px',
+            transform: 'translateZ(-40px)',
+            pointerEvents: 'none',
+            zIndex: -2
+          }} />
+
+          {/* LEFT HARDCOVER (Revealed when book is open) */}
+          <div style={{
+            position: 'absolute',
+            right: '50%',
+            width: '490px',
+            height: '690px',
+            background: 'linear-gradient(135deg, #161d31 0%, #0d121f 100%)',
+            borderRadius: '16px 0 0 16px',
+            border: '1px solid rgba(212, 175, 55, 0.4)',
+            borderRight: 'none',
+            boxShadow: '-10px 15px 35px rgba(0,0,0,0.6)',
+            transformOrigin: 'right center',
+            transform: currentSheet > 0 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+            opacity: currentSheet > 0 ? 1 : 0,
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s',
+            zIndex: 1,
+            pointerEvents: currentSheet > 0 ? 'auto' : 'none'
+          }}>
+            {/* Cover Inner styling (felt/silk endpaper look) */}
             <div style={{
-              fontFamily: '"Space Mono", monospace',
-              fontSize: '0.75rem',
-              color: '#D4AF37',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              marginBottom: '1.5rem',
-              borderBottom: '1px solid rgba(212,175,55,0.2)',
-              paddingBottom: '0.5rem'
-            }}>
-              Intro // Endpaper
-            </div>
+              position: 'absolute',
+              inset: '8px',
+              borderRadius: '12px 0 0 12px',
+              border: '2px solid rgba(212, 175, 55, 0.2)',
+              background: '#0c101c'
+            }} />
+          </div>
 
-            <h2 style={{
-              fontFamily: '"Space Mono", monospace',
-              fontSize: '1.6rem',
-              fontWeight: 800,
-              color: '#fff',
-              margin: '0 0 1.5rem 0'
-            }}>
-              Index of Contents
-            </h2>
-
+          {/* RIGHT HARDCOVER */}
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            width: '490px',
+            height: '690px',
+            background: 'linear-gradient(135deg, #161d31 0%, #0d121f 100%)',
+            borderRadius: '0 16px 16px 0',
+            border: '1px solid rgba(212, 175, 55, 0.4)',
+            borderLeft: 'none',
+            boxShadow: '10px 15px 35px rgba(0,0,0,0.6)',
+            transformOrigin: 'left center',
+            transform: currentSheet < totalSheets ? 'rotateY(0deg)' : 'rotateY(180deg)',
+            opacity: currentSheet < totalSheets ? 1 : 0,
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s',
+            zIndex: 1,
+            pointerEvents: currentSheet < totalSheets ? 'auto' : 'none'
+          }}>
             <div style={{
+              position: 'absolute',
+              inset: '8px',
+              borderRadius: '0 12px 12px 0',
+              border: '2px solid rgba(212, 175, 55, 0.2)',
+              background: '#0c101c'
+            }} />
+          </div>
+
+          {/* CENTER SPINE (Grandy spine connector) */}
+          {isBookOpen && (
+            <div style={{
+              position: 'absolute',
+              top: '-5px',
+              bottom: '-5px',
+              width: '24px',
+              zIndex: 100,
+              background: 'linear-gradient(90deg, #090c13 0%, #1a233a 50%, #090c13 100%)',
+              boxShadow: '0 0 15px rgba(0,0,0,0.8)',
+              borderTop: '1px solid rgba(212, 175, 55, 0.4)',
+              borderBottom: '1px solid rgba(212, 175, 55, 0.4)'
+            }} />
+          )}
+
+          {/* ============================================================== */}
+          {/* SHEET PAGES STACK */}
+          {/* ============================================================== */}
+
+          {/* SHEET 0 (Front Cover & Endpaper index) */}
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            width: '475px',
+            height: '660px',
+            transformStyle: 'preserve-3d',
+            transformOrigin: 'left center',
+            zIndex: currentSheet === 0 ? 50 : (flippingSheet === 0 ? 99 : (currentSheet < 0 ? 9 : 9)),
+            transform: currentSheet > 0 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}>
+            {/* SHEET 0 FRONT: Hardcover exterior */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              background: 'linear-gradient(135deg, #1a2238 0%, #0d121f 100%)',
+              borderRadius: '0 12px 12px 0',
+              border: '1px solid rgba(212, 175, 55, 0.5)',
+              boxSizing: 'border-box',
               display: 'flex',
               flexDirection: 'column',
-              gap: '1rem',
-              marginTop: '1rem'
-            }}>
-              {TABS.slice(1, 8).map((tab) => (
-                <div
-                  key={tab.id}
-                  onClick={() => turnToSheet(tab.leafFace === 'front' ? tab.sheetIdx : tab.sheetIdx + 1)}
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '3rem',
+              textAlign: 'center',
+              cursor: 'pointer'
+            }}
+              onClick={handleNext}
+            >
+              {/* Ornate Gold Frame */}
+              <div style={{
+                position: 'absolute',
+                inset: '20px',
+                border: '2px solid rgba(212, 175, 55, 0.4)',
+                borderRadius: '8px',
+                pointerEvents: 'none'
+              }} />
+              <div style={{
+                position: 'absolute',
+                inset: '26px',
+                border: '1px dashed rgba(212, 175, 55, 0.2)',
+                borderRadius: '6px',
+                pointerEvents: 'none'
+              }} />
+
+              {/* Premium Photo Avatar inside Golden Frame with Glowing Aura */}
+              <div style={{
+                position: 'relative',
+                width: '130px',
+                height: '130px',
+                borderRadius: '50%',
+                margin: '0 auto 1.5rem auto',
+                padding: '4px',
+                background: 'linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%)',
+                boxShadow: '0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(0,0,0,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 5
+              }}>
+                {/* Glowing outer aura */}
+                <div style={{
+                  position: 'absolute',
+                  inset: '-6px',
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(212,175,55,0.3) 0%, transparent 70%)',
+                  filter: 'blur(8px)',
+                  zIndex: -1,
+                  animation: 'pulse-ring 3s infinite alternate'
+                }} />
+                <img
+                  src={coverPhoto}
+                  alt="Sujeet Vishwakarma"
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    fontFamily: '"Space Mono", monospace',
-                    fontSize: '0.85rem',
-                    color: '#d1d5db',
-                    cursor: 'pointer',
-                    paddingBottom: '4px',
-                    borderBottom: '1px dotted rgba(255,255,255,0.1)',
-                    transition: 'all 0.3s'
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: '50%',
+                    border: '2px solid #0c101c'
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.color = '#D4AF37'; e.currentTarget.style.paddingLeft = '5px'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.color = '#d1d5db'; e.currentTarget.style.paddingLeft = '0'; }}
-                >
-                  <span>{tab.label}</span>
-                  <span style={{ color: '#D4AF37' }}>0{tab.id}</span>
-                </div>
-              ))}
-            </div>
+                />
+              </div>
 
-            <div style={{ marginTop: 'auto', fontSize: '0.75rem', color: '#6b7280', fontFamily: '"Space Mono", monospace', lineHeight: 1.5 }}>
-              * Use the ribbons menu on the right edge or bottom arrow keys to flip sheets.
-            </div>
-          </div>
-        </div>
-
-        {/* SHEET 1 (Hero/Home & About Part 1) */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          width: '475px',
-          height: '660px',
-          transformStyle: 'preserve-3d',
-          transformOrigin: 'left center',
-          zIndex: currentSheet === 1 ? 50 : (flippingSheet === 1 ? 99 : (currentSheet < 1 ? 8 : 10)),
-          transform: currentSheet > 1 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}>
-          {/* SHEET 1 FRONT: Hero / Home */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            background: '#0c101c',
-            borderRadius: '0 12px 12px 0',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Hero darkMode={darkMode} bookMode={true} />
-          </div>
-
-          {/* SHEET 1 BACK: About Part 1 */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: '#0c101c',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <About darkMode={darkMode} bookMode={true} aboutPart={1} />
-          </div>
-        </div>
-
-        {/* SHEET 2 (About Part 2 & Skills) */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          width: '475px',
-          height: '660px',
-          transformStyle: 'preserve-3d',
-          transformOrigin: 'left center',
-          zIndex: currentSheet === 2 ? 50 : (flippingSheet === 2 ? 99 : (currentSheet < 2 ? 7 : 11)),
-          transform: currentSheet > 2 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}>
-          {/* SHEET 2 FRONT: About Part 2 */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            background: '#0c101c',
-            borderRadius: '0 12px 12px 0',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <About darkMode={darkMode} bookMode={true} aboutPart={2} />
-          </div>
-
-          {/* SHEET 2 BACK: Skills */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: '#0c101c',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Skills darkMode={darkMode} bookMode={true} />
-          </div>
-        </div>
-
-        {/* SHEET 3 (Education Item 1 & Education Item 2) */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          width: '475px',
-          height: '660px',
-          transformStyle: 'preserve-3d',
-          transformOrigin: 'left center',
-          zIndex: currentSheet === 3 ? 50 : (flippingSheet === 3 ? 99 : (currentSheet < 3 ? 6 : 12)),
-          transform: currentSheet > 3 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}>
-          {/* SHEET 3 FRONT: Education Item 1 */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            background: '#0c101c',
-            borderRadius: '0 12px 12px 0',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Education darkMode={darkMode} bookMode={true} itemIndex={0} />
-          </div>
-
-          {/* SHEET 3 BACK: Education Item 2 */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: '#0c101c',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Education darkMode={darkMode} bookMode={true} itemIndex={1} />
-          </div>
-        </div>
-
-        {/* SHEET 4 (Education Item 3 & Project 1) */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          width: '475px',
-          height: '660px',
-          transformStyle: 'preserve-3d',
-          transformOrigin: 'left center',
-          zIndex: currentSheet === 4 ? 50 : (flippingSheet === 4 ? 99 : (currentSheet < 4 ? 5 : 13)),
-          transform: currentSheet > 4 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}>
-          {/* SHEET 4 FRONT: Education Item 3 */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            background: '#0c101c',
-            borderRadius: '0 12px 12px 0',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Education darkMode={darkMode} bookMode={true} itemIndex={2} />
-          </div>
-
-          {/* SHEET 4 BACK: Project 1 */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: '#0c101c',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Projects darkMode={darkMode} bookMode={true} projectIndex={0} />
-          </div>
-        </div>
-
-        {/* SHEET 5 (Project 2 & Project 3) */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          width: '475px',
-          height: '660px',
-          transformStyle: 'preserve-3d',
-          transformOrigin: 'left center',
-          zIndex: currentSheet === 5 ? 50 : (flippingSheet === 5 ? 99 : (currentSheet < 5 ? 4 : 14)),
-          transform: currentSheet > 5 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}>
-          {/* SHEET 5 FRONT: Project 2 */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            background: '#0c101c',
-            borderRadius: '0 12px 12px 0',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Projects darkMode={darkMode} bookMode={true} projectIndex={1} />
-          </div>
-
-          {/* SHEET 5 BACK: Project 3 */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: '#0c101c',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Projects darkMode={darkMode} bookMode={true} projectIndex={2} />
-          </div>
-        </div>
-
-        {/* SHEET 6 (Project 4 & Services) */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          width: '475px',
-          height: '660px',
-          transformStyle: 'preserve-3d',
-          transformOrigin: 'left center',
-          zIndex: currentSheet === 6 ? 50 : (flippingSheet === 6 ? 99 : (currentSheet < 6 ? 3 : 15)),
-          transform: currentSheet > 6 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}>
-          {/* SHEET 6 FRONT: Project 4 */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            background: '#0c101c',
-            borderRadius: '0 12px 12px 0',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Projects darkMode={darkMode} bookMode={true} projectIndex={3} />
-          </div>
-
-          {/* SHEET 6 BACK: Services */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: '#0c101c',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Services darkMode={darkMode} bookMode={true} />
-          </div>
-        </div>
-
-        {/* SHEET 7 (Testimonials & Contact) */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          width: '475px',
-          height: '660px',
-          transformStyle: 'preserve-3d',
-          transformOrigin: 'left center',
-          zIndex: currentSheet === 7 ? 50 : (flippingSheet === 7 ? 99 : (currentSheet < 7 ? 2 : 16)),
-          transform: currentSheet > 7 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}>
-          {/* SHEET 7 FRONT: Testimonials */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            background: '#0c101c',
-            borderRadius: '0 12px 12px 0',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Testimonials darkMode={darkMode} bookMode={true} />
-          </div>
-
-          {/* SHEET 7 BACK: Contact */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: '#0c101c',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <Contact darkMode={darkMode} bookMode={true} />
-          </div>
-        </div>
-
-        {/* SHEET 8 (Inside Back Cover & Motivation quote page) */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          width: '475px',
-          height: '660px',
-          transformStyle: 'preserve-3d',
-          transformOrigin: 'left center',
-          zIndex: currentSheet === 8 ? 50 : (flippingSheet === 8 ? 99 : (currentSheet < 8 ? 2 : 18)),
-          transform: currentSheet > 8 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-        }}>
-          {/* SHEET 8 FRONT: Inside Back Cover / Ending Page */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            background: 'linear-gradient(135deg, #0c101c 0%, #060810 100%)',
-            borderRadius: '0 12px 12px 0',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            padding: '2.5rem 2rem',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-          }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <div style={{
-              position: 'absolute',
-              inset: '16px',
-              border: '2px solid rgba(212, 175, 55, 0.2)',
-              borderRadius: '8px',
-              pointerEvents: 'none'
-            }} />
-
-            {/* Glowing background circles for visual premium depth */}
-            <div style={{
-              position: 'absolute',
-              width: '200px',
-              height: '200px',
-              background: 'radial-gradient(circle, rgba(0, 245, 160, 0.05) 0%, transparent 70%)',
-              filter: 'blur(30px)',
-              pointerEvents: 'none',
-              zIndex: 1
-            }} />
-
-            <style>{`
-              @keyframes pulse {
-                0%, 100% { opacity: 1; }
-                50% { opacity: 0.4; }
-              }
-              .footer-social-btn:hover {
-                transform: translateY(-3px) scale(1.1);
-                border-color: #00F5A0 !important;
-                color: #00F5A0 !important;
-                background: rgba(0,245,160,0.05) !important;
-              }
-              .footer-cta-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 20px -5px #00F5A0;
-              }
-            `}</style>
-
-            <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <h1 style={{
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '2rem',
+                fontWeight: 800,
+                color: '#D4AF37',
+                margin: '0 0 1rem 0',
+                letterSpacing: '0.05em',
+                lineHeight: 1.2
+              }}>
+                SUJEET VISHWAKARMA
+              </h1>
 
               <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                fontSize: '0.7rem',
-                color: '#00F5A0',
-                background: 'rgba(0, 245, 160, 0.08)',
-                padding: '0.3rem 0.8rem',
-                borderRadius: '50px',
-                border: '1px solid rgba(0, 245, 160, 0.2)',
-                marginBottom: '1rem',
+                width: '60px',
+                height: '2px',
+                background: '#D4AF37',
+                margin: '1rem 0 1.5rem 0'
+              }} />
+
+              <p style={{
                 fontFamily: '"Space Mono", monospace',
-                fontWeight: 600,
+                fontSize: '0.85rem',
+                letterSpacing: '0.25em',
+                color: '#a1a1aa',
+                textTransform: 'uppercase',
+                margin: 0
               }}>
-                <span style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: '#00F5A0',
-                  boxShadow: '0 0 8px #00F5A0',
-                  animation: 'pulse 2s infinite'
-                }}></span>
-                Available for Projects
+                Developer Portfolio
+              </p>
+
+              <span style={{
+                position: 'absolute',
+                bottom: '3rem',
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '0.75rem',
+                color: '#D4AF37',
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                animation: 'float-slow 2s infinite'
+              }}>
+                Click Cover to Open <ChevronRight size={14} />
+              </span>
+            </div>
+
+            {/* SHEET 0 BACK: Welcome Endpaper & Table of Contents */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              background: '#0c101c',
+              borderRadius: '12px 0 0 12px',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              padding: '3rem 2.5rem',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-start'
+            }}>
+              <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <div style={{
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '0.75rem',
+                color: '#D4AF37',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                marginBottom: '1.5rem',
+                borderBottom: '1px solid rgba(212,175,55,0.2)',
+                paddingBottom: '0.5rem'
+              }}>
+                Intro // Endpaper
               </div>
 
               <h2 style={{
                 fontFamily: '"Space Mono", monospace',
-                fontSize: '1.4rem',
+                fontSize: '1.6rem',
                 fontWeight: 800,
-                color: '#D4AF37',
-                margin: '0 0 0.25rem 0',
-                letterSpacing: '0.05em'
+                color: '#fff',
+                margin: '0 0 1.5rem 0'
               }}>
-                SUJEET VISHWAKARMA
+                Index of Contents
               </h2>
-              <p style={{
-                fontFamily: '"Inter", sans-serif',
-                fontSize: '0.8rem',
-                color: '#9ca3af',
-                margin: '0 0 1.5rem 0',
-                letterSpacing: '0.05em',
-                textTransform: 'uppercase',
-                fontWeight: 600
+
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem',
+                marginTop: '1rem'
               }}>
-                Let's Build Something Legendary
-              </p>
-
-              <div style={{ width: '30px', height: '1px', background: 'rgba(212,175,55,0.4)', marginBottom: '1.5rem' }} />
-
-              <p style={{
-                fontSize: '0.8rem',
-                color: '#d1d5db',
-                lineHeight: 1.5,
-                maxWidth: '280px',
-                marginBottom: '1.5rem'
-              }}>
-                Got an idea or a project in mind? Let's collaborate to bring it to life with high performance and clean code.
-              </p>
-
-              {/* Direct Mail CTA Button */}
-              <a
-                href="mailto:sujeet.cabbagecode@gmail.com"
-                className="footer-cta-btn"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontFamily: '"Space Mono", monospace',
-                  fontSize: '0.8rem',
-                  color: '#000',
-                  background: '#00F5A0',
-                  padding: '0.65rem 1.5rem',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  fontWeight: 700,
-                  letterSpacing: '0.03em',
-                  transition: 'all 0.3s',
-                  boxShadow: '0 4px 15px -3px rgba(0, 245, 160, 0.4)',
-                  marginBottom: '0.75rem'
-                }}
-              >
-                <Mail size={14} />
-                sujeet.cabbagecode@gmail.com
-              </a>
-
-              <a
-                href="https://www.fiverr.com/sujeet83/"
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  fontFamily: '"Space Mono", monospace',
-                  fontSize: '0.75rem',
-                  color: '#9ca3af',
-                  textDecoration: 'underline',
-                  marginBottom: '1.5rem',
-                  transition: 'color 0.2s'
-                }}
-                onMouseEnter={e => e.currentTarget.style.color = '#00F5A0'}
-                onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}
-              >
-                Hire on Fiverr
-              </a>
-
-              {/* Social Links Row */}
-              <div style={{ display: 'flex', gap: '0.8rem', marginBottom: '2rem' }}>
-                {[
-                  { icon: <GithubIcon size={16} />, href: 'https://github.com/sujeetvishwakarma83', label: 'GitHub', color: '#ffffff' },
-                  { icon: <LinkedinIcon size={16} />, href: 'https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a/', label: 'LinkedIn', color: '#0077B5' },
-                  { icon: <WhatsAppIcon size={16} />, href: 'https://wa.me/917800383448', label: 'WhatsApp', color: '#25D366' },
-                  { icon: <Mail size={16} />, href: 'mailto:sujeet.cabbagecode@gmail.com', label: 'Email', color: '#EA4335' }
-                ].map((link, idx) => (
-                  <a
-                    key={idx}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="footer-social-btn"
-                    title={link.label}
+                {TABS.slice(1, 8).map((tab) => (
+                  <div
+                    key={tab.id}
+                    onClick={() => turnToSheet(tab.leafFace === 'front' ? tab.sheetIdx : tab.sheetIdx + 1)}
                     style={{
                       display: 'flex',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '34px',
-                      height: '34px',
-                      color: link.color,
-                      border: `1px solid ${link.color}60`,
-                      borderRadius: '50%',
-                      background: 'rgba(255, 255, 255, 0.02)',
-                      transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                      fontFamily: '"Space Mono", monospace',
+                      fontSize: '0.85rem',
+                      color: '#d1d5db',
+                      cursor: 'pointer',
+                      paddingBottom: '4px',
+                      borderBottom: '1px dotted rgba(255,255,255,0.1)',
+                      transition: 'all 0.3s'
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = `${link.color}20`;
-                      e.currentTarget.style.borderColor = link.color;
-                      e.currentTarget.style.boxShadow = `0 0 12px ${link.color}90`;
-                      e.currentTarget.style.transform = 'translateY(-2px) scale(1.08)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
-                      e.currentTarget.style.borderColor = `${link.color}60`;
-                      e.currentTarget.style.boxShadow = 'none';
-                      e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = '#D4AF37'; e.currentTarget.style.paddingLeft = '5px'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = '#d1d5db'; e.currentTarget.style.paddingLeft = '0'; }}
                   >
-                    {link.icon}
-                  </a>
+                    <span>{tab.label}</span>
+                    <span style={{ color: '#D4AF37' }}>0{tab.id}</span>
+                  </div>
                 ))}
               </div>
 
-              {/* Copyright & Back button */}
-              <p style={{ fontSize: '0.65rem', color: '#6b7280', fontFamily: '"Space Mono", monospace', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                © 2026 Sujeet Vishwakarma. All Rights Reserved.
-              </p>
-
-              <span
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePrev();
-                }}
-                style={{
-                  fontFamily: '"Space Mono", monospace',
-                  fontSize: '0.7rem',
-                  color: '#D4AF37',
-                  letterSpacing: '0.1em',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  cursor: 'pointer',
-                  transition: 'color 0.2s'
-                }}
-                onMouseEnter={e => e.currentTarget.style.color = '#fff'}
-                onMouseLeave={e => e.currentTarget.style.color = '#D4AF37'}
-              >
-                <ChevronLeft size={12} /> Turn Back
-              </span>
-
+              <div style={{ marginTop: 'auto', fontSize: '0.75rem', color: '#6b7280', fontFamily: '"Space Mono", monospace', lineHeight: 1.5 }}>
+                * Use the ribbons menu on the right edge or bottom arrow keys to flip sheets.
+              </div>
             </div>
           </div>
 
-          {/* SHEET 8 BACK: Motivation Quote Page */}
+          {/* SHEET 1 (Hero/Home & About Part 1) */}
           <div style={{
             position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: '#0c101c',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            boxSizing: 'border-box',
-            padding: '3.5rem 2.5rem',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center'
+            left: '50%',
+            width: '475px',
+            height: '660px',
+            transformStyle: 'preserve-3d',
+            transformOrigin: 'left center',
+            zIndex: currentSheet === 1 ? 50 : (flippingSheet === 1 ? 99 : (currentSheet < 1 ? 8 : 10)),
+            transform: currentSheet > 1 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
           }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
-
-            <div style={{
-              position: 'absolute',
-              inset: '16px',
-              border: '1px solid rgba(212, 175, 55, 0.15)',
-              borderRadius: '8px',
-              pointerEvents: 'none'
-            }} />
-
-            {/* Glowing quote icon */}
-            <div style={{
-              fontSize: '3rem',
-              color: '#D4AF37',
-              fontFamily: 'serif',
-              lineHeight: 1,
-              marginBottom: '2.2rem',
-              textShadow: '0 0 10px rgba(212, 175, 55, 0.3)'
-            }}>
-              “
-            </div>
-
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.25rem',
-              maxWidth: '325px',
-              zIndex: 5
-            }}>
-              <p style={{
-                fontFamily: '"Space Mono", monospace',
-                fontSize: '0.85rem',
-                color: '#fff',
-                lineHeight: 1.6,
-                margin: 0,
-                letterSpacing: '0.02em'
-              }}>
-                Every great business starts with a bold idea.
-              </p>
-              
-              <div style={{ width: '40px', height: '1px', background: 'rgba(212, 175, 55, 0.2)', margin: '0 auto' }} />
-
-              <p style={{
-                fontFamily: '"Space Mono", monospace',
-                fontSize: '0.85rem',
-                color: '#fff',
-                lineHeight: 1.6,
-                margin: 0,
-                letterSpacing: '0.02em'
-              }}>
-                Every successful website begins with a single decision.
-              </p>
-
-              <div style={{ width: '40px', height: '1px', background: 'rgba(212, 175, 55, 0.2)', margin: '0 auto' }} />
-
-              <p style={{
-                fontFamily: '"Space Mono", monospace',
-                fontSize: '0.85rem',
-                color: '#00F5A0',
-                lineHeight: 1.6,
-                margin: 0,
-                fontWeight: 700,
-                letterSpacing: '0.02em'
-              }}>
-                Let's transform your vision into a powerful digital experience.
-              </p>
-
-              <div style={{ width: '40px', height: '1px', background: 'rgba(212, 175, 55, 0.2)', margin: '0 auto' }} />
-
-              <p style={{
-                fontFamily: '"Space Mono", monospace',
-                fontSize: '0.85rem',
-                color: '#fff',
-                lineHeight: 1.6,
-                margin: 0,
-                letterSpacing: '0.02em'
-              }}>
-                The next success story could be yours.
-              </p>
-            </div>
-
-            <div style={{
-              fontSize: '3rem',
-              color: '#D4AF37',
-              fontFamily: 'serif',
-              lineHeight: 1,
-              marginTop: '2.2rem',
-              textShadow: '0 0 10px rgba(212, 175, 55, 0.3)'
-            }}>
-              ”
-            </div>
-          </div>
-        </div>
-
-        {/* SHEET 9 (Closed Back Cover Outer) */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          width: '475px',
-          height: '660px',
-          transformStyle: 'preserve-3d',
-          transformOrigin: 'left center',
-          zIndex: currentSheet === 9 ? 50 : (flippingSheet === 9 ? 99 : (currentSheet < 9 ? 1 : 19)),
-          transform: currentSheet > 9 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          opacity: currentSheet === 9 ? 1 : 0,
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s',
-          pointerEvents: currentSheet === 9 ? 'auto' : 'none'
-        }}>
-          {/* SHEET 9 FRONT: Hardcover exterior back with full page photo overlay */}
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            borderRadius: '0 12px 12px 0',
-            border: '1px solid rgba(212, 175, 55, 0.5)',
-            boxSizing: 'border-box',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            cursor: 'pointer'
-          }}
-          onClick={handlePrev}
-          >
-            {/* Full Page Photo */}
-            <img 
-              src={coverPhoto} 
-              alt="Sujeet Vishwakarma Back Cover" 
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                zIndex: 1
-              }}
-            />
-
-            {/* Dark vignette overlay for readability */}
+            {/* SHEET 1 FRONT: Hero / Home */}
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(to bottom, rgba(12, 16, 28, 0.65) 0%, rgba(6, 8, 16, 0.9) 100%)',
-              zIndex: 2
-            }} />
+              backfaceVisibility: 'hidden',
+              background: '#0c101c',
+              borderRadius: '0 12px 12px 0',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
 
-            <div style={{
-              position: 'absolute',
-              inset: '20px',
-              border: '2px solid rgba(212, 175, 55, 0.4)',
-              borderRadius: '8px',
-              pointerEvents: 'none',
-              zIndex: 3
-            }} />
-
-            {/* Text Overlay */}
-            <div style={{ position: 'relative', zIndex: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-              <h3 style={{
-                fontFamily: '"Space Mono", monospace',
-                fontSize: '1.6rem',
-                fontWeight: 800,
-                color: '#D4AF37',
-                marginBottom: '1rem',
-                letterSpacing: '0.15em',
-                textShadow: '0 4px 15px rgba(0,0,0,0.8)'
-              }}>
-                THE END
-              </h3>
-              
-              <div style={{ width: '40px', height: '2px', background: '#D4AF37', marginBottom: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.5)' }} />
-              
-              <p style={{ 
-                fontSize: '0.85rem', 
-                color: '#e4e4e7', 
-                fontFamily: '"Space Mono", monospace',
-                margin: 0,
-                letterSpacing: '0.05em',
-                textShadow: '0 2px 8px rgba(0,0,0,0.8)'
-              }}>
-                Jaunpur, India // 2026
-              </p>
+              <Hero darkMode={darkMode} bookMode={true} />
             </div>
 
-            <span style={{
+            {/* SHEET 1 BACK: About Part 1 */}
+            <div style={{
               position: 'absolute',
-              bottom: '3rem',
-              fontFamily: '"Space Mono", monospace',
-              fontSize: '0.75rem',
-              color: '#D4AF37',
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              zIndex: 4,
-              textShadow: '0 2px 8px rgba(0,0,0,0.8)'
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              background: '#0c101c',
+              borderRadius: '12px 0 0 12px',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
             }}>
-              <ChevronLeft size={14} /> Open Book Again
-            </span>
+              <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <About darkMode={darkMode} bookMode={true} aboutPart={1} />
+            </div>
           </div>
 
-          {/* SHEET 9 BACK: hardcover back exterior */}
+          {/* SHEET 2 (About Part 2 & Skills) */}
           <div style={{
             position: 'absolute',
-            inset: 0,
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: 'linear-gradient(135deg, #1a2238 0%, #0d121f 100%)',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid rgba(212, 175, 55, 0.5)',
-            boxSizing: 'border-box'
-          }} />
-        </div>
+            left: '50%',
+            width: '475px',
+            height: '660px',
+            transformStyle: 'preserve-3d',
+            transformOrigin: 'left center',
+            zIndex: currentSheet === 2 ? 50 : (flippingSheet === 2 ? 99 : (currentSheet < 2 ? 7 : 11)),
+            transform: currentSheet > 2 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}>
+            {/* SHEET 2 FRONT: About Part 2 */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              background: '#0c101c',
+              borderRadius: '0 12px 12px 0',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
 
-      </div>
+              <About darkMode={darkMode} bookMode={true} aboutPart={2} />
+            </div>
+
+            {/* SHEET 2 BACK: Skills */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              background: '#0c101c',
+              borderRadius: '12px 0 0 12px',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <Skills darkMode={darkMode} bookMode={true} />
+            </div>
+          </div>
+
+          {/* SHEET 3 (Education Item 1 & Education Item 2) */}
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            width: '475px',
+            height: '660px',
+            transformStyle: 'preserve-3d',
+            transformOrigin: 'left center',
+            zIndex: currentSheet === 3 ? 50 : (flippingSheet === 3 ? 99 : (currentSheet < 3 ? 6 : 12)),
+            transform: currentSheet > 3 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}>
+            {/* SHEET 3 FRONT: Education Item 1 */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              background: '#0c101c',
+              borderRadius: '0 12px 12px 0',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <Education darkMode={darkMode} bookMode={true} itemIndex={0} />
+            </div>
+
+            {/* SHEET 3 BACK: Education Item 2 */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              background: '#0c101c',
+              borderRadius: '12px 0 0 12px',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <Education darkMode={darkMode} bookMode={true} itemIndex={1} />
+            </div>
+          </div>
+
+          {/* SHEET 4 (Education Item 3 & Project 1) */}
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            width: '475px',
+            height: '660px',
+            transformStyle: 'preserve-3d',
+            transformOrigin: 'left center',
+            zIndex: currentSheet === 4 ? 50 : (flippingSheet === 4 ? 99 : (currentSheet < 4 ? 5 : 13)),
+            transform: currentSheet > 4 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}>
+            {/* SHEET 4 FRONT: Education Item 3 */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              background: '#0c101c',
+              borderRadius: '0 12px 12px 0',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <Education darkMode={darkMode} bookMode={true} itemIndex={2} />
+            </div>
+
+            {/* SHEET 4 BACK: Project 1 */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              background: '#0c101c',
+              borderRadius: '12px 0 0 12px',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <Projects darkMode={darkMode} bookMode={true} projectIndex={0} />
+            </div>
+          </div>
+
+          {/* SHEET 5 (Project 2 & Project 3) */}
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            width: '475px',
+            height: '660px',
+            transformStyle: 'preserve-3d',
+            transformOrigin: 'left center',
+            zIndex: currentSheet === 5 ? 50 : (flippingSheet === 5 ? 99 : (currentSheet < 5 ? 4 : 14)),
+            transform: currentSheet > 5 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}>
+            {/* SHEET 5 FRONT: Project 2 */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              background: '#0c101c',
+              borderRadius: '0 12px 12px 0',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <Projects darkMode={darkMode} bookMode={true} projectIndex={1} />
+            </div>
+
+            {/* SHEET 5 BACK: Project 3 */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              background: '#0c101c',
+              borderRadius: '12px 0 0 12px',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <Projects darkMode={darkMode} bookMode={true} projectIndex={2} />
+            </div>
+          </div>
+
+          {/* SHEET 6 (Project 4 & Services) */}
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            width: '475px',
+            height: '660px',
+            transformStyle: 'preserve-3d',
+            transformOrigin: 'left center',
+            zIndex: currentSheet === 6 ? 50 : (flippingSheet === 6 ? 99 : (currentSheet < 6 ? 3 : 15)),
+            transform: currentSheet > 6 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}>
+            {/* SHEET 6 FRONT: Project 4 */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              background: '#0c101c',
+              borderRadius: '0 12px 12px 0',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <Projects darkMode={darkMode} bookMode={true} projectIndex={3} />
+            </div>
+
+            {/* SHEET 6 BACK: Services */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              background: '#0c101c',
+              borderRadius: '12px 0 0 12px',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <Services darkMode={darkMode} bookMode={true} />
+            </div>
+          </div>
+
+          {/* SHEET 7 (Testimonials & Contact) */}
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            width: '475px',
+            height: '660px',
+            transformStyle: 'preserve-3d',
+            transformOrigin: 'left center',
+            zIndex: currentSheet === 7 ? 50 : (flippingSheet === 7 ? 99 : (currentSheet < 7 ? 2 : 16)),
+            transform: currentSheet > 7 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}>
+            {/* SHEET 7 FRONT: Testimonials */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              background: '#0c101c',
+              borderRadius: '0 12px 12px 0',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <Testimonials darkMode={darkMode} bookMode={true} />
+            </div>
+
+            {/* SHEET 7 BACK: Contact */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              background: '#0c101c',
+              borderRadius: '12px 0 0 12px',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <Contact darkMode={darkMode} bookMode={true} />
+            </div>
+          </div>
+
+          {/* SHEET 8 (Inside Back Cover & Motivation quote page) */}
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            width: '475px',
+            height: '660px',
+            transformStyle: 'preserve-3d',
+            transformOrigin: 'left center',
+            zIndex: currentSheet === 8 ? 50 : (flippingSheet === 8 ? 99 : (currentSheet < 8 ? 2 : 18)),
+            transform: currentSheet > 8 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}>
+            {/* SHEET 8 FRONT: Inside Back Cover / Ending Page */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              background: 'linear-gradient(135deg, #0c101c 0%, #060810 100%)',
+              borderRadius: '0 12px 12px 0',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              padding: '2.5rem 2rem',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              textAlign: 'center',
+            }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '40px', background: 'linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, right: 0, width: '30px', height: '30px', background: 'linear-gradient(-135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(100% 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <div style={{
+                position: 'absolute',
+                inset: '16px',
+                border: '2px solid rgba(212, 175, 55, 0.2)',
+                borderRadius: '8px',
+                pointerEvents: 'none'
+              }} />
+
+              {/* Glowing background circles for visual premium depth */}
+              <div style={{
+                position: 'absolute',
+                width: '200px',
+                height: '200px',
+                background: 'radial-gradient(circle, rgba(0, 245, 160, 0.05) 0%, transparent 70%)',
+                filter: 'blur(30px)',
+                pointerEvents: 'none',
+                zIndex: 1
+              }} />
+
+              <style>{`
+                @keyframes pulse {
+                  0%, 100% { opacity: 1; }
+                  50% { opacity: 0.4; }
+                }
+                .footer-social-btn:hover {
+                  transform: translateY(-3px) scale(1.1);
+                  border-color: #00F5A0 !important;
+                  color: #00F5A0 !important;
+                  background: rgba(0,245,160,0.05) !important;
+                }
+                .footer-cta-btn:hover {
+                  transform: translateY(-2px);
+                  box-shadow: 0 8px 20px -5px #00F5A0;
+                }
+              `}</style>
+
+              <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  fontSize: '0.7rem',
+                  color: '#00F5A0',
+                  background: 'rgba(0, 245, 160, 0.08)',
+                  padding: '0.3rem 0.8rem',
+                  borderRadius: '50px',
+                  border: '1px solid rgba(0, 245, 160, 0.2)',
+                  marginBottom: '1rem',
+                  fontFamily: '"Space Mono", monospace',
+                  fontWeight: 600,
+                }}>
+                  <span style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    background: '#00F5A0',
+                    boxShadow: '0 0 8px #00F5A0',
+                    animation: 'pulse 2s infinite'
+                  }}></span>
+                  Available for Projects
+                </div>
+
+                <h2 style={{
+                  fontFamily: '"Space Mono", monospace',
+                  fontSize: '1.4rem',
+                  fontWeight: 800,
+                  color: '#D4AF37',
+                  margin: '0 0 0.25rem 0',
+                  letterSpacing: '0.05em'
+                }}>
+                  SUJEET VISHWAKARMA
+                </h2>
+                <p style={{
+                  fontFamily: '"Inter", sans-serif',
+                  fontSize: '0.8rem',
+                  color: '#9ca3af',
+                  margin: '0 0 1.5rem 0',
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase',
+                  fontWeight: 600
+                }}>
+                  Let's Build Something Legendary
+                </p>
+
+                <div style={{ width: '30px', height: '1px', background: 'rgba(212,175,55,0.4)', marginBottom: '1.5rem' }} />
+
+                <p style={{
+                  fontSize: '0.8rem',
+                  color: '#d1d5db',
+                  lineHeight: 1.5,
+                  maxWidth: '280px',
+                  marginBottom: '1.5rem'
+                }}>
+                  Got an idea or a project in mind? Let's collaborate to bring it to life with high performance and clean code.
+                </p>
+
+                {/* Direct Mail CTA Button */}
+                <a
+                  href="mailto:sujeet.cabbagecode@gmail.com"
+                  className="footer-cta-btn"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontFamily: '"Space Mono", monospace',
+                    fontSize: '0.8rem',
+                    color: '#000',
+                    background: '#00F5A0',
+                    padding: '0.65rem 1.5rem',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    fontWeight: 700,
+                    letterSpacing: '0.03em',
+                    transition: 'all 0.3s',
+                    boxShadow: '0 4px 15px -3px rgba(0, 245, 160, 0.4)',
+                    marginBottom: '0.75rem'
+                  }}
+                >
+                  <Mail size={14} />
+                  sujeet.cabbagecode@gmail.com
+                </a>
+
+                <a
+                  href="https://www.fiverr.com/sujeet83/"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    fontFamily: '"Space Mono", monospace',
+                    fontSize: '0.75rem',
+                    color: '#9ca3af',
+                    textDecoration: 'underline',
+                    marginBottom: '1.5rem',
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#00F5A0'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}
+                >
+                  Hire on Fiverr
+                </a>
+
+                {/* Social Links Row */}
+                <div style={{ display: 'flex', gap: '0.8rem', marginBottom: '2rem' }}>
+                  {[
+                    { icon: <GithubIcon size={16} />, href: 'https://github.com/sujeetvishwakarma83', label: 'GitHub', color: '#ffffff' },
+                    { icon: <LinkedinIcon size={16} />, href: 'https://www.linkedin.com/in/sujeet-vishwakarma-a19b2323a/', label: 'LinkedIn', color: '#0077B5' },
+                    { icon: <WhatsAppIcon size={16} />, href: 'https://wa.me/917800383448', label: 'WhatsApp', color: '#25D366' },
+                    { icon: <Mail size={16} />, href: 'mailto:sujeet.cabbagecode@gmail.com', label: 'Email', color: '#EA4335' }
+                  ].map((link, idx) => (
+                    <a
+                      key={idx}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="footer-social-btn"
+                      title={link.label}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '34px',
+                        height: '34px',
+                        color: link.color,
+                        border: `1px solid ${link.color}60`,
+                        borderRadius: '50%',
+                        background: 'rgba(255, 255, 255, 0.02)',
+                        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = `${link.color}20`;
+                        e.currentTarget.style.borderColor = link.color;
+                        e.currentTarget.style.boxShadow = `0 0 12px ${link.color}90`;
+                        e.currentTarget.style.transform = 'translateY(-2px) scale(1.08)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
+                        e.currentTarget.style.borderColor = `${link.color}60`;
+                        e.currentTarget.style.boxShadow = 'none';
+                        e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                      }}
+                    >
+                      {link.icon}
+                    </a>
+                  ))}
+                </div>
+
+                {/* Copyright & Back button */}
+                <p style={{ fontSize: '0.65rem', color: '#6b7280', fontFamily: '"Space Mono", monospace', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  © 2026 Sujeet Vishwakarma. All Rights Reserved.
+                </p>
+
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePrev();
+                  }}
+                  style={{
+                    fontFamily: '"Space Mono", monospace',
+                    fontSize: '0.7rem',
+                    color: '#D4AF37',
+                    letterSpacing: '0.1em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    cursor: 'pointer',
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#fff'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#D4AF37'}
+                >
+                  <ChevronLeft size={12} /> Turn Back
+                </span>
+
+              </div>
+            </div>
+
+            {/* SHEET 8 BACK: Motivation Quote Page */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              background: '#0c101c',
+              borderRadius: '12px 0 0 12px',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              boxSizing: 'border-box',
+              padding: '3.5rem 2.5rem',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              textAlign: 'center'
+            }}>
+              <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40px', background: 'linear-gradient(-90deg, rgba(0,0,0,0.5) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 10 }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '30px', height: '30px', background: 'linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.4) 100%)', clipPath: 'polygon(0 0, 100% 100%, 0 100%)', zIndex: 20 }} />
+
+              <div style={{
+                position: 'absolute',
+                inset: '16px',
+                border: '1px solid rgba(212, 175, 55, 0.15)',
+                borderRadius: '8px',
+                pointerEvents: 'none'
+              }} />
+
+              {/* Glowing quote icon */}
+              <div style={{
+                fontSize: '3rem',
+                color: '#D4AF37',
+                fontFamily: 'serif',
+                lineHeight: 1,
+                marginBottom: '2.2rem',
+                textShadow: '0 0 10px rgba(212, 175, 55, 0.3)'
+              }}>
+                “
+              </div>
+
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.25rem',
+                maxWidth: '325px',
+                zIndex: 5
+              }}>
+                <p style={{
+                  fontFamily: '"Space Mono", monospace',
+                  fontSize: '0.85rem',
+                  color: '#fff',
+                  lineHeight: 1.6,
+                  margin: 0,
+                  letterSpacing: '0.02em'
+                }}>
+                  Every great business starts with a bold idea.
+                </p>
+                
+                <div style={{ width: '40px', height: '1px', background: 'rgba(212, 175, 55, 0.2)', margin: '0 auto' }} />
+
+                <p style={{
+                  fontFamily: '"Space Mono", monospace',
+                  fontSize: '0.85rem',
+                  color: '#fff',
+                  lineHeight: 1.6,
+                  margin: 0,
+                  letterSpacing: '0.02em'
+                }}>
+                  Every successful website begins with a single decision.
+                </p>
+
+                <div style={{ width: '40px', height: '1px', background: 'rgba(212, 175, 55, 0.2)', margin: '0 auto' }} />
+
+                <p style={{
+                  fontFamily: '"Space Mono", monospace',
+                  fontSize: '0.85rem',
+                  color: '#00F5A0',
+                  lineHeight: 1.6,
+                  margin: 0,
+                  fontWeight: 700,
+                  letterSpacing: '0.02em'
+                }}>
+                  Let's transform your vision into a powerful digital experience.
+                </p>
+
+                <div style={{ width: '40px', height: '1px', background: 'rgba(212, 175, 55, 0.2)', margin: '0 auto' }} />
+
+                <p style={{
+                  fontFamily: '"Space Mono", monospace',
+                  fontSize: '0.85rem',
+                  color: '#fff',
+                  lineHeight: 1.6,
+                  margin: 0,
+                  letterSpacing: '0.02em'
+                }}>
+                  The next success story could be yours.
+                </p>
+              </div>
+
+              <div style={{
+                fontSize: '3rem',
+                color: '#D4AF37',
+                fontFamily: 'serif',
+                lineHeight: 1,
+                marginTop: '2.2rem',
+                textShadow: '0 0 10px rgba(212, 175, 55, 0.3)'
+              }}>
+                ”
+              </div>
+            </div>
+          </div>
+
+          {/* SHEET 9 (Closed Back Cover Outer) */}
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            width: '475px',
+            height: '660px',
+            transformStyle: 'preserve-3d',
+            transformOrigin: 'left center',
+            zIndex: currentSheet === 9 ? 50 : (flippingSheet === 9 ? 99 : (currentSheet < 9 ? 1 : 19)),
+            transform: currentSheet > 9 ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+            opacity: currentSheet === 9 ? 1 : 0,
+            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s',
+            pointerEvents: currentSheet === 9 ? 'auto' : 'none'
+          }}>
+            {/* SHEET 9 FRONT: Hardcover exterior back with full page photo overlay */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              borderRadius: '0 12px 12px 0',
+              border: '1px solid rgba(212, 175, 55, 0.5)',
+              boxSizing: 'border-box',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              cursor: 'pointer'
+            }}
+            onClick={handlePrev}
+            >
+              {/* Full Page Photo */}
+              <img 
+                src={coverPhoto} 
+                alt="Sujeet Vishwakarma Back Cover" 
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  zIndex: 1
+                }}
+              />
+
+              {/* Dark vignette overlay for readability */}
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(to bottom, rgba(12, 16, 28, 0.65) 0%, rgba(6, 8, 16, 0.9) 100%)',
+                zIndex: 2
+              }} />
+
+              <div style={{
+                position: 'absolute',
+                inset: '20px',
+                border: '2px solid rgba(212, 175, 55, 0.4)',
+                borderRadius: '8px',
+                pointerEvents: 'none',
+                zIndex: 3
+              }} />
+
+              {/* Text Overlay */}
+              <div style={{ position: 'relative', zIndex: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                <h3 style={{
+                  fontFamily: '"Space Mono", monospace',
+                  fontSize: '1.6rem',
+                  fontWeight: 800,
+                  color: '#D4AF37',
+                  marginBottom: '1rem',
+                  letterSpacing: '0.15em',
+                  textShadow: '0 4px 15px rgba(0,0,0,0.8)'
+                }}>
+                  THE END
+                </h3>
+                
+                <div style={{ width: '40px', height: '2px', background: '#D4AF37', marginBottom: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.5)' }} />
+                
+                <p style={{ 
+                  fontSize: '0.85rem', 
+                  color: '#e4e4e7', 
+                  fontFamily: '"Space Mono", monospace',
+                  margin: 0,
+                  letterSpacing: '0.05em',
+                  textShadow: '0 2px 8px rgba(0,0,0,0.8)'
+                }}>
+                  Jaunpur, India // 2026
+                </p>
+              </div>
+
+              <span style={{
+                position: 'absolute',
+                bottom: '3rem',
+                fontFamily: '"Space Mono", monospace',
+                fontSize: '0.75rem',
+                color: '#D4AF37',
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                zIndex: 4,
+                textShadow: '0 2px 8px rgba(0,0,0,0.8)'
+              }}>
+                <ChevronLeft size={14} /> Open Book Again
+              </span>
+            </div>
+
+            {/* SHEET 9 BACK: hardcover back exterior */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              background: 'linear-gradient(135deg, #1a2238 0%, #0d121f 100%)',
+              borderRadius: '12px 0 0 12px',
+              border: '1px solid rgba(212, 175, 55, 0.5)',
+              boxSizing: 'border-box'
+            }} />
+          </div>
+
+        </div>
+      )}
 
       {/* Under-book Desk Controls (Prev/Next Page arrows) */}
       <div style={{
         position: 'absolute',
-        bottom: '2.5rem',
+        bottom: isMobile ? '1.5rem' : '2.5rem',
         display: 'flex',
         alignItems: 'center',
-        gap: '2rem',
+        gap: isMobile ? '1rem' : '2rem',
         zIndex: 100
       }}>
         {/* Previous Button */}
         <button
-          onClick={handlePrev}
-          disabled={currentSheet === 0 || flippingSheet !== null}
+          onClick={isMobile ? handlePrevMobile : handlePrev}
+          disabled={isMobile ? (currentPage === 0) : (currentSheet === 0 || flippingSheet !== null)}
           style={{
-            width: '50px',
-            height: '50px',
+            width: isMobile ? '40px' : '50px',
+            height: isMobile ? '40px' : '50px',
             borderRadius: '50%',
             background: 'rgba(255, 255, 255, 0.02)',
             border: '1px solid rgba(212, 175, 55, 0.3)',
@@ -1523,55 +2267,65 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            cursor: (currentSheet === 0 || flippingSheet !== null) ? 'not-allowed' : 'pointer',
-            opacity: (currentSheet === 0) ? 0.3 : 1,
+            cursor: (isMobile ? (currentPage === 0) : (currentSheet === 0 || flippingSheet !== null)) ? 'not-allowed' : 'pointer',
+            opacity: (isMobile ? (currentPage === 0) : (currentSheet === 0)) ? 0.3 : 1,
             transition: 'all 0.3s'
           }}
-          onMouseEnter={(e) => { if (currentSheet > 0 && flippingSheet === null) { e.currentTarget.style.background = 'rgba(212, 175, 55, 0.15)'; e.currentTarget.style.boxShadow = '0 0 10px rgba(212, 175, 55, 0.3)'; } }}
+          onMouseEnter={(e) => { 
+            const isDisabled = isMobile ? (currentPage === 0) : (currentSheet === 0 || flippingSheet !== null);
+            if (!isDisabled) { 
+              e.currentTarget.style.background = 'rgba(212, 175, 55, 0.15)'; 
+              e.currentTarget.style.boxShadow = '0 0 10px rgba(212, 175, 55, 0.3)'; 
+            } 
+          }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'; e.currentTarget.style.boxShadow = 'none'; }}
         >
-          <ChevronLeft size={24} />
+          <ChevronLeft size={isMobile ? 20 : 24} />
         </button>
 
         {/* Dynamic Page indicator text */}
         <div style={{
           fontFamily: '"Space Mono", monospace',
-          fontSize: '0.8rem',
+          fontSize: isMobile ? '0.7rem' : '0.8rem',
           fontWeight: 700,
           color: '#D4AF37',
-          letterSpacing: '0.15em',
-          textTransform: 'uppercase'
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          textAlign: 'center',
+          maxWidth: isMobile ? '160px' : 'none'
         }}>
-          {currentSheet === 0
-            ? 'Cover Page'
-            : currentSheet === 9
-              ? 'Back Cover'
-              : currentSheet === 1
-                ? 'Index / Intro'
-                : currentSheet === 2
-                  ? 'About Me'
-                  : currentSheet === 3
-                    ? 'Skills / Journey'
-                    : currentSheet === 4
-                      ? 'Journey'
-                      : currentSheet === 5
-                        ? 'Projects 01 - 02'
-                        : currentSheet === 6
-                          ? 'Projects 03 - 04'
-                          : currentSheet === 7
-                            ? 'Services / Reviews'
-                            : currentSheet === 8
-                              ? 'Contact / Ending'
-                              : `Sheet 0${currentSheet} / 0${totalSheets - 1}`}
+          {isMobile ? getMobilePageLabel(currentPage) : (
+            currentSheet === 0
+              ? 'Cover Page'
+              : currentSheet === 9
+                ? 'Back Cover'
+                : currentSheet === 1
+                  ? 'Index / Intro'
+                  : currentSheet === 2
+                    ? 'About Me'
+                    : currentSheet === 3
+                      ? 'Skills / Journey'
+                      : currentSheet === 4
+                        ? 'Journey'
+                        : currentSheet === 5
+                          ? 'Projects 01 - 02'
+                          : currentSheet === 6
+                            ? 'Projects 03 - 04'
+                            : currentSheet === 7
+                              ? 'Services / Reviews'
+                              : currentSheet === 8
+                                ? 'Contact / Ending'
+                                : `Sheet 0${currentSheet} / 0${totalSheets - 1}`
+          )}
         </div>
 
         {/* Next Button */}
         <button
-          onClick={handleNext}
-          disabled={currentSheet === totalSheets || flippingSheet !== null}
+          onClick={isMobile ? handleNextMobile : handleNext}
+          disabled={isMobile ? (currentPage === 18) : (currentSheet === totalSheets || flippingSheet !== null)}
           style={{
-            width: '50px',
-            height: '50px',
+            width: isMobile ? '40px' : '50px',
+            height: isMobile ? '40px' : '50px',
             borderRadius: '50%',
             background: 'rgba(255, 255, 255, 0.02)',
             border: '1px solid rgba(212, 175, 55, 0.3)',
@@ -1579,14 +2333,20 @@ function BookPortfolio({ darkMode, onToggleScrollMode }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            cursor: (currentSheet === totalSheets || flippingSheet !== null) ? 'not-allowed' : 'pointer',
-            opacity: (currentSheet === totalSheets) ? 0.3 : 1,
+            cursor: (isMobile ? (currentPage === 18) : (currentSheet === totalSheets || flippingSheet !== null)) ? 'not-allowed' : 'pointer',
+            opacity: (isMobile ? (currentPage === 18) : (currentSheet === totalSheets)) ? 0.3 : 1,
             transition: 'all 0.3s'
           }}
-          onMouseEnter={(e) => { if (currentSheet < totalSheets && flippingSheet === null) { e.currentTarget.style.background = 'rgba(212, 175, 55, 0.15)'; e.currentTarget.style.boxShadow = '0 0 10px rgba(212, 175, 55, 0.3)'; } }}
+          onMouseEnter={(e) => { 
+            const isDisabled = isMobile ? (currentPage === 18) : (currentSheet === totalSheets || flippingSheet !== null);
+            if (!isDisabled) { 
+              e.currentTarget.style.background = 'rgba(212, 175, 55, 0.15)'; 
+              e.currentTarget.style.boxShadow = '0 0 10px rgba(212, 175, 55, 0.3)'; 
+            } 
+          }}
           onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'; e.currentTarget.style.boxShadow = 'none'; }}
         >
-          <ChevronRight size={24} />
+          <ChevronRight size={isMobile ? 20 : 24} />
         </button>
       </div>
 
