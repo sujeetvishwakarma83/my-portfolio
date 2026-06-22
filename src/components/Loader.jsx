@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import logoImg from '../assets/logo.png';
+import logoImg from '../assets/logo1.png';
 
 const loadingPhrases = [
   { limit: 20, text: 'Initializing portfolio system...' },
