@@ -20,6 +20,7 @@ import Background3D from './components/Background3D';
 
 import BookPortfolio from './components/BookPortfolio';
 import Testimonials from './components/Testimonials';
+import Loader from './components/Loader';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
@@ -31,6 +32,7 @@ function App() {
 
   // Toggle Scroll vs Book Mode
   const [scrollMode, setScrollMode] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,6 +65,12 @@ function App() {
         transition: 'background 0.3s, color 0.3s',
       }}
     >
+      <AnimatePresence>
+        {isLoading && (
+          <Loader onFinished={() => setIsLoading(false)} darkMode={darkMode} />
+        )}
+      </AnimatePresence>
+
       <CustomCursor />
 
       {!scrollMode ? (
