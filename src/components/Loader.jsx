@@ -57,17 +57,17 @@ function Loader({ onFinished, darkMode }) {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
-  const activeColor = '#00f5a0'; // Neon green accent
+  const activeColor = '#00f5a0';
   const baseColor = darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
 
   return (
     <motion.div
       initial={{ opacity: 1 }}
-      exit={{ 
+      exit={{
         opacity: 0,
         scale: 1.05,
         filter: 'blur(10px)',
-        transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } 
+        transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
       }}
       style={{
         position: 'fixed',
@@ -77,8 +77,8 @@ function Loader({ onFinished, darkMode }) {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: darkMode 
-          ? 'radial-gradient(circle at center, #131320 0%, #08080c 100%)' 
+        background: darkMode
+          ? 'radial-gradient(circle at center, #131320 0%, #08080c 100%)'
           : 'radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%)',
         color: darkMode ? '#ffffff' : '#0f172a',
         fontFamily: '"Space Mono", monospace',
@@ -86,7 +86,7 @@ function Loader({ onFinished, darkMode }) {
       }}
     >
       {/* Background ambient lighting */}
-      <div 
+      <div
         style={{
           position: 'absolute',
           width: '350px',
@@ -100,7 +100,7 @@ function Loader({ onFinished, darkMode }) {
           pointerEvents: 'none'
         }}
       />
-      <div 
+      <div
         style={{
           position: 'absolute',
           width: '300px',
@@ -117,14 +117,14 @@ function Loader({ onFinished, darkMode }) {
 
       {/* Main Logo & Ring Container */}
       <div style={{ position: 'relative', width: '220px', height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        
+
         {/* SVG Circular Loader */}
-        <svg 
-          width="210" 
-          height="210" 
-          viewBox="0 0 200 200" 
-          style={{ 
-            position: 'absolute', 
+        <svg
+          width="208"
+          height="208"
+          viewBox="0 0 200 200"
+          style={{
+            position: 'absolute',
             transform: 'rotate(-90deg)',
             filter: 'drop-shadow(0 0 8px rgba(0, 245, 160, 0.35))'
           }}
@@ -210,8 +210,8 @@ function Loader({ onFinished, darkMode }) {
               width: '82%',
               height: '82%',
               objectFit: 'contain',
-              filter: darkMode 
-                ? 'brightness(1.1) contrast(1.05) drop-shadow(0 0 6px rgba(0, 245, 160, 0.2))' 
+              filter: darkMode
+                ? 'brightness(1.1) contrast(1.05) drop-shadow(0 0 6px rgba(0, 245, 160, 0.2))'
                 : 'none'
             }}
           />
@@ -219,7 +219,7 @@ function Loader({ onFinished, darkMode }) {
       </div>
 
       {/* Progress & Log Text Container */}
-      <div 
+      <div
         style={{
           marginTop: '2.5rem',
           display: 'flex',
@@ -230,7 +230,7 @@ function Loader({ onFinished, darkMode }) {
         }}
       >
         {/* Glowing Percentage Counter */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           style={{
@@ -245,7 +245,7 @@ function Loader({ onFinished, darkMode }) {
         </motion.div>
 
         {/* Phrase / Terminal log message */}
-        <div 
+        <div
           style={{
             fontSize: '0.75rem',
             color: darkMode ? '#94a3b8' : '#64748b',
@@ -261,14 +261,14 @@ function Loader({ onFinished, darkMode }) {
         >
           <span style={{ color: activeColor, fontWeight: 700 }}>&gt;</span>
           <span>{phrase}</span>
-          <span 
-            style={{ 
-              width: '6px', 
-              height: '12px', 
-              background: activeColor, 
+          <span
+            style={{
+              width: '6px',
+              height: '12px',
+              background: activeColor,
               display: 'inline-block',
-              animation: 'blink 0.8s infinite step-end' 
-            }} 
+              animation: 'blink 0.8s infinite step-end'
+            }}
           />
         </div>
       </div>
