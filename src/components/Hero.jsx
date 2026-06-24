@@ -43,7 +43,7 @@ function useTyping(texts, speed, pause) {
   return display;
 }
 
-function Hero({ darkMode, bookMode = false }) {
+function Hero({ darkMode, bookMode = false, hidePhoto = false }) {
   var [visible, setVisible] = useState(false);
   var [isMobile, setIsMobile] = useState(window.innerWidth <= 992);
   var [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -401,7 +401,9 @@ function Hero({ darkMode, bookMode = false }) {
               border: `2px dashed ${primaryColor}50`,
               animation: 'rotate-slow 15s linear infinite',
               pointerEvents: 'none',
-              zIndex: 1
+              zIndex: 1,
+              opacity: hidePhoto ? 0 : 1,
+              transition: 'opacity 0.3s ease',
             }} />
 
             {/* Rotating Cyber Ring 2 - Solid/Gradient Accent */}
@@ -415,21 +417,28 @@ function Hero({ darkMode, bookMode = false }) {
               borderRightColor: 'transparent',
               animation: 'rotate-reverse 12s linear infinite',
               pointerEvents: 'none',
-              zIndex: 1
+              zIndex: 1,
+              opacity: hidePhoto ? 0 : 1,
+              transition: 'opacity 0.3s ease',
             }} />
 
             {/* Core Profile Photo Frame */}
-            <div style={{
-              width: isMobile ? '190px' : '280px',
-              height: isMobile ? '190px' : '280px',
-              borderRadius: '50%',
-              overflow: 'hidden',
-              border: `4px solid ${darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'}`,
-              boxShadow: '0 20px 45px -10px rgba(0,0,0,0.5)',
-              zIndex: 10,
-              background: darkMode ? '#111' : '#fff',
-              position: 'relative'
-            }}>
+            <div 
+              id="hero-photo-placeholder"
+              style={{
+                width: isMobile ? '190px' : '280px',
+                height: isMobile ? '190px' : '280px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                border: `4px solid ${darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'}`,
+                boxShadow: '0 20px 45px -10px rgba(0,0,0,0.5)',
+                zIndex: 10,
+                background: darkMode ? '#111' : '#fff',
+                position: 'relative',
+                opacity: hidePhoto ? 0 : 1,
+                transition: 'opacity 0.3s ease',
+              }}
+            >
               <img
                 src={profilePhoto}
                 alt="Sujeet Vishwakarma"

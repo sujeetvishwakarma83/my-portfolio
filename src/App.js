@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; // ✅ Naya import Modal Animation ke liye
 import './App.css';
 
@@ -34,6 +34,9 @@ function App() {
   const [scrollMode, setScrollMode] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [photoState, setPhotoState] = useState('hero'); // 'hero', 'animating', 'about'
+  const coordsRef = useRef({ hero: null, about: null, endScroll: null });
+
   useEffect(() => {
     const handleScroll = () => {
       setShowTop(window.scrollY > 400);
@@ -51,6 +54,108 @@ function App() {
     return () => window.removeEventListener('open-profile-modal', openModal);
   }, []);
 
+  // Scroll animation coordinator for the profile photo
+  useEffect(() => {
+    if (!scrollMode || isLoading) return;
+
+    let ticked = false;
+    const handleScroll = () => {
+      if (!ticked) {
+        requestAnimationFrame(() => {
+          const S = window.scrollY || document.documentElement.scrollTop;
+
+          const heroEl = document.getElementById('hero-photo-placeholder');
+          const aboutEl = document.getElementById('about-photo-placeholder');
+          
+          if (!heroEl || !aboutEl) {
+            ticked = false;
+            return;
+          }
+
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+          const heroRect = heroEl.getBoundingClientRect();
+          const aboutRect = aboutEl.getBoundingClientRect();
+
+          const hero = {
+            top: heroRect.top + scrollTop,
+            left: heroRect.left + scrollLeft,
+            width: heroRect.width,
+            height: heroRect.height,
+          };
+
+          const about = {
+            top: aboutRect.top + scrollTop,
+            left: aboutRect.left + scrollLeft,
+            width: aboutRect.width,
+            height: aboutRect.height,
+          };
+
+          // Calculate center scroll positions
+          const S_hero_center = Math.max(0, hero.top - (window.innerHeight - hero.height) / 2);
+          const S_about_center = about.top - (window.innerHeight - about.height) / 2;
+          const range = S_about_center - S_hero_center;
+
+          const floatEl = document.getElementById('floating-scroll-photo');
+
+          if (range <= 0 || S <= 0 || S <= S_hero_center) {
+            setPhotoState('hero');
+            if (floatEl) floatEl.style.display = 'none';
+          } else if (S >= S_about_center) {
+            setPhotoState('about');
+            if (floatEl) floatEl.style.display = 'none';
+          } else {
+            setPhotoState('animating');
+            const percent = Math.min(Math.max((S - S_hero_center) / range, 0), 1);
+
+            const top = hero.top + (about.top - hero.top) * percent;
+            const left = hero.left + (about.left - hero.left) * percent;
+            const width = hero.width + (about.width - hero.width) * percent;
+            const height = hero.height + (about.height - hero.height) * percent;
+            
+            // Interpolate border-radius from circle (width/2) to rectangle (16px)
+            const radius = (hero.width / 2) + (16 - (hero.width / 2)) * percent;
+            
+            // Interpolate border
+            const borderWidth = 4 + (1 - 4) * percent;
+            const borderOpacity = 0.08 + (0.05 - 0.08) * percent;
+            const borderColor = darkMode 
+              ? `rgba(255, 255, 255, ${borderOpacity})` 
+              : `rgba(0, 0, 0, ${borderOpacity})`;
+
+            // Interpolate shadow
+            const shadowOpacity = 0.5 * (1 - percent);
+
+            if (floatEl) {
+              floatEl.style.display = 'block';
+              floatEl.style.top = `${top}px`;
+              floatEl.style.left = `${left}px`;
+              floatEl.style.width = `${width}px`;
+              floatEl.style.height = `${height}px`;
+              floatEl.style.borderRadius = `${radius}px`;
+              floatEl.style.border = `${borderWidth}px solid ${borderColor}`;
+              floatEl.style.boxShadow = `0 ${20 * (1 - percent)}px ${45 * (1 - percent)}px -${10 * (1 - percent)}px rgba(0,0,0,${shadowOpacity})`;
+            }
+          }
+          ticked = false;
+        });
+        ticked = true;
+      }
+    };
+
+    // Run once initially to set the correct state
+    handleScroll();
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [scrollMode, isLoading, darkMode]);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -63,6 +168,7 @@ function App() {
         color: darkMode ? '#e8e8f0' : '#1a1a2e',
         minHeight: '100vh',
         transition: 'background 0.3s, color 0.3s',
+        position: 'relative',
       }}
     >
       <AnimatePresence>
@@ -81,8 +187,36 @@ function App() {
           <ShareButton darkMode={darkMode} />
 
           <Navbar darkMode={darkMode} setDarkMode={setDarkMode} onToggleBookMode={() => setScrollMode(false)} />
-          <Hero darkMode={darkMode} />
-          <About darkMode={darkMode} />
+          
+          {/* Scroll floating photo overlay */}
+          {scrollMode && (
+            <div
+              id="floating-scroll-photo"
+              style={{
+                position: 'absolute',
+                pointerEvents: 'none',
+                zIndex: 99,
+                display: 'none',
+                overflow: 'hidden',
+                background: darkMode ? '#111' : '#fff',
+                willChange: 'transform, top, left, width, height, border-radius',
+              }}
+            >
+              <img
+                src={profilePic}
+                alt="Floating Profile"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'top',
+                }}
+              />
+            </div>
+          )}
+
+          <Hero darkMode={darkMode} hidePhoto={photoState !== 'hero'} />
+          <About darkMode={darkMode} hidePhoto={photoState !== 'about'} />
           <Services darkMode={darkMode} /> 
           <Skills darkMode={darkMode} />
           <Education darkMode={darkMode} />

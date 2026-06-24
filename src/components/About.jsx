@@ -42,7 +42,7 @@ function AIStreamText({ content, visible, delayOffset }) {
   );
 }
 
-function About({ darkMode, bookMode = false, aboutPart = null }) {
+function About({ darkMode, bookMode = false, aboutPart = null, hidePhoto = false }) {
   var [visible, setVisible] = useState(false);
   var [imgHovered, setImgHovered] = useState(false);
   var [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -262,11 +262,12 @@ function About({ darkMode, bookMode = false, aboutPart = null }) {
                 background: 'linear-gradient(135deg, #00F5A0, #7C3AED)',
                 borderRadius: '20px',
                 filter: 'blur(15px)',
-                opacity: imgHovered ? 0.6 : 0.2,
+                opacity: hidePhoto ? 0 : (imgHovered ? 0.6 : 0.2),
                 transition: 'opacity 0.4s ease'
               }} />
 
               <div
+                id="about-photo-placeholder"
                 onMouseEnter={function() { setImgHovered(true); }}
                 onMouseLeave={function() { setImgHovered(false); }}
                 style={{
@@ -277,7 +278,9 @@ function About({ darkMode, bookMode = false, aboutPart = null }) {
                   overflow: 'hidden',
                   border: glassBorder,
                   zIndex: 2,
-                  background: darkMode ? '#111' : '#fff'
+                  background: darkMode ? '#111' : '#fff',
+                  opacity: hidePhoto ? 0 : 1,
+                  transition: 'opacity 0.3s ease'
                 }}
               >
                 <img
@@ -306,7 +309,9 @@ function About({ darkMode, bookMode = false, aboutPart = null }) {
                 alignItems: 'center',
                 gap: '8px',
                 zIndex: 3,
-                boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2)'
+                boxShadow: '0 10px 20px -5px rgba(0,0,0,0.2)',
+                opacity: hidePhoto ? 0 : 1,
+                transition: 'opacity 0.3s ease'
               }}>
                 <span style={{
                   width: '10px', height: '10px',
