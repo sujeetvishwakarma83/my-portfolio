@@ -28,36 +28,34 @@ const projectsData = [
     title: 'Vishwakarma Furniture (E-Commerce)',
     problem: 'Manual inventory tracking and limited local reach.',
     solution: 'Engineered a scalable MERN stack storefront with real-time cart functionality, secure checkout, and dynamic product management.',
-    tags: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'Google Auth', 'Payment Integration'], // ✅ Added new tags
+    tags: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'Google Auth', 'Payment Integration'],
     link: 'https://my-shop-two-theta.vercel.app/',
-    github: 'https://github.com/sujeetvishwakarma83/my-shop', // ✅ Real Repo Link
+    github: 'https://github.com/sujeetvishwakarma83/my-shop',
     image: '/projects/ecommerce.jpg',
     rating: 4.9,
     reviews: 124
   },
   {
     num: '02',
-    title: 'Student Management System',
-    problem: 'Paper-based records were slow to retrieve and hard to manage.',
-    solution: 'Developed a secure CRUD application with role-based authentication, enabling fast data retrieval and responsive dashboard management.',
-    tags: ['PHP', 'MySQL', 'JavaScript'],
-    link: 'https://student-management.infinityfreeapp.com/index.php', 
-    github: 'https://github.com/sujeetvishwakarma83/student-management-system', // ✅ Real Repo Link
-    image: '/projects/sms.jpg',
-    demoId: 'admin',
-    demoPass: 'admin123',
-    rating: 4.7,
-    reviews: 89
+    title: 'AI-Powered Lead Booking & Support Automation',
+    problem: 'Manual lead qualification and 24/7 client communication bottlenecks.',
+    solution: 'Developed an automated lead capture and qualification workflow using n8n/Make, OpenAI API, and Google Sheets, reducing manual workload by 80%.',
+    tags: ['n8n / Make.com', 'OpenAI API', 'Google Sheets API', 'Webhooks', 'CRM Integration'],
+    link: '#', 
+    github: '#',
+    image: '/projects/automation.jpg',
+    rating: 4.9,
+    reviews: 94
   },
   {
-    num: '03', // ✅ Bank system replaced with Portfolio
+    num: '03',
     title: 'Personal Portfolio Platform',
     problem: 'Needed a high-performance, interactive digital space to showcase projects and technical skills.',
     solution: 'Designed and developed a fully responsive MERN stack portfolio featuring smooth animations, dynamic data rendering, and a premium UI.',
     tags: ['MongoDB', 'Express.js', 'React.js', 'Node.js', 'Framer Motion'],
     link: 'https://my-portfolio-one-ochre-45.vercel.app/', 
-    github: '#', // Agar iska bhi github link dena ho toh yahan replace kar dena
-    image: '/projects/portfolio.jpg', // Portfolio ki image apne public folder me daal lena
+    github: '#',
+    image: '/projects/portfolio.jpg',
     rating: 4.8,
     reviews: 56
   },

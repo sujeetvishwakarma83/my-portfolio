@@ -101,10 +101,10 @@ const Education = ({ darkMode, bookMode = false, itemIndex = null }) => {
   const timelineData = [
     {
       type: "experience",
-      title: "Freelance Full Stack Developer",
+      title: "Freelance MERN & AI Automation Developer",
       subtitle: "Self-Employed / Independent",
       year: "2024 - Present",
-      description: "Developing scalable digital solutions. Built and launched production-ready applications including Vishwakarma Furniture (MERN E-commerce) and secure Management Systems using PHP/MySQL.",
+      description: "Developing scalable digital solutions and automated business workflows. Built and launched production-ready MERN applications, integrated OpenAI APIs, and engineered n8n/Make automation pipelines.",
       icon: <Briefcase size={20} />,
       color: "#7C3AED" // Purple for Experience
     },

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Layout, Server, Database, Lightbulb } from 'lucide-react';
+import { Layout, Server, Database, Lightbulb, Cpu, Bot } from 'lucide-react';
 
 // ✅ Aapke Custom SVG Icons
 const HtmlIcon = () => (
@@ -43,9 +43,19 @@ const skillCategories = [
     icon: <Server size={24} color="#7C3AED" />,
     color: "#7C3AED",
     skills: [
-      { icon: <PhpIcon />, name: 'PHP', tag: 'Core Backend' },
+      { icon: <PhpIcon />, name: 'PHP & MySQL', tag: 'Core Backend' },
       { icon: <Server size={20} />, name: 'Node.js', tag: 'MERN Stack' },
       { icon: <Layout size={20} />, name: 'Express.js', tag: 'API Design' }
+    ]
+  },
+  {
+    title: "AI & Automation",
+    icon: <Cpu size={24} color="#f59e0b" />,
+    color: "#f59e0b",
+    skills: [
+      { icon: <Lightbulb size={20} />, name: 'n8n / Make.com', tag: 'Workflows' },
+      { icon: <Cpu size={20} />, name: 'OpenAI API', tag: 'LLM Integration' },
+      { icon: <Bot size={20} />, name: 'Chatbot Dev', tag: 'Conversational' }
     ]
   },
   {
@@ -54,16 +64,7 @@ const skillCategories = [
     color: "#38bdf8",
     skills: [
       { icon: <Database size={20} />, name: 'MongoDB', tag: 'NoSQL' },
-      { icon: <Database size={20} />, name: 'MySQL', tag: 'Relational' },
-      { icon: <GitIcon />, name: 'Git & GitHub', tag: 'Version Control' }
-    ]
-  },
-  {
-    title: "Emerging Tech",
-    icon: <Lightbulb size={24} color="#f59e0b" />,
-    color: "#f59e0b",
-    skills: [
-      { icon: <MlIcon />, name: 'Machine Learning', tag: 'Exploring' },
+      { icon: <GitIcon />, name: 'Git & GitHub', tag: 'Version Control' },
       { icon: <Server size={20} />, name: 'Cloud Deployment', tag: 'AWS / Vercel' }
     ]
   }

@@ -6,7 +6,7 @@ function ShareButton({ darkMode }) {
 
   // Enter your portfolio URL here — update it after deployment.
   var portfolioUrl = window.location.href;
-  var portfolioDesc = 'Check out my portfolio! MCA student, Full Stack Developer. Available for freelance & internship.';
+  var portfolioDesc = 'Check out my portfolio! Full Stack MERN Developer & AI Automation Specialist. Available for freelance & automation solutions.';
 
   var shareLinks = [
     {

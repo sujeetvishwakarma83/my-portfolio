@@ -8,7 +8,7 @@ const reasonsData = [
     id: 1,
     icon: <Target size={32} />,
     title: "Business-First Approach",
-    description: "I don't just write code; I build solutions. Every feature I develop is aimed at solving your specific business problems, increasing ROI, and improving user engagement."
+    description: "I don't just write code; I build solutions. Every feature and automation workflow I develop is aimed at solving your specific business bottlenecks and increasing ROI."
   },
   {
     id: 2,
@@ -19,14 +19,14 @@ const reasonsData = [
   {
     id: 3,
     icon: <Code2 size={32} />,
-    title: "Clean & Scalable Architecture",
-    description: "Using the robust MERN stack and PHP, I deliver clean, well-documented, and modular code that is easy to maintain and scale as your business grows."
+    title: "MERN & AI Automation Expertise",
+    description: "I build robust, high-performance web applications using the MERN stack alongside smart AI automation workflows (Make/n8n/APIs) that optimize operations."
   },
   {
     id: 4,
     icon: <ShieldCheck size={32} />,
     title: "Reliable Post-Launch Support",
-    description: "My responsibility doesn't end at delivery. I provide dedicated post-launch support and bug-fixing to ensure your digital product runs flawlessly in the real world."
+    description: "My responsibility doesn't end at delivery. I provide dedicated post-launch support and optimization to ensure your digital tools and workflows run flawlessly."
   }
 ];
 

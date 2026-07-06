@@ -13,7 +13,7 @@ const testimonialsData = [
   {
     name: 'Priya Patel',
     role: 'Founder, EdTech Solutions',
-    text: 'The Student Management System Sujeet built is lightning fast, secure, and extremely easy to use. He has an excellent grasp of database architecture and API design.',
+    text: 'Sujeet automated our entire lead management and student onboarding workflow using n8n and OpenAI. It saved our team 25+ hours every week and works flawlessly!',
     rating: 5,
     avatarColor: '#7C3AED'
   },

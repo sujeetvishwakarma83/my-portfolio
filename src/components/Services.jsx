@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Monitor, ShoppingBag, Zap, ShieldCheck, ArrowRight, MessageSquare, PenTool, Code, CheckCircle } from 'lucide-react';
+import { Monitor, ShoppingBag, Zap, ShieldCheck, ArrowRight, MessageSquare, PenTool, Code, CheckCircle, Cpu, Bot } from 'lucide-react';
 import { use3DTilt } from '../hooks/use3DTilt';
 
 function ServiceCard({ service, index, visible, darkMode, isMobile, highlightColor, secondaryColor, glassBg, glassBorder, cardHoverBg, textColor, titleColor, bookMode = false }) {
@@ -128,29 +128,29 @@ function Services({ darkMode, bookMode = false }) {
       id: 1,
       icon: <Monitor size={32} color={highlightColor} />,
       title: 'Custom Web Applications',
-      description: 'Scalable and robust web apps tailored to your specific business logic using the MERN stack and PHP.',
-      features: ['Dashboard Systems', 'Custom CRMs', 'API Development']
+      description: 'Scalable and robust web apps tailored to your specific business logic using the MERN stack and secure backends.',
+      features: ['Dashboard Systems', 'Custom CRMs', 'API Integrations']
     },
     {
       id: 2,
-      icon: <ShoppingBag size={32} color={secondaryColor} />,
-      title: 'E-Commerce Solutions',
-      description: 'High-converting, secure, and easy-to-manage online stores that turn visitors into loyal customers.',
-      features: ['Payment Gateways', 'Inventory Management', 'User-Friendly Checkout']
+      icon: <Cpu size={32} color={secondaryColor} />,
+      title: 'AI Automation & Workflows',
+      description: 'Streamline repetitive processes by integrating tools like Google Sheets, Gmail, and CRMs using Make.com and n8n.',
+      features: ['Workflow Automation', 'Lead Routing Systems', 'Data Integration & Sync']
     },
     {
       id: 3,
-      icon: <Zap size={32} color="#38bdf8" />,
-      title: 'Business Websites',
-      description: 'Professional, SEO-optimized digital identities designed to generate leads and build brand trust.',
-      features: ['Responsive Design', 'SEO Optimization', 'Fast Loading']
+      icon: <Bot size={32} color="#38bdf8" />,
+      title: 'Intelligent AI Chatbots',
+      description: 'Automate customer support, qualification, and scheduling 24/7 with custom OpenAI API integrations.',
+      features: ['OpenAI Integration', 'Automated Lead Qualification', 'Smart Support Bots']
     },
     {
       id: 4,
-      icon: <ShieldCheck size={32} color="#f59e0b" />,
-      title: 'Performance & Security',
-      description: 'Auditing and upgrading existing websites for lightning-fast speeds and bulletproof security.',
-      features: ['Core Web Vitals', 'Cloud Deployment', 'Data Protection']
+      icon: <Zap size={32} color="#f59e0b" />,
+      title: 'Premium Business Websites',
+      description: 'High-performance, SEO-optimized websites designed to convert visitors and establish authority.',
+      features: ['Responsive Layouts', 'SEO & Speed Optimization', 'Lead Capture Forms']
     }
   ];
 

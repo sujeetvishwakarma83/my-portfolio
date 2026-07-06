@@ -105,7 +105,7 @@ function About({ darkMode, bookMode = false, aboutPart = null, hidePhoto = false
     { num: '3+', label: 'Years Experience' },
   ];
 
-  var badges = ['React.js', 'Node.js', 'MongoDB', 'Express.js', 'PHP', 'MySQL', 'Tailwind'];
+  var badges = ['React.js', 'Node.js', 'MongoDB', 'Express.js', 'AI Automation', 'n8n / Make.com', 'OpenAI API', 'PHP', 'MySQL', 'Tailwind'];
 
   // Theme Variables
   var sectionBg = 'transparent';
@@ -125,6 +125,12 @@ function About({ darkMode, bookMode = false, aboutPart = null, hidePhoto = false
     lineHeight: bookMode ? 1.5 : 1.8,
     marginBottom: bookMode ? '0.75rem' : '1.25rem',
     textAlign: 'justify',
+  };
+
+  var aiHighlightStyle = {
+    color: highlightColor,
+    fontWeight: 800,
+    textShadow: darkMode ? '0 0 10px rgba(0, 245, 160, 0.4)' : '0 0 5px rgba(0, 168, 107, 0.2)',
   };
 
   return (
@@ -297,15 +303,19 @@ function About({ darkMode, bookMode = false, aboutPart = null, hidePhoto = false
             {(aboutPart === 1 || aboutPart === null) && (
               <>
                 <p style={paraStyle}>
-                  Hello! I'm <span style={{ color: highlightColor, fontWeight: 700 }}>Sujeet Vishwakarma</span>, a Full Stack Developer based in Jaunpur, Uttar Pradesh. I bridge the gap between complex technical architecture and seamless user experiences.
+                  Hello! I'm <span style={{ color: highlightColor, fontWeight: 700 }}>Sujeet Vishwakarma</span>, a <span style={aiHighlightStyle}>Full Stack MERN Developer & AI Automation Specialist</span> helping businesses save time, reduce manual work, and grow through intelligent digital solutions.
                 </p>
                 
                 <p style={paraStyle}>
-                  With a solid foundation in BCA and MCA, I don't just write code—I engineer solutions that help businesses grow. Whether it's building a fast, scalable web application using the <span style={{ color: titleColor, fontWeight: 700 }}>MERN stack</span> or developing reliable backend systems with <span style={{ color: titleColor, fontWeight: 700 }}>PHP</span>, my focus is always on delivering secure and high-performance digital assets.
+                  I build modern, high-performance websites and <span style={aiHighlightStyle}>custom AI-powered systems</span> that automate repetitive business processes. From <span style={{ color: titleColor, fontWeight: 700 }}>lead generation</span> and <span style={{ color: titleColor, fontWeight: 700 }}>appointment booking</span> to <span style={aiHighlightStyle}>customer support, CRM workflows</span>, and business operations, I create solutions that improve efficiency while delivering an exceptional user experience.
                 </p>
                 
                 <p style={paraStyle}>
-                  My approach is simple: I listen to your business requirements, design the optimal technical architecture, and deliver clean, scalable solutions on time. I am actively available for freelance projects and remote collaborations.
+                  My approach is simple—understand your business, identify bottlenecks, and build scalable solutions that generate real business value. Every project is developed with <span style={{ color: titleColor, fontWeight: 700 }}>clean architecture</span>, performance, security, and long-term scalability in mind.
+                </p>
+                
+                <p style={paraStyle}>
+                  Whether you need a premium business website, an <span style={aiHighlightStyle}>AI automation workflow</span>, or a complete custom web application, my goal is to deliver solutions that help your business operate <span style={aiHighlightStyle}>smarter—not harder</span>.
                 </p>
               </>
             )}

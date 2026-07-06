@@ -69,8 +69,8 @@ function Hero({ darkMode, bookMode = false, hidePhoto = false }) {
 
   var typedDesc = useTyping(
     [
-      'Full Stack Developer',
-      'MERN Stack Developer',
+      'Full Stack MERN Developer',
+      'AI Automation Specialist',
       'React Developer',
       'Freelance Developer'
     ],
@@ -323,7 +323,7 @@ function Hero({ darkMode, bookMode = false, hidePhoto = false }) {
           </div>
 
           <h1 style={h1Style}>
-            Building Modern Websites That Help Businesses <span style={gradientTextStyle}>Grow</span>
+            Building <span style={gradientTextStyle}>AI-Powered Web Apps</span> & Automations That Scale
           </h1>
 
           <div style={typedLineStyle}>
@@ -333,7 +333,7 @@ function Hero({ darkMode, bookMode = false, hidePhoto = false }) {
           </div>
 
           <p style={descStyle}>
-            I help businesses build modern, responsive, and scalable websites and web applications. From startups to local services, I craft high-performance digital solutions that elevate online presence.
+            I help businesses build modern, high-performance web applications and custom AI-powered automation systems that save time, reduce manual work, and drive business growth.
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', width: '100%', marginBottom: '2.5rem' }}>
@@ -363,7 +363,7 @@ function Hero({ darkMode, bookMode = false, hidePhoto = false }) {
               Tech Stack
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-              {['React.js', 'Node.js', 'MongoDB', 'PHP/MySQL', 'Tailwind CSS', 'AWS', 'REST APIs'].map((tech, i) => (
+              {['React.js', 'Node.js', 'MongoDB', 'AI Automation', 'n8n / Make.com', 'OpenAI API', 'Tailwind CSS'].map((tech, i) => (
                 <span key={i} className="tech-pill" style={pillStyle}>
                   {tech}
                 </span>
