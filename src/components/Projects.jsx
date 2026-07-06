@@ -31,7 +31,7 @@ const projectsData = [
     tags: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'Google Auth', 'Payment Integration'], // ✅ Added new tags
     link: 'https://my-shop-two-theta.vercel.app/',
     github: 'https://github.com/sujeetvishwakarma83/my-shop', // ✅ Real Repo Link
-    image: '/projects/ecommerce.png',
+    image: '/projects/ecommerce.jpg',
     rating: 4.9,
     reviews: 124
   },
@@ -43,7 +43,7 @@ const projectsData = [
     tags: ['PHP', 'MySQL', 'JavaScript'],
     link: 'https://student-management.infinityfreeapp.com/index.php', 
     github: 'https://github.com/sujeetvishwakarma83/student-management-system', // ✅ Real Repo Link
-    image: '/projects/sms.png',
+    image: '/projects/sms.jpg',
     demoId: 'admin',
     demoPass: 'admin123',
     rating: 4.7,
@@ -57,19 +57,19 @@ const projectsData = [
     tags: ['MongoDB', 'Express.js', 'React.js', 'Node.js', 'Framer Motion'],
     link: 'https://my-portfolio-one-ochre-45.vercel.app/', 
     github: '#', // Agar iska bhi github link dena ho toh yahan replace kar dena
-    image: '/projects/portfolio.png', // Portfolio ki image apne public folder me daal lena
+    image: '/projects/portfolio.jpg', // Portfolio ki image apne public folder me daal lena
     rating: 4.8,
     reviews: 56
   },
   {
     num: '04',
     title: 'Premium Fine-Dining Platform',
-    problem: 'High-end dining establishments need a digital experience that reflects their exclusivity, craftsmanship, and hospitality standards.',
+    problem: 'High-end dining establishments need a digital experience that reflects their hospitality standards.',
     solution: 'Created a sophisticated fine-dining platform with modern UI/UX, interactive gastronomy showcases, responsive layouts, premium branding, and optimized booking flows to elevate the online guest experience.',
     tags: ['React.js', 'Tailwind CSS', 'JavaScript', 'Framer Motion', 'GSAP', 'Responsive Design'],
     link: 'https://restaurant-demo-sable.vercel.app/', 
     github: 'https://github.com/sujeetvishwakarma83/restaurant-demo',
-    image: '/projects/restaurant.png',
+    image: '/projects/restaurant.jpg',
     rating: 4.9,
     reviews: 86
   },

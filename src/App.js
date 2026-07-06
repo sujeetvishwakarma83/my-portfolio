@@ -1,26 +1,27 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; // ✅ Naya import Modal Animation ke liye
 import './App.css';
 
 import profilePic from './assets/profile.jpg'; // ✅ DP Popup ke liye import kiya
 
 import CustomCursor from './components/CustomCursor';
-import ShareButton from './components/ShareButton';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
-import Services from './components/Services';
-import Skills from './components/Skills';
-import Education from './components/Education';
-import Projects from './components/Projects';
-import WhyHireMe from './components/WhyHireMe';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
 import Background3D from './components/Background3D';
-
-import BookPortfolio from './components/BookPortfolio';
-import Testimonials from './components/Testimonials';
 import Loader from './components/Loader';
+
+// Lazy loaded components for code splitting & speed optimization
+const ShareButton = lazy(() => import('./components/ShareButton'));
+const Services = lazy(() => import('./components/Services'));
+const Skills = lazy(() => import('./components/Skills'));
+const Education = lazy(() => import('./components/Education'));
+const Projects = lazy(() => import('./components/Projects'));
+const WhyHireMe = lazy(() => import('./components/WhyHireMe'));
+const Testimonials = lazy(() => import('./components/Testimonials'));
+const Contact = lazy(() => import('./components/Contact'));
+const Footer = lazy(() => import('./components/Footer'));
+const BookPortfolio = lazy(() => import('./components/BookPortfolio'));
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
@@ -180,11 +181,31 @@ function App() {
       <CustomCursor />
 
       {!scrollMode ? (
-        <BookPortfolio darkMode={darkMode} onToggleScrollMode={() => setScrollMode(true)} />
+        <Suspense fallback={
+          <div style={{
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: '"Space Mono", monospace',
+            background: darkMode ? '#030712' : '#F8FAFC',
+            color: darkMode ? '#e8e8f0' : '#1a1a2e'
+          }}>
+            <div style={{ fontSize: '1.2rem', marginBottom: '1rem', color: '#00f5a0' }}>Loading Book View...</div>
+            <div style={{ width: '40px', height: '40px', border: '3px solid rgba(0,245,160,0.2)', borderTopColor: '#00f5a0', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+            <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
+          </div>
+        }>
+          <BookPortfolio darkMode={darkMode} onToggleScrollMode={() => setScrollMode(true)} />
+        </Suspense>
       ) : (
         <>
           <Background3D darkMode={darkMode} />
-          <ShareButton darkMode={darkMode} />
+          
+          <Suspense fallback={null}>
+            <ShareButton darkMode={darkMode} />
+          </Suspense>
 
           <Navbar darkMode={darkMode} setDarkMode={setDarkMode} onToggleBookMode={() => setScrollMode(false)} />
           
@@ -217,14 +238,38 @@ function App() {
 
           <Hero darkMode={darkMode} hidePhoto={photoState !== 'hero'} />
           <About darkMode={darkMode} hidePhoto={photoState !== 'about'} />
-          <Services darkMode={darkMode} /> 
-          <Skills darkMode={darkMode} />
-          <Education darkMode={darkMode} />
-          <Projects darkMode={darkMode} />
-          <WhyHireMe darkMode={darkMode} />
-          <Testimonials darkMode={darkMode} />
-          <Contact darkMode={darkMode} />
-          <Footer darkMode={darkMode} />
+          
+          <Suspense fallback={<div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading Services...</div>}>
+            <Services darkMode={darkMode} /> 
+          </Suspense>
+          
+          <Suspense fallback={<div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading Skills...</div>}>
+            <Skills darkMode={darkMode} />
+          </Suspense>
+          
+          <Suspense fallback={<div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading Education...</div>}>
+            <Education darkMode={darkMode} />
+          </Suspense>
+          
+          <Suspense fallback={<div style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading Projects...</div>}>
+            <Projects darkMode={darkMode} />
+          </Suspense>
+          
+          <Suspense fallback={<div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading Why Hire Me...</div>}>
+            <WhyHireMe darkMode={darkMode} />
+          </Suspense>
+          
+          <Suspense fallback={<div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading Testimonials...</div>}>
+            <Testimonials darkMode={darkMode} />
+          </Suspense>
+          
+          <Suspense fallback={<div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading Contact...</div>}>
+            <Contact darkMode={darkMode} />
+          </Suspense>
+          
+          <Suspense fallback={null}>
+            <Footer darkMode={darkMode} />
+          </Suspense>
         </>
       )}
 

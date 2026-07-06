@@ -1,47 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import profilePhoto from '../assets/profile.jpg'; // Apni photo ka path verify kar lein
 
-// AI Streaming Text Helper Component
-function AIStreamText({ content, visible, delayOffset }) {
-  let globalWordIndex = 0;
-  
-  return (
-    <>
-      {content.map((segment, segmentIndex) => {
-        // Text ko words mein todna
-        const words = segment.text.split(" ").filter(w => w !== "");
-        
-        return words.map((word, wordIndex) => {
-          // Har word ka delay calculate karna (0.02s per word = Fast AI typing)
-          const delay = delayOffset + (globalWordIndex * 0.02);
-          globalWordIndex++;
-          
-          return (
-            <span key={`${segmentIndex}-${wordIndex}`}>
-              <span 
-                style={{
-                  opacity: visible ? 1 : 0,
-                  filter: visible ? 'blur(0px)' : 'blur(4px)', // AI jaisa reveal effect
-                  transform: visible ? 'translateY(0)' : 'translateY(2px)',
-                  transition: `all 0.15s ease-out ${delay}s`,
-                  color: segment.color || 'inherit',
-                  fontWeight: segment.fontWeight || 'inherit',
-                  display: 'inline-block',
-                  willChange: 'opacity, filter'
-                }}
-              >
-                {word}
-              </span>
-              {/* Space zaroori hai taaki 'justify' alignment perfectly kaam kare */}
-              {" "}
-            </span>
-          );
-        });
-      })}
-    </>
-  );
-}
-
 function About({ darkMode, bookMode = false, aboutPart = null, hidePhoto = false }) {
   var [visible, setVisible] = useState(false);
   var [imgHovered, setImgHovered] = useState(false);
@@ -338,39 +297,15 @@ function About({ darkMode, bookMode = false, aboutPart = null, hidePhoto = false
             {(aboutPart === 1 || aboutPart === null) && (
               <>
                 <p style={paraStyle}>
-                  <AIStreamText 
-                    visible={visible} 
-                    delayOffset={0.6} 
-                    content={[
-                      { text: "Hello! I'm" },
-                      { text: " Sujeet Vishwakarma,", color: highlightColor, fontWeight: 700 },
-                      { text: " a Full Stack Developer based in Jaunpur, Uttar Pradesh. I bridge the gap between complex technical architecture and seamless user experiences." }
-                    ]}
-                  />
+                  Hello! I'm <span style={{ color: highlightColor, fontWeight: 700 }}>Sujeet Vishwakarma</span>, a Full Stack Developer based in Jaunpur, Uttar Pradesh. I bridge the gap between complex technical architecture and seamless user experiences.
                 </p>
                 
                 <p style={paraStyle}>
-                  <AIStreamText 
-                    visible={visible} 
-                    delayOffset={1.2} 
-                    content={[
-                      { text: "With a solid foundation in BCA and MCA, I don't just write code—I engineer solutions that help businesses grow. Whether it's building a fast, scalable web application using the" },
-                      { text: " MERN stack", color: titleColor, fontWeight: 700 },
-                      { text: " or developing reliable backend systems with" },
-                      { text: " PHP,", color: titleColor, fontWeight: 700 },
-                      { text: " my focus is always on delivering secure and high-performance digital assets." }
-                    ]}
-                  />
+                  With a solid foundation in BCA and MCA, I don't just write code—I engineer solutions that help businesses grow. Whether it's building a fast, scalable web application using the <span style={{ color: titleColor, fontWeight: 700 }}>MERN stack</span> or developing reliable backend systems with <span style={{ color: titleColor, fontWeight: 700 }}>PHP</span>, my focus is always on delivering secure and high-performance digital assets.
                 </p>
                 
                 <p style={paraStyle}>
-                  <AIStreamText 
-                    visible={visible} 
-                    delayOffset={2.2} 
-                    content={[
-                      { text: "My approach is simple: I listen to your business requirements, design the optimal technical architecture, and deliver clean, scalable solutions on time. I am actively available for freelance projects and remote collaborations." }
-                    ]}
-                  />
+                  My approach is simple: I listen to your business requirements, design the optimal technical architecture, and deliver clean, scalable solutions on time. I am actively available for freelance projects and remote collaborations.
                 </p>
               </>
             )}
@@ -396,7 +331,7 @@ function About({ darkMode, bookMode = false, aboutPart = null, hidePhoto = false
                       letterSpacing: '0.05em',
                       opacity: visible ? 1 : 0,
                       transform: visible ? 'translateY(0)' : 'translateY(10px)',
-                      transition: aboutPart === 2 ? 'none' : `all 0.4s ease ${3.2 + (i * 0.1)}s` 
+                      transition: aboutPart === 2 ? 'none' : `all 0.4s ease ${0.2 + (i * 0.05)}s` 
                     }}>
                       {badge}
                     </span>
@@ -420,7 +355,7 @@ function About({ darkMode, bookMode = false, aboutPart = null, hidePhoto = false
                     <div key={stat.label} style={{
                       opacity: visible ? 1 : 0,
                       transform: visible ? 'translateY(0)' : 'translateY(15px)',
-                      transition: aboutPart === 2 ? 'none' : `all 0.5s ease ${3.5 + (i * 0.15)}s` 
+                      transition: aboutPart === 2 ? 'none' : `all 0.5s ease ${0.4 + (i * 0.08)}s` 
                     }}>
                       <div style={{
                         fontSize: bookMode ? '1.4rem' : (isMobile ? '1.8rem' : '2.2rem'),
